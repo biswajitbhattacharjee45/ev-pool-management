@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1e293b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pool EV" />
+  <title>⚡ Pool EV Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { margin: 0; background: #f0f4f8; font-family: "DM Sans", sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyBL78FannqRMAk9MMRQf6w3S2qSiZYao_E",
+      authDomain: "ev-pool-management.firebaseapp.com",
+      projectId: "ev-pool-management",
+      storageBucket: "ev-pool-management.firebasestorage.app",
+      messagingSenderId: "420704956913",
+      appId: "1:420704956913:web:30935786b294645680d450"
+    });
+    window.__db = firebase.firestore();
+  </script>
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect } = React;
+
+
+
+// ── AUTHORISED USERS DATABASE ─────────────────────────────────
+const AUTHORISED_USERS = [
+  { name: 'SANKALPA BORTHAKUR', pfId: '1000574', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Kaushik Das', pfId: '1007296', department: 'Funds Settlement Link Office' },
+  { name: 'PRIYANKA MEDHI', pfId: '1012809', department: 'Circle Complaint Resolution Centre' },
+  { name: 'SANJEEV BORO', pfId: '1015214', department: 'Circle Security Deptt' },
+  { name: 'JEENA DAIMARY', pfId: '1016896', department: 'WEALTH HUB' },
+  { name: 'DYUTOM DYUMON SAHA', pfId: '1022181', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'RAHUL RAUT', pfId: '1022227', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'ODELIA DARISHISHA SAWIAN', pfId: '1023198', department: 'Adminstration(LHO,GHY)' },
+  { name: 'BIRJU GAYARY', pfId: '1025451', department: 'WEALTH HUB' },
+  { name: 'ROSHAN DUTTA', pfId: '1025584', department: 'WEALTH HUB' },
+  { name: 'BIRKHANG BASUMATARY', pfId: '1025612', department: 'WEALTH HUB' },
+  { name: 'ROSY SUMI', pfId: '1025715', department: 'WEALTH HUB' },
+  { name: 'ANWARUL HAQUE LASKAR', pfId: '1025783', department: 'WEALTH HUB' },
+  { name: 'GULSHAN AHMED', pfId: '1025911', department: 'WEALTH HUB' },
+  { name: 'HIDANGMAYUM SARDHANA SHARMA', pfId: '1031768', department: 'Cust Experience Enhancement Deptt' },
+  { name: 'SWAPAN DAS', pfId: '1032899', department: 'Circle Security Deptt' },
+  { name: 'OBANG AO', pfId: '1032900', department: 'Circle Security Deptt' },
+  { name: 'PUSHPA THAPA', pfId: '1032901', department: 'Circle Security Deptt' },
+  { name: 'DILIP PRADHAN', pfId: '1032902', department: 'Circle Security Deptt' },
+  { name: 'MONALISA DAS', pfId: '1036223', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'ARJUN RAJ GHOSH', pfId: '1036231', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'DURGA DUTT THAKUR', pfId: '1038744', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Bandita Sarma', pfId: '1038762', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Sahil Jaiswal', pfId: '1038765', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'DEBKUMAR SEN', pfId: '1038919', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'MONALISA SAIKIA', pfId: '1038946', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'HIRAKJYOTI DEURI', pfId: '1038964', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'MUNNA TERON', pfId: '1038971', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'SUJIT BASFORE', pfId: '1043595', department: 'Adminstration(LHO,GHY)' },
+  { name: 'DAIBOKI KUMAR', pfId: '1047964', department: 'Adminstration(LHO,GHY)' },
+  { name: 'NIRAJ PATHAK', pfId: '1062852', department: 'Government Business Unit' },
+  { name: 'ANANYA DEBNATH', pfId: '1066168', department: 'WEALTH HUB' },
+  { name: 'IRENGBAM JIO SINGH', pfId: '1069068', department: 'Circle Security Deptt' },
+  { name: 'ARBAB KALAM', pfId: '1069175', department: 'Premises & Estate' },
+  { name: 'Ridul Saud', pfId: '1085133', department: 'Premises & Estate' },
+  { name: 'VICKEY ANAND', pfId: '1085150', department: 'Premises & Estate' },
+  { name: 'ANUBHAW CHOUDHARY', pfId: '1085155', department: 'Premises & Estate' },
+  { name: 'PARTHA BHOWMIK', pfId: '1319971', department: 'WEALTH HUB' },
+  { name: 'PINAK GUPTA', pfId: '1320715', department: 'RB&O-LHO-CIRCLE-CHANNEL MGMT & CUST SERV' },
+  { name: 'Sanjay Kumar Shaw', pfId: '1320872', department: 'WEALTH HUB' },
+  { name: 'MANASH PRATIM DEKA', pfId: '1320913', department: 'WEALTH HUB' },
+  { name: 'Chandan Jyoti Deka', pfId: '1320978', department: 'WEALTH HUB' },
+  { name: 'Rakesh Das', pfId: '1321154', department: 'WEALTH HUB' },
+  { name: 'Sruti Laxmi Choudhury', pfId: '1321155', department: 'WEALTH HUB' },
+  { name: 'PRADIP KUMAR ROY', pfId: '1321353', department: 'Account Traking Centre' },
+  { name: 'Diptanu Saha', pfId: '1321444', department: 'WEALTH HUB' },
+  { name: 'BISWAJIT DEBBARMA', pfId: '1321671', department: 'WEALTH HUB' },
+  { name: 'PRANJAL NATH', pfId: '1322082', department: 'WEALTH HUB' },
+  { name: 'LETKHONEH HAOKIP', pfId: '1322267', department: 'Lead Bank & RSETI' },
+  { name: 'TAPASH SEN', pfId: '1323787', department: 'Circle Complaint Resolution Centre' },
+  { name: 'SWAPAN KUMAR DEBNATH', pfId: '1323864', department: 'Circle Complaint Resolution Centre' },
+  { name: 'RAJIV NANDA', pfId: '1323872', department: 'Local head Office,Guwahat' },
+  { name: 'JOYDIP DEBNATH', pfId: '1330966', department: 'WEALTH HUB' },
+  { name: 'Ranjan Barthakur', pfId: '1330970', department: 'WEALTH HUB' },
+  { name: 'Sangeetha Bhaskar M', pfId: '2958252', department: 'Agri Bussiness Unit' },
+  { name: 'Deben Deka', pfId: '3183661', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Alois Daimari', pfId: '3189228', department: 'Disciplinary Proceeding D' },
+  { name: 'Deo Bahadur Bisukarma', pfId: '3195937', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Ajit Kalita', pfId: '3197808', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Pranab Kumar Paul', pfId: '3198421', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Pankaj Goswami', pfId: '3198863', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Bibhas Das', pfId: '3199479', department: 'Audit Department (BOD)' },
+  { name: 'Amaresh Kumar Jha', pfId: '3458415', department: 'GM Network -2( Guwahati)' },
+  { name: 'Pramod Kumar Singh', pfId: '3499766', department: 'Non Performing Asset' },
+  { name: 'Niranjan Baruah', pfId: '3600181', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Shyamal Kumar Hazarika', pfId: '3600424', department: 'Human Resources' },
+  { name: 'Dulal Roy', pfId: '3600726', department: 'Disciplinary Proceeding D' },
+  { name: 'Gurupada Halder', pfId: '3601161', department: 'Outreach' },
+  { name: 'Suren Kalita', pfId: '3602176', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Sujit Dey', pfId: '3602397', department: 'Public Relations & Comm.S' },
+  { name: 'Monoj Kumar Paul', pfId: '3603334', department: 'RISK' },
+  { name: 'Shyamanta Konwar', pfId: '3603903', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Monoj Sen', pfId: '3605175', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
+  { name: 'Dhanendra Nath Brahma', pfId: '3605205', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Ujjwal Sarmah', pfId: '3605728', department: 'Human Resources' },
+  { name: 'Biswajit Bhattacharjee', pfId: '3606643', department: 'Liaison' },
+  { name: 'Susanta Chakraborty', pfId: '3606651', department: 'IT Support Services' },
+  { name: 'Suren Regon', pfId: '3606813', department: 'Credit & Performance Monitoring' },
+  { name: 'Singh Nimai Mayanglambam', pfId: '3606880', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Nijananda Badir', pfId: '3606937', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Subhrangshu Dey', pfId: '3607259', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Monjoy Bohora', pfId: '3607542', department: 'AC OPERATIONS (AGM) NW-1' },
+  { name: 'Bikash Basumatary', pfId: '3610713', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
+  { name: 'Hiren Sarma', pfId: '3610845', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Ashok Kumar Ghosh', pfId: '3611191', department: 'Government Business Unit' },
+  { name: 'Mahendra Deka', pfId: '3611612', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Pabitra Nath Kakati', pfId: '3611655', department: 'PPG Department Guwahati' },
+  { name: 'Dibakar Chakraborty', pfId: '3611779', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Gunendra Kumar Barman', pfId: '3611787', department: 'Outreach' },
+  { name: 'Madan Gopal Goswami', pfId: '3612627', department: 'Premises & Estate' },
+  { name: 'Debananda Pao', pfId: '3612767', department: 'AGM INVESTIGATION LHO GUWAHATI' },
+  { name: 'Prodeep Saikia', pfId: '3613135', department: 'Cust Experience Enhancement Deptt' },
+  { name: 'Satyajit Chowdhury', pfId: '3613283', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Pinak Dutta', pfId: '3613445', department: 'Lead Bank & RSETI' },
+  { name: 'Rupak Bhowal', pfId: '3613623', department: 'Human Resources' },
+  { name: 'Ranendra Narzary', pfId: '3613666', department: 'PPG Department Guwahati' },
+  { name: 'Girindra Sarma', pfId: '3614131', department: 'MIS&BPM' },
+  { name: 'Sandip Bhattacharjee', pfId: '3614549', department: 'Human Resources' },
+  { name: 'Santanu Bhattacharjee', pfId: '3614891', department: 'RISK' },
+  { name: 'Prabin Hazuwary', pfId: '3614948', department: 'DIGITAL BANKING DEPARTMENT' },
+  { name: 'Kumud Chandra Boro', pfId: '3615405', department: 'Audit Department (BOD)' },
+  { name: 'Dipak Chandra Sarmah', pfId: '3615669', department: 'IT Support Services' },
+  { name: 'Amal Chandra Sarkar', pfId: '3615707', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Sujit Das', pfId: '3615715', department: 'RE & Retail Loans (DGM)' },
+  { name: 'Jogat Jibon Paul', pfId: '3616428', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
+  { name: 'Bijou Uddin Ahmed', pfId: '3616495', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Dhiraj Choudhury', pfId: '3617149', department: 'Disciplinary Proceeding D' },
+  { name: 'Abhijit Bhattacharjee', pfId: '3617394', department: 'Liaison' },
+  { name: 'Shyam Kumar Upadhaya', pfId: '3617750', department: 'Disciplinary Proceeding D' },
+  { name: 'Ratul Kumar Talukdar', pfId: '3617769', department: 'Human Resources' },
+  { name: 'Prabhat Rajkhowa', pfId: '3618005', department: 'Banking Ombudsman' },
+  { name: 'Alok Choudhury', pfId: '3618404', department: 'DIGITAL & eCOMMERCE' },
+  { name: 'Prasanta Paul', pfId: '3618552', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Rajesh Biswas', pfId: '3618749', department: 'Credit & Performance Monitoring' },
+  { name: 'Lalkholun Hangshing', pfId: '3618951', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Ashok Chakraborty', pfId: '3619214', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Alak Ranjan Paul', pfId: '3619435', department: 'Funds Settlement Link Office' },
+  { name: 'Mrinal Kumar Hazarika', pfId: '3619532', department: 'Human Resources' },
+  { name: 'Dibyendu Dhar', pfId: '3619818', department: 'DIGITAL & eCOMMERCE' },
+  { name: 'Pradip Mazumder', pfId: '3619885', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Rajib Bhagawati', pfId: '3620107', department: 'CGM  Secretariat' },
+  { name: 'Subodh Kumar Das', pfId: '3620190', department: 'Cust Experience Enhancement Deptt' },
+  { name: 'Jatin Kumar Boruah', pfId: '3620492', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Chandra Kanta Rabha', pfId: '3620816', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Piali Ghosh', pfId: '3620840', department: 'Retail Loan LHO Ghy' },
+  { name: 'Shamim Ahmed', pfId: '3621480', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Joy Ram Pait', pfId: '3621758', department: 'Lead Bank & RSETI' },
+  { name: 'H. Haukhanpau', pfId: '3622002', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Bijoy Kumar Saha', pfId: '3622789', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Narendra Nath Saha', pfId: '3623262', department: 'Non Performing Asset' },
+  { name: 'Abhijit Das', pfId: '3624390', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Uttam Das', pfId: '3624714', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Diganta Kumar Rabha', pfId: '3624994', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Sabita Kalita', pfId: '3625052', department: 'Premises & Estate' },
+  { name: 'Pijush Bora', pfId: '3625923', department: 'Audit Department (BOD)' },
+  { name: 'Hatneikim  Gangte Imsong', pfId: '3626083', department: 'Circle Complaint Resolution Centre' },
+  { name: 'Tapan Kumar Narzy', pfId: '3626334', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
+  { name: 'Benjamin Baglary', pfId: '3626377', department: 'Human Resources' },
+  { name: 'Bhabatosh Dutta', pfId: '3626652', department: 'RE & Retail Loans (DGM)' },
+  { name: 'Muhammad Salauddin Mansoori', pfId: '3626709', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Anirban Dutta', pfId: '3626806', department: 'I O R Department' },
+  { name: 'L P Lalchangkima', pfId: '3627276', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Papulal Harizan', pfId: '3627489', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Niren Das', pfId: '3627535', department: 'Funds Settlement Link Office' },
+  { name: 'Suraj Nath', pfId: '3627705', department: 'I O R Department' },
+  { name: 'Dadhi Charan Basumatary', pfId: '3628795', department: 'Network Credit Management' },
+  { name: 'Sohan Sarki', pfId: '3628973', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Sambhu Rajbangshi', pfId: '3629406', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Chanchal Chandra Paul', pfId: '3629627', department: 'RE & Retail Loans (DGM)' },
+  { name: 'Abhijit Das', pfId: '3629864', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Nandu Ram Sharma', pfId: '3630528', department: 'Human Resources' },
+  { name: 'Dandeswar Ray', pfId: '3630641', department: 'CGM  Secretariat' },
+  { name: 'Komanly Khongwar', pfId: '3630730', department: 'Account Traking Centre' },
+  { name: 'Odimenla Jamir', pfId: '3631400', department: 'CLIC' },
+  { name: 'Sanjib Sen', pfId: '3631893', department: 'Account Traking Centre' },
+  { name: 'Bimal Das', pfId: '3632008', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Anil Gharphalia', pfId: '3632245', department: 'Disciplinary Proceeding D' },
+  { name: 'Parag Roymedhi', pfId: '3632512', department: 'Premises & Estate' },
+  { name: 'Sushil Brahma', pfId: '3632598', department: 'IT Support Services' },
+  { name: 'Khamkhochinthang Hnunkhum Khuptong', pfId: '3633195', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'S.Chinlianthang Ngaihte', pfId: '3633276', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Besii Bosco Sani', pfId: '3633306', department: 'Circle Complaint Resolution Centre' },
+  { name: 'Theo Ayu Pao Paul', pfId: '3633373', department: 'PPG Department Guwahati' },
+  { name: 'Joy Chandra Chakma', pfId: '3633403', department: 'Lead Bank & RSETI' },
+  { name: 'Sita Kumari Basfore', pfId: '3633411', department: 'Outreach' },
+  { name: 'Uttam Kumar Saha', pfId: '3633454', department: 'Premises & Estate' },
+  { name: 'Plabon Borgohain', pfId: '3633535', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Sumangali Choudhury', pfId: '3634868', department: 'I O R Department' },
+  { name: 'Khaikhopao Haokip', pfId: '3635163', department: 'Outreach' },
+  { name: 'Maheswar Choudhury', pfId: '3635287', department: 'HR G.M (NW-I)' },
+  { name: 'Chandrajyoti Dowari', pfId: '3635295', department: 'SME AGRI ASSET QUALITY NW1' },
+  { name: 'Nilamoni Hazarika', pfId: '3635333', department: 'SME AGRI ASSET QUALITY NW1' },
+  { name: 'Bhabananda Talukdar', pfId: '3635368', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Sarat Chandra Haloi', pfId: '3635384', department: 'Adminstration(LHO,GHY)' },
+  { name: 'KC Vanlal Vena', pfId: '3635406', department: 'DIGITAL & eCOMMERCE' },
+  { name: 'Sarbari Debbarman', pfId: '3635457', department: 'WEALTH HUB' },
+  { name: 'Manawar Lyngdoh', pfId: '3635503', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Sanjib Swargiary', pfId: '3635538', department: 'Lead Bank & RSETI' },
+  { name: 'Santanu Buragohain', pfId: '3635562', department: 'Human Resources' },
+  { name: 'Rupam Roy', pfId: '3635619', department: 'PPG Department Guwahati' },
+  { name: 'Abinash Hembrom', pfId: '3635864', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
+  { name: 'C RAMDINSANGA', pfId: '3635880', department: 'Lead Bank & RSETI' },
+  { name: 'Munindra Upadhyaya', pfId: '3636127', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Pradip Malakar', pfId: '3636690', department: 'Outreach' },
+  { name: 'I Temjen Changkiri', pfId: '3636720', department: 'Human Resources' },
+  { name: 'Dhiraj Kumar Boro', pfId: '3636828', department: 'Circle Complaint Resolution Centre' },
+  { name: 'Pitambor Taye', pfId: '3636917', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Suraj Pradhan', pfId: '3637425', department: 'AC OPERATIONS (AGM) NW-2' },
+  { name: 'Moloy Kanti Paul', pfId: '3637557', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Manash Bhuyan', pfId: '3637646', department: 'Human Resources' },
+  { name: 'Nirmalendu Dhar', pfId: '3637913', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Mantu Das', pfId: '3638804', department: 'Human Resources' },
+  { name: 'David N Lhouvum', pfId: '3638987', department: 'AGM AGRI' },
+  { name: 'Pirbox Ali', pfId: '3639452', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Dharitri Deka', pfId: '3640604', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Prajnan Chaitanya Deka', pfId: '3641031', department: 'Law' },
+  { name: 'Lienkholal Gangte', pfId: '3641392', department: 'Outreach' },
+  { name: 'Ankur Pradhan', pfId: '3642186', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Bijoy Sarma', pfId: '3642577', department: 'Merchant Acquiring Business' },
+  { name: 'Partha Pratim Saikia', pfId: '3642712', department: 'Human Resources' },
+  { name: 'Kamal Debnath', pfId: '3643050', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Papan Kumar Das', pfId: '3643107', department: 'Liaison' },
+  { name: 'Daisy Baro', pfId: '3643727', department: 'Outreach' },
+  { name: 'Sujata Bhattacharjee', pfId: '3643867', department: 'Lead Bank & RSETI' },
+  { name: 'Chandamita Gogoi', pfId: '3643875', department: 'Small and Medium Enterpri' },
+  { name: 'Golap Hossain', pfId: '3643921', department: 'I O R Department' },
+  { name: 'Abu Toufique Miftasul Hussain', pfId: '3644170', department: 'CGM  Secretariat' },
+  { name: 'Ujjal Deka', pfId: '3644200', department: 'Premises & Estate' },
+  { name: 'Dibyajyoti Saikia', pfId: '3644367', department: 'Funds Settlement Link Office' },
+  { name: 'Puspita Nath', pfId: '3644480', department: 'AC OPERATIONS (AGM) NW-2' },
+  { name: 'Sudipto Bhattacharjee', pfId: '3644537', department: 'BOPM NW-I' },
+  { name: 'Leenabati Mutum', pfId: '3644960', department: 'PPG Department Guwahati' },
+  { name: 'Monica Dkhar', pfId: '3645266', department: 'AGM AGRI' },
+  { name: 'Jyoti Krishna Nath', pfId: '3645495', department: 'Human Resources' },
+  { name: 'Swaraj Hatibaruah', pfId: '3645649', department: 'Human Resources' },
+  { name: 'Hari Krishna Chetia', pfId: '3645657', department: 'Public Relations & Comm.S' },
+  { name: 'Papori Das Chakraborty', pfId: '3646181', department: 'PROJECT LOTUS' },
+  { name: 'Priyanka Phukan', pfId: '3646645', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Susanta Das', pfId: '3646661', department: 'Retail Loan LHO Ghy' },
+  { name: 'Ramesh Chand Meena', pfId: '3710629', department: 'OPR LHO GUWAHATI' },
+  { name: 'Sujit Kumar Singh', pfId: '3733726', department: 'Banking Ombudsman' },
+  { name: 'Sanjeeb Kumar Dev', pfId: '3797074', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Dilip Kumar Pathak', pfId: '3924386', department: 'Retail Loan LHO Ghy' },
+  { name: 'Rakesh Kumar', pfId: '3924718', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Diwakar Kumar', pfId: '3935507', department: 'FRAUD MONITORING CELL' },
+  { name: 'Deepak Kumar', pfId: '3939979', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Amit Ranjan', pfId: '3939987', department: 'Lead Bank & RSETI' },
+  { name: 'Saurabh Mishra', pfId: '3941892', department: 'Digital Banking and TBU' },
+  { name: 'Ranjit Kumar Jha', pfId: '3941906', department: 'Small and Medium Enterpri' },
+  { name: 'Md Naiyar Imam', pfId: '3949257', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Narasimha Murthy Gangappa', pfId: '4005120', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Prabhas Bose', pfId: '4198905', department: 'Local head Office,Guwahat' },
+  { name: 'Kishore Kumar Choudhary', pfId: '4200276', department: 'Non Performing Asset' },
+  { name: 'Pramod Kumar', pfId: '4271114', department: 'RBO-LHO-NW 2-RSC CVE  WEALTH' },
+  { name: 'Kamal Kishor Naik', pfId: '4273141', department: 'DIGITAL BANKING DEPARTMENT' },
+  { name: 'Anthony Leyangi', pfId: '4307631', department: 'Small and Medium Enterpri' },
+  { name: 'Urmilesh Kumar Pathak', pfId: '4327985', department: 'AGM AGRI' },
+  { name: 'Rakesh Banerjee', pfId: '4338553', department: 'RBO-LHO-NW 1-RSC CVE  WEALTH' },
+  { name: 'Lalremtluangi C', pfId: '4340671', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Vijay Kumar Sharma', pfId: '4359844', department: 'Circle Security Deptt' },
+  { name: 'Narendra Pratap Singh', pfId: '4414640', department: 'Outreach' },
+  { name: 'Anurag Arpan', pfId: '4415507', department: 'Small and Medium Enterpri' },
+  { name: 'Ashok Kumar Sahoo', pfId: '4415531', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'BISWA RANJAN ACHARYA', pfId: '4459733', department: 'Retail Loan LHO Ghy' },
+  { name: 'Bhupen Borah', pfId: '4479459', department: 'AGM AGRI' },
+  { name: 'Chongtham Chanchan', pfId: '4479696', department: 'AGM AGRI2' },
+  { name: 'Roopam Das', pfId: '4494946', department: 'Agri Bussiness Unit' },
+  { name: 'Bhaba Jyoti Dutta', pfId: '4495195', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Md Jehirul Islam', pfId: '4495284', department: 'WEALTH HUB' },
+  { name: 'Lopamudra Biswas Kangsa Banik', pfId: '4495292', department: 'WEALTH HUB' },
+  { name: 'Lakhima Phukan', pfId: '4495314', department: 'WEALTH HUB' },
+  { name: 'Adaha Nepuni', pfId: '4496132', department: 'AGM AGRI' },
+  { name: 'Kshetrimayum Shanta Devi', pfId: '4496159', department: 'WEALTH HUB' },
+  { name: 'Raj  Kumar Jaiswal', pfId: '4496345', department: 'AGM AGRI2' },
+  { name: 'Safal Tripathi', pfId: '4522060', department: 'GM Network -1( Guwahati)' },
+  { name: 'Satyendra Kumar', pfId: '4522958', department: 'AC OPERATIONS (AGM) NW-2' },
+  { name: 'Manish Uppal', pfId: '4527208', department: 'RB&O-LHO-CIRCLE-CHANNEL MGMT & CUST SERV' },
+  { name: 'Satish Kumar Sharma', pfId: '4562135', department: 'Dy. Gen. Manager& Circle' },
+  { name: 'Hrishikesh Jha', pfId: '4567196', department: 'Audit Department (BOD)' },
+  { name: 'Amit Saklani', pfId: '4578058', department: 'REH AGM LHO GUWAHATI' },
+  { name: 'Rajesh Chaturvedy', pfId: '4585364', department: 'Rajbhasha' },
+  { name: 'Pankaj Kumar', pfId: '4590007', department: 'AC – Sys. & Proc' },
+  { name: 'Nabajyoti Borah', pfId: '4592409', department: 'Government Business Unit' },
+  { name: 'Vivek Kumar Singh', pfId: '4595173', department: 'Rajbhasha' },
+  { name: 'Niraj Kumar Choudhary', pfId: '5003954', department: 'RE & Retail Loans (DGM)' },
+  { name: 'Rakesh Kumar', pfId: '5011086', department: 'SME AGRI ASSET QUALITY NW2' },
+  { name: 'Nishant Kumar', pfId: '5012988', department: 'Procurment' },
+  { name: 'Manish Sinha', pfId: '5014212', department: 'AC OPERATIONS (AGM) NW-1' },
+  { name: 'Ipsita Itisudha Tarai', pfId: '5118182', department: 'BPR( IT)' },
+  { name: 'Hemchandra Rajkumar Jha', pfId: '5238889', department: 'BPR( IT)' },
+  { name: 'Parimal Langthasa', pfId: '5243831', department: 'Funds Settlement Link Office' },
+  { name: 'BHASKAR KUMAR DEY SARKAR', pfId: '5289688', department: 'Funds Settlement Link Office' },
+  { name: 'J CHUMBENTHUNG HUMTSOE', pfId: '5315999', department: 'Data Processing Centre' },
+  { name: 'SUDHIR KUMAR JHA', pfId: '5389135', department: 'RE & Retail Loans (DGM)' },
+  { name: 'Johnson Tawmbing', pfId: '5442605', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Manoj Kumar Choudhary', pfId: '5523087', department: 'I O R Department' },
+  { name: 'Sanjeeb Kumar Kalita', pfId: '5523109', department: 'Funds Settlement Link Office' },
+  { name: 'Amrita Das', pfId: '5523168', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Sangita Kalita', pfId: '5523516', department: 'PPG Department Guwahati' },
+  { name: 'Pratyush Baruah', pfId: '5523524', department: 'Agri Bussiness Unit' },
+  { name: 'Paran Jyoti Deka', pfId: '5523559', department: 'Human Resources' },
+  { name: 'Purabi Sarma', pfId: '5523648', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Saurav Kumar Kalita', pfId: '5523885', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Priti Prasun Sen', pfId: '5523893', department: 'Human Resources' },
+  { name: 'Mehdi Hassan', pfId: '5524148', department: 'IT Support Services' },
+  { name: 'Pallabi Borah', pfId: '5524229', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Archana Saha', pfId: '5524296', department: 'Outreach' },
+  { name: 'Shameek Purkayastha', pfId: '5524318', department: 'Human Resources' },
+  { name: 'Utpal Deka', pfId: '5524458', department: 'Credit & Performance Monitoring' },
+  { name: 'Bikramjeet Goswami', pfId: '5524539', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Vivekananda Das', pfId: '5524601', department: 'CLIC' },
+  { name: 'Samir Kumar Dey', pfId: '5525438', department: 'Small and Medium Enterpri' },
+  { name: 'Devraj Phookan', pfId: '5525926', department: 'Human Resources' },
+  { name: 'Ankur Pratim Saikia', pfId: '5525993', department: 'WEALTH HUB' },
+  { name: 'Debankita Paul', pfId: '5526361', department: 'AC – Sys. & Proc' },
+  { name: 'Bismita Borchetia', pfId: '5526795', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Pranjal Dey', pfId: '5526892', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Rituparna Basu Roy', pfId: '5527139', department: 'CGM  Secretariat' },
+  { name: 'Krishang Buragohain', pfId: '5528275', department: 'Circle Complaint Resolution Centre' },
+  { name: 'Rajeev Kumar Das', pfId: '5528313', department: 'AC OPERATIONS (AGM) NW-1' },
+  { name: 'Bishnu Kinkar', pfId: '5528666', department: 'AC OPERATIONS (AGM) NW-1' },
+  { name: 'Pranjal Saikia', pfId: '5528720', department: 'CLIC' },
+  { name: 'Krishna Mallick', pfId: '5528828', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Shaonli Majumder', pfId: '5529042', department: 'Human Resources' },
+  { name: 'Moumita Gandha Banik', pfId: '5529050', department: 'RISK' },
+  { name: 'Mridul Goiary', pfId: '5529204', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Gautam Swargiary', pfId: '5529239', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Jinti Moni Khakhlary', pfId: '5529328', department: 'Outreach' },
+  { name: 'Daisy B. Rabha', pfId: '5529727', department: 'Public Relations & Comm.S' },
+  { name: 'Pandava Chakma', pfId: '5529883', department: 'Cust Experience Enhancement Deptt' },
+  { name: 'Sandeepan Roy', pfId: '5530555', department: 'Retail Loan LHO Ghy' },
+  { name: 'Vijaya Laxmi Phukan', pfId: '5530660', department: 'Funds Settlement Link Office' },
+  { name: 'Koushiki Gupta', pfId: '5532493', department: 'BPR( IT)' },
+  { name: 'Rahul Ranjan', pfId: '5544335', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Satyaranjan Das', pfId: '5546559', department: 'AC – Sys. & Proc' },
+  { name: 'John Borgoyari', pfId: '5559367', department: 'IT Support Services' },
+  { name: 'Bhaskar Pegu', pfId: '5559499', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Spondon Chelleng', pfId: '5559766', department: 'Non Performing Asset' },
+  { name: 'Diganta Bordoloi', pfId: '5698618', department: 'Data Processing Centre' },
+  { name: 'Rahul Deb Thakur', pfId: '5772737', department: 'Human Resources' },
+  { name: 'Biswadeep Dey', pfId: '5838541', department: 'IT Support Services' },
+  { name: 'Thangkholen Khongsai', pfId: '5838614', department: 'Retail Loan LHO Ghy' },
+  { name: 'Debraj Barua', pfId: '5838843', department: 'LEARNING and DEVELOPMENT GUWAHATI' },
+  { name: 'Raj Kumar Bhagat', pfId: '5839416', department: 'Government Business Unit' },
+  { name: 'Tapash Paul', pfId: '5839696', department: 'PPG Department Guwahati' },
+  { name: 'Mrinmoy Rajbongshi', pfId: '5839750', department: 'IT Support Services' },
+  { name: 'Deba Kanta Phukan', pfId: '5839890', department: 'WEALTH HUB' },
+  { name: 'Mriganka Buragohain', pfId: '5839955', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Kishor Kumar Das', pfId: '5839971', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Surajit Das', pfId: '5840252', department: 'IT Support Services' },
+  { name: 'Baikuntha Phukan', pfId: '5840333', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Rupjyoti Sarma', pfId: '5840384', department: 'Human Resources' },
+  { name: 'Pawan Kumar Verma', pfId: '5840473', department: 'Public Relations & Comm.S' },
+  { name: 'Sadananda Kalita', pfId: '5840554', department: 'Premises & Estate' },
+  { name: 'Pranab Barman', pfId: '5840562', department: 'Outreach' },
+  { name: 'Yendrembam Amarprem Singh', pfId: '5841763', department: 'FINANCE AND OPERATIONS' },
+  { name: 'G Tawnliansiam', pfId: '5842379', department: 'BPR( IT)' },
+  { name: 'Torida Sandor Marbaniang', pfId: '5842433', department: 'BPR( IT)' },
+  { name: 'Bendangla Amer', pfId: '5843324', department: 'BPR( IT)' },
+  { name: 'Sashilemba Longkumer', pfId: '5843707', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Ruposmita Baruah', pfId: '5843790', department: 'Account Traking Centre' },
+  { name: 'Anup Kumar Atreya', pfId: '5880955', department: 'FINANCE AND OPERATIONS' },
+  { name: 'ANURADHA KUMARI', pfId: '5904633', department: 'Retail Loan LHO Ghy' },
+  { name: 'Gaurica Naidu', pfId: '5973775', department: 'Human Resources' },
+  { name: 'Asim Anand', pfId: '5999472', department: 'Small and Medium Enterpri' },
+  { name: 'Niti Vidyarthi', pfId: '6004172', department: 'Human Resources' },
+  { name: 'Prakash Kr Srivastava', pfId: '6004571', department: 'Small and Medium Enterpri' },
+  { name: 'Amit Kumar Jha', pfId: '6005160', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'DURLABH KHAUND', pfId: '6012752', department: 'Banking Ombudsman' },
+  { name: 'Jagrit Jyoti Bora', pfId: '6012760', department: 'Account Traking Centre' },
+  { name: 'Hiranyamayee Phukan', pfId: '6013007', department: 'Vigilance Dpt(Guwahati)' },
+  { name: 'Saptarshi Roy', pfId: '6013287', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Shahid Haque', pfId: '6013295', department: 'PPG Department Guwahati' },
+  { name: 'Ayekpam Premjit Singh', pfId: '6013619', department: 'DIGITAL & eCOMMERCE' },
+  { name: 'Pratiti Hazarika', pfId: '6013872', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Sambit Kumar Pattanayak', pfId: '6079571', department: 'Premises & Estate' },
+  { name: 'Irengbam Priyokumar Singh', pfId: '6213820', department: 'LEARNING and DEVELOPMENT GUWAHATI' },
+  { name: 'Tuikhang Chuongchun Koren', pfId: '6238297', department: 'IT Support Services' },
+  { name: 'AJOY PAUL', pfId: '6255663', department: 'IT Support Services' },
+  { name: 'Ranjita Bastia Panda', pfId: '6382754', department: 'DGM & CIRCLE CREDIT OFFICER' },
+  { name: 'Ramtawnlien H D', pfId: '6406769', department: 'FRAUD MONITORING CELL' },
+  { name: 'KHAILUNMANG Vaiphei', pfId: '6406866', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'JITENDRA KUMAR', pfId: '6463924', department: 'RE & Retail Loans (DGM)' },
+  { name: 'MD FIROZ ALAM', pfId: '6507026', department: 'Premises & Estate' },
+  { name: 'Jolen Prabha Tiru', pfId: '6653537', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Naba Chandra Singh', pfId: '6659306', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Tanmoy Barman', pfId: '6715737', department: 'AC OPERATIONS (AGM) NW-2' },
+  { name: 'Avik Ghosh', pfId: '6715834', department: 'Government Business Unit' },
+  { name: 'Aroj Kumar', pfId: '6715850', department: 'IT Support Services' },
+  { name: 'Samar Jyoti Deka', pfId: '6723195', department: 'Premises & Estate' },
+  { name: 'Rini Elizabeth Toppo', pfId: '6727778', department: 'Circle Complaint Resolution Centre' },
+  { name: 'Bikramjyoti Das', pfId: '6732003', department: 'Digital Banking and TBU' },
+  { name: 'Joycee Vungngaihmawi Guite', pfId: '6732372', department: 'Cust Experience Enhancement Deptt' },
+  { name: 'Daricor Pariat', pfId: '6745784', department: 'DIGITAL BANKING DEPARTMENT' },
+  { name: 'Vipin Upadhyay', pfId: '6754139', department: 'AC OPERATIONS (AGM) NW-1' },
+  { name: 'Jitender Yadav', pfId: '6778313', department: 'Credit & Performance Monitoring' },
+  { name: 'Bhabesh Bhagabati', pfId: '6817424', department: 'Circle Security Deptt' },
+  { name: 'Ahindra Kumar Sinha', pfId: '6817432', department: 'Circle Security Deptt' },
+  { name: 'Binita Kumari', pfId: '6824722', department: 'Lead Bank & RSETI' },
+  { name: 'Tage Gyuthey', pfId: '6845258', department: 'Premises & Estate' },
+  { name: 'Preetimayee Tripathy', pfId: '6847005', department: 'Rajbhasha' },
+  { name: 'Bharat Baruah', pfId: '6944809', department: 'CGM  Secretariat' },
+  { name: 'Plaban Mazumdar', pfId: '6979661', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Manjit', pfId: '7014880', department: 'CLIC' },
+  { name: 'Imdad Arif Ahmed', pfId: '7017081', department: 'IT Support Services' },
+  { name: 'Shaiborlang Dkhar', pfId: '7017448', department: 'Data Processing Centre' },
+  { name: 'Vikash Kumar', pfId: '7053118', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'SANDEEP KUMAR', pfId: '7083289', department: 'Rajbhasha' },
+  { name: 'SURYANSH BAMANIA', pfId: '7115210', department: 'Rajbhasha' },
+  { name: 'Biju Gopinathan Pillai', pfId: '7231229', department: 'Agri Bussiness Unit' },
+  { name: 'Brajesh Kumar R', pfId: '7240201', department: 'BPR( IT)' },
+  { name: 'Salseng Sangma Marak', pfId: '7254350', department: 'Human Resources' },
+  { name: 'Shibojit Soren', pfId: '7334796', department: 'Premises & Estate' },
+  { name: 'Joydeep Das', pfId: '7427972', department: 'FRAUD MONITORING CELL' },
+  { name: 'Gagan Baro', pfId: '7428197', department: 'Human Resources' },
+  { name: 'Banty Sonowal', pfId: '7428405', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Tulika Barman', pfId: '7428510', department: 'Account Traking Centre' },
+  { name: 'Bandita Dihingia', pfId: '7428685', department: 'IT Support Services' },
+  { name: 'Chandan Talukdar', pfId: '7429096', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Gitika Nath', pfId: '7429584', department: 'Account Traking Centre' },
+  { name: 'Nabanita Hazarika', pfId: '7429835', department: 'Rajbhasha' },
+  { name: 'Subhasish Das', pfId: '7429967', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Bhaskar Narayan Chakraborty', pfId: '7430043', department: 'IT Support Services' },
+  { name: 'Sanjib Kumar Baishya', pfId: '7430264', department: 'PROJECT LOTUS' },
+  { name: 'Trishna Barua', pfId: '7430280', department: 'Audit Department (BOD)' },
+  { name: 'Prabhat Kumar Choudhary', pfId: '7430493', department: 'Outreach' },
+  { name: 'HIRANYA KALITA', pfId: '7430744', department: 'MIS&BPM' },
+  { name: 'Debankur Pathak', pfId: '7430809', department: 'Human Resources' },
+  { name: 'Imran Ali', pfId: '7430868', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Dhrubajyoti Pathak', pfId: '7430906', department: 'GM Network -1( Guwahati)' },
+  { name: 'Sumi Das', pfId: '7430973', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
+  { name: 'Rijuwana Akhtar', pfId: '7431112', department: 'AC OPERATIONS (AGM) NW-1' },
+  { name: 'Arup Sarma', pfId: '7431449', department: 'I O R Department' },
+  { name: 'Rahul Singh', pfId: '7431597', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Sarda Sagar', pfId: '7434510', department: 'Disciplinary Proceeding D' },
+  { name: 'ABHIJIT KHATIA', pfId: '7436246', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Om Prakash Gupta', pfId: '7437048', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Kabita Barai', pfId: '7515421', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
+  { name: 'Usharani Rajkhowa', pfId: '7583257', department: 'Human Resources' },
+  { name: 'Pratima Patir', pfId: '7583303', department: 'FINANCE AND OPERATIONS' },
+  { name: 'Bhaskar Jyoti Nath', pfId: '7584555', department: 'Government Business Unit' },
+  { name: 'Karuna Kanta Das', pfId: '7585047', department: 'IT Support Services' },
+  { name: 'Amar Jyoti Kalita', pfId: '7585438', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Anupam Haloi', pfId: '7585446', department: 'GM Network -2( Guwahati)' },
+  { name: 'Rameez Raja Ahmed', pfId: '7585632', department: 'Premises & Estate' },
+  { name: 'Sandip Pathak', pfId: '7585888', department: 'Human Resources' },
+  { name: 'Samiparna Dutta', pfId: '7586132', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Arijit Dey', pfId: '7587244', department: 'MIS&BPM' },
+  { name: 'Radha Shakti Boro', pfId: '7601026', department: 'Human Resources' },
+  { name: 'Minakshi Ayushman Baruah', pfId: '7601085', department: 'BOPM NW-I' },
+  { name: 'Tarun Dey', pfId: '7637446', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Chaitanya Kirti', pfId: '7673469', department: 'Agri Bussiness Unit' },
+  { name: 'Sonam Gagrai', pfId: '7675798', department: 'Circle Complaint Resolution Centre' },
+  { name: 'Rana Pratap Bhoi', pfId: '7691793', department: 'Human Resources' },
+  { name: 'Amit Kumar', pfId: '7810210', department: 'Law' },
+  { name: 'Swarndeep D', pfId: '7810881', department: 'Retail Loan LHO Ghy' },
+  { name: 'Bikash Roy', pfId: '7816278', department: 'Human Resources' },
+  { name: 'Gourab Goswami', pfId: '7817568', department: 'BOPM NW-I' },
+  { name: 'JOLY GOSWAMI', pfId: '7830750', department: 'FRAUD MONITORING CELL' },
+  { name: 'BISWAJIT DAS', pfId: '7844328', department: 'Audit Department (BOD)' },
+  { name: 'Darshan Jyoti Deka', pfId: '7874456', department: 'Banking Ombudsman' },
+  { name: 'HIMANGSHU KALITA', pfId: '7874596', department: 'Lead Bank & RSETI' },
+  { name: 'ARNAB BARKATAKI', pfId: '7874960', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'URMISNATA NANDA', pfId: '7875428', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'DIJABRATA BHAGABATI', pfId: '7876343', department: 'PPG Department Guwahati' },
+  { name: 'SAMIRAN NATH', pfId: '7876416', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Suman Das', pfId: '7877390', department: 'RB&O-LHO-NW 2-BOPM' },
+  { name: 'Ashish Kumar', pfId: '8072914', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'Biswajit Chandra Das', pfId: '8130957', department: 'WEALTH HUB' },
+  { name: 'Jitumoni Malakar', pfId: '8135193', department: 'WEALTH HUB' },
+  { name: 'Sandipa Gogoi', pfId: '8329834', department: 'Digital Banking and TBU' },
+  { name: 'Monchumi Bora', pfId: '8331294', department: 'Adminstration(LHO,GHY)' },
+  { name: 'Nitish Kumar', pfId: '8333076', department: 'DIGITAL BANKING DEPARTMENT' },
+  { name: 'SUDIP SARKAR', pfId: '8456151', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'Aditi Paul', pfId: '8476608', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
+  { name: 'KONDURU PRANEETH', pfId: '8479224', department: 'IT Support Services' },
+  { name: 'PRANJAL BHARALI', pfId: '8485143', department: 'AC OPERATIONS (AGM) NW-1' },
+  { name: 'Bandana Rabha', pfId: '8490996', department: 'Non Performing Asset' },
+  { name: 'RUPAM CHANDRA RABHA', pfId: '8491909', department: 'Human Resources' },
+  { name: 'TISHA GHOSH', pfId: '8510903', department: 'Premises & Estate' },
+  { name: 'GAYATRI SAIKIA', pfId: '8518831', department: 'RE & Retail Loans (DGM)' },
+  { name: 'Maitreyi Roy', pfId: '8519773', department: 'Account Traking Centre' },
+  { name: 'ANMOL GHOSHAL', pfId: '8523266', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'PUNAM DEVI', pfId: '8529558', department: 'MIS&BPM' },
+  { name: 'CHAYANIKA CHOUDHURY', pfId: '8532214', department: 'Adminstration(LHO,GHY)' },
+  { name: 'HAROLD DHAR', pfId: '8557403', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'BIBEK DEY', pfId: '8558256', department: 'Circle Complaint Resolution Centre' },
+  { name: 'Meenakshi Baishya', pfId: '8561141', department: 'Circle Security Deptt' },
+  { name: 'BIKRAM DAMAI', pfId: '8570175', department: 'Account Traking Centre' },
+  { name: 'ARPITA MALLICK', pfId: '8580634', department: 'Adminstration(LHO,GHY)' },
+  { name: 'PRITAM BASUMATARY', pfId: '8597359', department: 'Account Traking Centre' },
+  { name: 'VISHAL BHALLA', pfId: '8598584', department: 'Circle Security Deptt' },
+  { name: 'DIVESH ANAND', pfId: '8609055', department: 'DIGITAL BANKING DEPARTMENT' },
+  { name: 'SATADRU DEY', pfId: '8613478', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
+  { name: 'KALYANI RAJBONGSHI', pfId: '8624194', department: 'Small and Medium Enterpri' },
+  { name: 'Richard Uj Zaman', pfId: '8646473', department: 'Circle Security Deptt' },
+];
+
+// Admin PF IDs — Biswajit Bhattacharjee & Abhijit Bhattacharjee
+const ADMIN_PF_IDS = ["3606643", "3617394"];
+const ADMIN_1 = { pfId: "3606643", name: "Biswajit Bhattacharjee" };
+const ADMIN_2 = { pfId: "3617394", name: "Abhijit Bhattacharjee" };
+
+// Driver credentials — login with name + phone number
+const DRIVERS = [
+  { id: "CAR1", name: "Alam",    phone: "7637946383", vehicle: "Vehicle 1", plate: "AS 01 FF 9417", color: "#2563eb" },
+  { id: "CAR2", name: "Tinku",   phone: "8638183371", vehicle: "Vehicle 2", plate: "AS 01 FF 9427", color: "#16a34a" },
+  { id: "CAR3", name: "Pinku",   phone: "7578062778", vehicle: "Vehicle 3", plate: "AS 01 FF 9437", color: "#0891b2" },
+  { id: "CAR4", name: "Safiqul", phone: "7896993883", vehicle: "Vehicle 4", plate: "AS 01 FF 9447", color: "#9333ea" },
+];
+
+const INITIAL_CARS = [
+  { id: "CAR1", name: "Vehicle 1", plate: "AS 01 FF 9417", model: "Tata Nexon EV Max", color: "#2563eb", batteryCapacity: 40.5, driver: "Alam", driverPhone: "+917637946383" },
+  { id: "CAR2", name: "Vehicle 2", plate: "AS 01 FF 9427", model: "Tata Nexon EV Max", color: "#16a34a", batteryCapacity: 40.5, driver: "Tinku", driverPhone: "+918638183371" },
+  { id: "CAR3", name: "Vehicle 3", plate: "AS 01 FF 9437", model: "Tata Nexon EV Max", color: "#0891b2", batteryCapacity: 40.5, driver: "Pinku", driverPhone: "+917578062778" },
+  { id: "CAR4", name: "Vehicle 4", plate: "AS 01 FF 9447", model: "Tata Nexon EV Max", color: "#9333ea", batteryCapacity: 40.5, driver: "Safiqul", driverPhone: "+917896993883" },
+];
+
+const DEPARTMENTS = ["Administration", "Finance", "Engineering", "HR", "Legal", "IT", "Operations", "Director's Office"];
+
+const today = () => new Date().toISOString().slice(0, 10);
+const now = () => new Date().toTimeString().slice(0, 5);
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+const fmtTime = (t) => t || "—";
+
+// ── STYLES ────────────────────────────────────────────────────
+const G = {
+  bg: "#f0f4f8", card: "#ffffff", border: "#e2e8f0",
+  text: "#1e293b", muted: "#64748b", light: "#f8fafc",
+  success: "#16a34a", danger: "#dc2626", warning: "#d97706",
+  info: "#2563eb",
+};
+
+const css = {
+  app: { minHeight: "100vh", background: G.bg, fontFamily: "'DM Sans', sans-serif", fontSize: 14 },
+  header: { background: "#1e293b", color: "#fff", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, boxShadow: "0 2px 8px rgba(0,0,0,0.2)", position: "sticky", top: 0, zIndex: 100 },
+  headerTitle: { fontSize: 16, fontWeight: 700, letterSpacing: "-0.3px" },
+  headerSub: { fontSize: 10, color: "#94a3b8", marginTop: 1 },
+  body: { padding: "16px", maxWidth: 1100, margin: "0 auto", paddingBottom: 80 },
+  grid4: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
+  card: { background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `1px solid ${G.border}` },
+  carCard: (color, busy) => ({ background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `2px solid ${busy ? G.danger : G.success}`, position: "relative", overflow: "hidden" }),
+  badge: (color) => ({ display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: color + "20", color: color }),
+  btn: (color = G.info, outline = false) => ({ padding: "9px 18px", borderRadius: 7, border: outline ? `1.5px solid ${color}` : "none", background: outline ? "transparent" : color, color: outline ? color : "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.15s" }),
+  btnSm: (color = G.info) => ({ padding: "4px 12px", borderRadius: 5, border: "none", background: color, color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }),
+  input: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
+  select: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
+  label: { fontSize: 12, fontWeight: 600, color: G.muted, marginBottom: 4, display: "block" },
+  formGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 },
+  table: { width: "100%", borderCollapse: "collapse" },
+  th: { textAlign: "left", padding: "10px 12px", fontSize: 11, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `2px solid ${G.border}`, background: G.light, whiteSpace: "nowrap" },
+  td: { padding: "10px 12px", borderBottom: `1px solid ${G.border}`, fontSize: 13, color: G.text },
+  modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 },
+  modalBox: { background: "#fff", borderRadius: 12, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" },
+  sectionTitle: { fontSize: 16, fontWeight: 700, color: G.text, marginBottom: 14 },
+  row: { display: "flex", alignItems: "center", gap: 10 },
+  statNum: { fontSize: 26, fontWeight: 800, color: G.text },
+  statLabel: { fontSize: 11, color: G.muted, fontWeight: 600 },
+  // Mobile bottom nav
+  bottomNav: { position: "fixed", bottom: 0, left: 0, right: 0, background: "#1e293b", display: "flex", zIndex: 200, borderTop: "1px solid #334155", boxShadow: "0 -4px 12px rgba(0,0,0,0.2)" },
+  bottomNavBtn: (active) => ({ flex: 1, padding: "8px 4px 10px", border: "none", background: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active ? "#60a5fa" : "#64748b", fontSize: 9, fontWeight: active ? 700 : 500, transition: "color 0.15s", minWidth: 0 }),
+};
+
+// ── MAIN APP ──────────────────────────────────────────────────
+function App() {
+  const [tab, setTab] = useState("dashboard");
+  const [cars, setCars] = useState(INITIAL_CARS);
+  const saveCars = async (data) => {
+    setCars(data);
+    try { const db = window.__db; if (db) await db.collection("config").doc("cars").set({ list: data }); } catch(e) {}
+  };
+  const [trips, setTrips] = useState([]);
+  const [maintenance, setMaintenance] = useState([]);
+  const [fuelLogs, setFuelLogs] = useState([]);
+  const [liveLocations, setLiveLocations] = useState({});
+  const [currentUser, setCurrentUser] = useState(null); // { name, pfId, isAdmin }
+  const [loaded, setLoaded] = useState(false);
+
+  // Load from storage
+  useEffect(() => {
+    // Load session immediately
+    try { const u = localStorage.getItem("ev_session"); if (u) setCurrentUser(JSON.parse(u)); } catch {}
+    setLoaded(true);
+
+    // Then attach Firebase listeners asynchronously
+    const db = window.__db;
+    if (!db) return;
+
+    // Load car/driver overrides from Firebase
+    try {
+      db.collection("config").doc("cars").onSnapshot(snap => {
+        if (snap.exists) { const d = snap.data(); if (d.list && d.list.length > 0) setCars(d.list); }
+      });
+    } catch(e) {}
+
+    const unsubs = [];
+    try {
+      unsubs.push(db.collection("trips").onSnapshot(snap => {
+        setTrips(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      }));
+      unsubs.push(db.collection("maintenance").onSnapshot(snap => {
+        setMaintenance(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      }));
+      unsubs.push(db.collection("fuel").onSnapshot(snap => {
+        setFuelLogs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      }));
+      unsubs.push(db.collection("config").doc("live").onSnapshot(snap => {
+        if (snap.exists) setLiveLocations(snap.data());
+      }));
+    } catch(e) { console.error("Firebase listener error:", e); }
+
+    return () => unsubs.forEach(u => { try { u(); } catch {} });
+  }, []);
+
+  const _fsWrite = async (colName, data) => {
+    const db = window.__db; if (!db) return;
+    try {
+      const snap = await db.collection(colName).get();
+      await Promise.all(snap.docs.map(d => d.ref.delete()));
+      await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
+    } catch(e) { console.error("_fsWrite error:", e); }
+  };
+  const saveTrips = async (data) => { setTrips(data); _fsWrite("trips", data); };
+  const saveMaint = async (data) => { setMaintenance(data); _fsWrite("maintenance", data); };
+  const saveFuel  = async (data) => { setFuelLogs(data); _fsWrite("fuel", data); };
+  const saveLive  = async (data) => {
+    setLiveLocations(data);
+    try { const db = window.__db; if (db) await db.collection("config").doc("live").set(data); } catch(e){}
+  };
+
+  const handleLogin = async (user) => {
+    setCurrentUser(user);
+    try { localStorage.setItem("ev_session", JSON.stringify(user)); } catch {}
+  };
+  const handleLogout = async () => {
+    setCurrentUser(null);
+    try { localStorage.removeItem("ev_session"); } catch {}
+    setTab("dashboard");
+  };
+
+  const activeTripForCar = (carId) => trips.find(t => t.carId === carId && !t.returnTime && t.approvalStatus === "approved");
+  const isCarBusy = (carId) => !!activeTripForCar(carId);
+
+  if (!loaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted }}>Loading...</div>;
+
+  if (!currentUser) return <LoginScreen onLogin={handleLogin} />;
+
+  // Driver portal — separate minimal interface
+  if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} />;
+
+
+  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser };
+
+  const pendingCount = trips.filter(t => t.approvalStatus === "pending").length;
+
+  const NAV_ITEMS = [
+    { id: "dashboard", label: "Dashboard", icon: "📊" },
+    { id: "book",      label: "Book Trip",  icon: "📤" },
+    { id: "trips",     label: "Trip Log",   icon: "📋" },
+    ...(currentUser.isAdmin ? [
+      { id: "tracking",    label: "Tracking",  icon: "🗺" },
+      { id: "fuel",        label: "Charging",  icon: "⚡" },
+      { id: "maintenance", label: "Maint.",    icon: "🔧" },
+      { id: "approvals",   label: pendingCount > 0 ? `Approve(${pendingCount})` : "Approvals", icon: "✅" },
+      { id: "users",       label: "Users",     icon: "👥" },
+    ] : []),
+  ];
+
+  return (
+    <div style={css.app}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <style>{`
+        @media (max-width: 600px) {
+          .desktop-nav { display: none !important; }
+          .mobile-bottom-nav { display: flex !important; }
+          .two-col { grid-template-columns: 1fr !important; }
+          .scroll-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          .hide-mobile { display: none !important; }
+        }
+        @media (min-width: 601px) {
+          .mobile-bottom-nav { display: none !important; }
+          .desktop-nav { display: flex !important; }
+        }
+        * { -webkit-tap-highlight-color: transparent; }
+        input, select, button { font-family: inherit; }
+      `}</style>
+
+      {/* ── HEADER ── */}
+      <header style={css.header}>
+        <div>
+          <div style={css.headerTitle}>⚡ Pool EV Management</div>
+          <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}</div>
+        </div>
+        {/* Desktop nav */}
+        <nav className="desktop-nav" style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {NAV_ITEMS.map(({ id, label, icon }) => (
+            <button key={id} style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: tab === id ? 700 : 500, background: tab === id ? "#3b82f6" : "transparent", color: tab === id ? "#fff" : "#94a3b8" }} onClick={() => setTab(id)}>{icon} {label}</button>
+          ))}
+        </nav>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
+          <div style={{ textAlign: "right" }} className="hide-mobile">
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}</div>
+            <div style={{ fontSize: 10, color: "#94a3b8" }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
+          </div>
+          <button onClick={handleLogout} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Logout</button>
+        </div>
+      </header>
+
+      {/* ── BODY ── */}
+      <div style={css.body}>
+        {tab === "dashboard"   && <Dashboard {...props} />}
+        {tab === "book"        && <BookTrip {...props} setTab={setTab} />}
+        {tab === "trips"       && <TripLog {...props} currentUser={currentUser} />}
+        {tab === "tracking"    && <LiveTracking {...props} />}
+        {tab === "fuel"        && <FuelLog {...props} />}
+        {tab === "maintenance" && <Maintenance {...props} />}
+        {tab === "approvals"   && currentUser.isAdmin && <Approvals {...props} />}
+        {tab === "users"       && currentUser.isAdmin && <UserManagement {...props} cars={cars} saveCars={saveCars} />}
+      </div>
+
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <nav className="mobile-bottom-nav" style={css.bottomNav}>
+        {NAV_ITEMS.map(({ id, label, icon }) => (
+          <button key={id} style={css.bottomNavBtn(tab === id)} onClick={() => setTab(id)}>
+            <span style={{ fontSize: 18 }}>{icon}</span>
+            <span style={{ fontSize: 9, lineHeight: 1 }}>{label}</span>
+            {id === "approvals" && pendingCount > 0 && (
+              <span style={{ position: "absolute", top: 4, background: G.danger, color: "#fff", borderRadius: 10, fontSize: 8, fontWeight: 800, padding: "1px 4px" }}>{pendingCount}</span>
+            )}
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+// ── LOGIN SCREEN ──────────────────────────────────────────────
+function LoginScreen({ onLogin }) {
+  const [portal, setPortal] = useState(null); // "staff" | "driver"
+  const [pfId, setPfId] = useState("");
+  const [driverPhone, setDriverPhone] = useState("");
+  const [driverName, setDriverName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [matched, setMatched] = useState(null);
+  const [firebaseUsers, setFirebaseUsers] = useState([]);
+
+  // Load Firebase users list on mount so newly added users can log in
+  useEffect(() => {
+    const db = window.__db;
+    if (!db) return;
+    try {
+      db.collection("config").doc("users").onSnapshot(snap => {
+        if (snap.exists) {
+          const data = snap.data();
+          if (data.list && data.list.length > 0) setFirebaseUsers(data.list);
+        }
+      });
+    } catch(e) {}
+  }, []);
+
+  // Merge: Firebase list takes priority (has latest additions/edits), fallback to hardcoded
+  const getAllUsers = () => {
+    if (firebaseUsers.length > 0) return firebaseUsers;
+    return AUTHORISED_USERS;
+  };
+
+  useEffect(() => {
+    if (pfId.length >= 5) {
+      const found = getAllUsers().find(u => u.pfId === pfId.trim());
+      setMatched(found || null);
+    } else { setMatched(null); }
+  }, [pfId, firebaseUsers]);
+
+  const handleStaffLogin = () => {
+    setError("");
+    const user = getAllUsers().find(u => u.pfId === pfId.trim());
+    if (!user) { setError("❌ PF ID not found. You are not authorised to access this system."); return; }
+    setLoading(true);
+    setTimeout(() => {
+      onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), role: "staff" });
+      setLoading(false);
+    }, 600);
+  };
+
+  const handleDriverLogin = () => {
+    setError("");
+    const phone = driverPhone.replace(/\D/g, "").slice(-10);
+    const driver = DRIVERS.find(d => d.phone === phone && d.name.toLowerCase() === driverName.trim().toLowerCase());
+    if (!driver) { setError("❌ Name or phone number does not match. Please check your details."); return; }
+    setLoading(true);
+    setTimeout(() => {
+      onLogin({ name: driver.name, carId: driver.id, vehicle: driver.vehicle, plate: driver.plate, color: driver.color, phone: driver.phone, role: "driver" });
+      setLoading(false);
+    }, 600);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans', sans-serif", padding: 16 }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <div style={{ width: "100%", maxWidth: 440 }}>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ fontSize: 52, marginBottom: 12 }}>⚡</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px" }}>Pool EV Management</div>
+          <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>Tata Nexon EV Fleet · Guwahati Office</div>
+        </div>
+
+        {/* Portal selector */}
+        {!portal && (
+          <div style={{ background: "#1e293b", borderRadius: 14, padding: 28, boxShadow: "0 20px 60px rgba(0,0,0,0.4)", border: "1px solid #334155" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#94a3b8", textAlign: "center", marginBottom: 20, textTransform: "uppercase", letterSpacing: "0.08em" }}>Select Your Role</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <button onClick={() => setPortal("staff")} style={{ padding: "24px 16px", borderRadius: 10, border: "2px solid #334155", background: "#0f172a", color: "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor="#3b82f6"}
+                onMouseLeave={e => e.currentTarget.style.borderColor="#334155"}>
+                <div style={{ fontSize: 32, marginBottom: 10 }}>👤</div>
+                <div style={{ fontWeight: 700, fontSize: 14 }}>Staff / Officer</div>
+                <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>Login with PF ID</div>
+              </button>
+              <button onClick={() => setPortal("driver")} style={{ padding: "24px 16px", borderRadius: 10, border: "2px solid #334155", background: "#0f172a", color: "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor="#16a34a"}
+                onMouseLeave={e => e.currentTarget.style.borderColor="#334155"}>
+                <div style={{ fontSize: 32, marginBottom: 10 }}>🧑‍✈️</div>
+                <div style={{ fontWeight: 700, fontSize: 14 }}>Driver</div>
+                <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>Login with phone</div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Staff login */}
+        {portal === "staff" && (
+          <div style={{ background: "#1e293b", borderRadius: 14, padding: 32, boxShadow: "0 20px 60px rgba(0,0,0,0.4)", border: "1px solid #334155" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <button onClick={() => { setPortal(null); setError(""); setPfId(""); }} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 18 }}>←</button>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>👤 Staff Login</div>
+                <div style={{ fontSize: 11, color: "#64748b" }}>Enter your Employee PF ID</div>
+              </div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>PF ID Number</label>
+              <input style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: `1.5px solid ${error ? "#ef4444" : matched ? "#22c55e" : "#334155"}`, background: "#0f172a", color: "#fff", fontSize: 16, outline: "none", letterSpacing: "0.1em", boxSizing: "border-box" }}
+                value={pfId} onChange={e => { setPfId(e.target.value); setError(""); }}
+                placeholder="e.g. 3600181" maxLength={10} onKeyDown={e => e.key === "Enter" && handleStaffLogin()} autoFocus />
+            </div>
+            {matched && (
+              <div style={{ padding: "10px 14px", background: "#052e16", border: "1px solid #16a34a", borderRadius: 8, marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff" }}>{matched.name.charAt(0)}</div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#4ade80" }}>{matched.name}</div>
+                  <div style={{ fontSize: 11, color: "#16a34a" }}>✓ {matched.department || "Authorised user found"}</div>
+                </div>
+              </div>
+            )}
+            {error && <div style={{ padding: "10px 14px", background: "#450a0a", border: "1px solid #ef4444", borderRadius: 8, marginBottom: 16, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
+            <button onClick={handleStaffLogin} disabled={loading || !pfId}
+              style={{ width: "100%", padding: "13px", borderRadius: 8, border: "none", background: pfId ? "#3b82f6" : "#1e3a5f", color: pfId ? "#fff" : "#475569", fontWeight: 700, fontSize: 14, cursor: pfId ? "pointer" : "not-allowed" }}>
+              {loading ? "Verifying..." : "Access System →"}
+            </button>
+          </div>
+        )}
+
+        {/* Driver login */}
+        {portal === "driver" && (
+          <div style={{ background: "#1e293b", borderRadius: 14, padding: 32, boxShadow: "0 20px 60px rgba(0,0,0,0.4)", border: "1px solid #334155" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <button onClick={() => { setPortal(null); setError(""); setDriverPhone(""); setDriverName(""); }} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 18 }}>←</button>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>🧑‍✈️ Driver Login</div>
+                <div style={{ fontSize: 11, color: "#64748b" }}>Enter your name and phone number</div>
+              </div>
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Your Name</label>
+              <input style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: `1.5px solid ${error ? "#ef4444" : "#334155"}`, background: "#0f172a", color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box" }}
+                value={driverName} onChange={e => { setDriverName(e.target.value); setError(""); }}
+                placeholder="e.g. Alam" autoFocus />
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Registered Phone Number</label>
+              <input style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: `1.5px solid ${error ? "#ef4444" : "#334155"}`, background: "#0f172a", color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box" }}
+                value={driverPhone} onChange={e => { setDriverPhone(e.target.value); setError(""); }}
+                placeholder="e.g. 7637946383" maxLength={15} onKeyDown={e => e.key === "Enter" && handleDriverLogin()} />
+            </div>
+            {error && <div style={{ padding: "10px 14px", background: "#450a0a", border: "1px solid #ef4444", borderRadius: 8, marginBottom: 16, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
+            <button onClick={handleDriverLogin} disabled={loading || !driverPhone || !driverName}
+              style={{ width: "100%", padding: "13px", borderRadius: 8, border: "none", background: (driverPhone && driverName) ? "#16a34a" : "#14532d", color: (driverPhone && driverName) ? "#fff" : "#475569", fontWeight: 700, fontSize: 14, cursor: (driverPhone && driverName) ? "pointer" : "not-allowed" }}>
+              {loading ? "Verifying..." : "Enter Driver Portal →"}
+            </button>
+          </div>
+        )}
+
+        <div style={{ textAlign: "center", marginTop: 20, fontSize: 11, color: "#334155" }}>Office Pool Car System · {new Date().getFullYear()}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── DRIVER PORTAL ─────────────────────────────────────────────
+function DriverPortal({ driver, trips, saveTrips, onLogout }) {
+  const myTrips = trips.filter(t => t.carId === driver.carId).slice().reverse();
+  const activeTrip = myTrips.find(t => !t.returnTime && t.approvalStatus === "approved");
+  const pendingTrips = myTrips.filter(t => t.approvalStatus === "pending");
+  const todayTrips = myTrips.filter(t => t.date === today());
+
+  // Return update state
+  const [showReturn, setShowReturn] = useState(false);
+  const [returnForm, setReturnForm] = useState({ returnDate: today(), returnTime: now(), endKm: "", remarks: "" });
+  const [returnMsg, setReturnMsg] = useState("");
+
+  const handleDriverReturn = () => {
+    if (!activeTrip) return;
+    if (!returnForm.returnTime) { setReturnMsg("❌ Please enter return time."); return; }
+    const returnDateTime = returnForm.returnDate + " " + returnForm.returnTime;
+    const updated = trips.map(t => t.id === activeTrip.id
+      ? { ...t, returnTime: returnDateTime, endKm: returnForm.endKm, remarks: returnForm.remarks }
+      : t
+    );
+    saveTrips(updated);
+    setReturnMsg("✅ Return recorded successfully!");
+    setShowReturn(false);
+    setReturnForm({ returnDate: today(), returnTime: now(), endKm: "", remarks: "" });
+    setTimeout(() => setReturnMsg(""), 3000);
+  };
+
+  const statusColor = { approved: G.success, pending: G.warning, rejected: G.danger };
+  const statusLabel = { approved: "✅ Approved — On Duty", pending: "⏳ Awaiting Approval", rejected: "❌ Rejected" };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0f172a", fontFamily: "'DM Sans', sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+      {/* Header */}
+      <div style={{ background: driver.color, padding: "20px 24px", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
+        <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>Driver Portal</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginTop: 2 }}>🧑‍✈️ {driver.name}</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", marginTop: 4 }}>
+              {driver.vehicle} · {driver.plate}
+            </div>
+          </div>
+          <button onClick={onLogout} style={{ padding: "8px 16px", borderRadius: 8, border: "1.5px solid rgba(255,255,255,0.4)", background: "transparent", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Logout</button>
+        </div>
+      </div>
+
+      <div style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
+
+        {/* Current status card */}
+        <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, marginBottom: 16, border: `2px solid ${activeTrip ? G.success : "#334155"}` }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Current Vehicle Status</div>
+          {activeTrip ? (
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 0 3px rgba(34,197,94,0.3)", animation: "pulse 1.5s infinite" }} />
+                <span style={{ fontSize: 16, fontWeight: 800, color: "#4ade80" }}>ON DUTY</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px", fontSize: 14 }}>
+                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>OFFICER</div><div style={{ color: "#fff", fontWeight: 700 }}>{activeTrip.officerName}</div></div>
+                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>DEPARTMENT</div><div style={{ color: "#fff", fontWeight: 600 }}>{activeTrip.department}</div></div>
+                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>DESTINATION</div><div style={{ color: "#fff", fontWeight: 700 }}>{activeTrip.destination}</div></div>
+                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>PURPOSE</div><div style={{ color: "#94a3b8" }}>{activeTrip.purpose || "—"}</div></div>
+                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>DEPARTURE</div><div style={{ color: "#fff" }}>{fmtDate(activeTrip.date)} at {activeTrip.departureTime}</div></div>
+                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>START KM</div><div style={{ color: "#fff" }}>{activeTrip.startKm || "—"}</div></div>
+              </div>
+            </div>
+          ) : pendingTrips.length > 0 ? (
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>⏳</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#fbbf24" }}>Approval Pending</div>
+              <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>{pendingTrips.length} trip request(s) awaiting admin approval</div>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>🅿️</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#4ade80" }}>Vehicle Available</div>
+              <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>No active trips assigned to your vehicle</div>
+            </div>
+          )}
+          <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
+        </div>
+
+        {/* ── MARK RETURN — shown only when there's an active trip not yet returned ── */}
+        {activeTrip && (
+          <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, marginBottom: 16, border: `2px solid ${showReturn ? "#f97316" : "#f59e0b"}` }}>
+            {returnMsg && (
+              <div style={{ padding: "10px 14px", borderRadius: 8, background: returnMsg.startsWith("✅") ? "#14532d" : "#7f1d1d", color: "#fff", marginBottom: 14, fontSize: 13, fontWeight: 600 }}>{returnMsg}</div>
+            )}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showReturn ? 16 : 0 }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em" }}>🔄 Mark Vehicle Return</div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{activeTrip.officerName} hasn't returned yet — record it here</div>
+              </div>
+              <button
+                onClick={() => setShowReturn(s => !s)}
+                style={{ padding: "8px 18px", borderRadius: 8, border: "none", background: showReturn ? "#475569" : "#f59e0b", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+                {showReturn ? "Cancel" : "Update Return"}
+              </button>
+            </div>
+            {showReturn && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ padding: "10px 14px", background: "#0f172a", borderRadius: 8, fontSize: 13, color: "#94a3b8" }}>
+                  🚗 <b style={{ color: "#fff" }}>{activeTrip.carName}</b> · Officer: <b style={{ color: "#fff" }}>{activeTrip.officerName}</b> · To: {activeTrip.destination}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Return Date *</label>
+                    <input type="date" value={returnForm.returnDate}
+                      onChange={e => setReturnForm(f => ({ ...f, returnDate: e.target.value }))}
+                      style={{ width: "100%", padding: "10px 12px", borderRadius: 7, border: "1.5px solid #334155", fontSize: 14, background: "#0f172a", color: "#fff", boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Return Time *</label>
+                    <input type="time" value={returnForm.returnTime}
+                      onChange={e => setReturnForm(f => ({ ...f, returnTime: e.target.value }))}
+                      style={{ width: "100%", padding: "10px 12px", borderRadius: 7, border: "1.5px solid #334155", fontSize: 14, background: "#0f172a", color: "#fff", boxSizing: "border-box" }} />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>End Odometer (km)</label>
+                  <input type="number" value={returnForm.endKm}
+                    onChange={e => setReturnForm(f => ({ ...f, endKm: e.target.value }))}
+                    placeholder="e.g. 45310"
+                    style={{ width: "100%", padding: "10px 12px", borderRadius: 7, border: "1.5px solid #334155", fontSize: 14, background: "#0f172a", color: "#fff", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Remarks (optional)</label>
+                  <input value={returnForm.remarks}
+                    onChange={e => setReturnForm(f => ({ ...f, remarks: e.target.value }))}
+                    placeholder="Any notes about the trip..."
+                    style={{ width: "100%", padding: "10px 12px", borderRadius: 7, border: "1.5px solid #334155", fontSize: 14, background: "#0f172a", color: "#fff", boxSizing: "border-box" }} />
+                </div>
+                <button onClick={handleDriverReturn}
+                  style={{ padding: "12px", borderRadius: 8, border: "none", background: "#f59e0b", color: "#000", fontWeight: 800, fontSize: 14, cursor: "pointer" }}>
+                  ✅ Confirm Vehicle Returned
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Today's trips */}
+        <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, marginBottom: 16, border: "1px solid #334155" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
+            Today's Schedule — {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
+          </div>
+          {todayTrips.length === 0 ? (
+            <div style={{ fontSize: 13, color: "#475569", textAlign: "center", padding: "12px 0" }}>No trips scheduled for today</div>
+          ) : todayTrips.map(t => (
+            <div key={t.id} style={{ padding: "14px", background: "#0f172a", borderRadius: 10, marginBottom: 10, borderLeft: `3px solid ${statusColor[t.approvalStatus] || G.muted}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{t.officerName}</div>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: (statusColor[t.approvalStatus] || G.muted) + "25", color: statusColor[t.approvalStatus] || G.muted }}>
+                  {statusLabel[t.approvalStatus] || t.approvalStatus}
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: "#64748b", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 12px" }}>
+                <div>📍 {t.destination}</div>
+                <div>🕐 {t.departureTime}</div>
+                <div>🏢 {t.department}</div>
+                <div>📝 {t.purpose || "—"}</div>
+              </div>
+              {t.returnTime && <div style={{ marginTop: 8, fontSize: 12, color: "#4ade80" }}>✅ Returned at {t.returnTime} {t.endKm ? `· End KM: ${t.endKm}` : ""}</div>}
+            </div>
+          ))}
+        </div>
+
+        {/* Recent trip history */}
+        <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, border: "1px solid #334155" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>Recent Trip History</div>
+          {myTrips.length === 0 ? (
+            <div style={{ fontSize: 13, color: "#475569", textAlign: "center", padding: "12px 0" }}>No trips recorded yet</div>
+          ) : myTrips.slice(0, 10).map(t => (
+            <div key={t.id} style={{ display: "flex", gap: 12, padding: "10px 0", borderBottom: "1px solid #0f172a", alignItems: "flex-start" }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: statusColor[t.approvalStatus] || G.muted, marginTop: 5, flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{t.officerName} → {t.destination}</div>
+                <div style={{ fontSize: 12, color: "#64748b" }}>{fmtDate(t.date)} · {t.department} · {t.departureTime}{t.returnTime ? ` – ${t.returnTime}` : ""}</div>
+                {t.startKm && t.endKm && <div style={{ fontSize: 11, color: "#475569" }}>Distance: {parseInt(t.endKm) - parseInt(t.startKm)} km</div>}
+              </div>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: (statusColor[t.approvalStatus] || G.muted) + "20", color: statusColor[t.approvalStatus] || G.muted, flexShrink: 0 }}>
+                {t.approvalStatus?.toUpperCase()}
+              </span>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBusy, activeTripForCar, currentUser }) {
+  const [view, setView] = useState("pf"); // "pf" | "driver"
+  const [search, setSearch] = useState("");
+  const [expandedDates, setExpandedDates] = useState({ [today()]: true }); // today expanded by default
+  const toggleDate = (d) => setExpandedDates(prev => ({ ...prev, [d]: !prev[d] }));
+
+  const activeTrips   = trips.filter(t => !t.returnTime && t.approvalStatus === "approved");
+  const pendingTrips  = trips.filter(t => t.approvalStatus === "pending");
+  const todayTrips    = trips.filter(t => t.date === today());
+  const pendingMaint  = maintenance.filter(m => m.status === "Pending").length;
+
+  // ── PF-wise: group all trips by officerPfId / bookedByPfId
+  const pfMap = {};
+  trips.forEach(t => {
+    const key = t.officerPfId || t.bookedByPfId || "unknown";
+    if (!pfMap[key]) pfMap[key] = { pfId: key, name: t.officerName, department: t.department, trips: [] };
+    pfMap[key].trips.push(t);
+  });
+  const pfRows = Object.values(pfMap).sort((a, b) => b.trips.length - a.trips.length);
+
+  // ── Driver-wise: group all trips by carId
+  const driverMap = {};
+  cars.forEach(car => { driverMap[car.id] = { car, trips: [] }; });
+  trips.forEach(t => { if (driverMap[t.carId]) driverMap[t.carId].trips.push(t); });
+  const driverRows = Object.values(driverMap);
+
+  const filteredPf = pfRows.filter(r =>
+    !search || r.name?.toLowerCase().includes(search.toLowerCase()) || r.pfId.includes(search) || r.department?.toLowerCase().includes(search.toLowerCase())
+  );
+  const filteredDriver = driverRows.filter(r =>
+    !search || r.car.driver.toLowerCase().includes(search.toLowerCase()) || r.car.plate.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const statusBadge = (t) => {
+    if (t.returnTime) return <span style={css.badge(G.success)}>Returned</span>;
+    if (t.approvalStatus === "pending") return <span style={css.badge(G.warning)}>Pending</span>;
+    if (t.approvalStatus === "rejected") return <span style={css.badge(G.danger)}>Rejected</span>;
+    return <span style={css.badge("#0891b2")}>Active</span>;
+  };
+
+  return (
+    <div>
+      {/* ── Stat cards ── */}
+      <div style={css.grid4}>
+        {[
+          { label: "EVs Available",      val: cars.length - activeTrips.length, color: G.success,  icon: "✅" },
+          { label: "Active Trips",        val: activeTrips.length,               color: "#0891b2",  icon: "🚗" },
+          { label: "Pending Approvals",   val: pendingTrips.length,              color: G.warning,  icon: "⏳" },
+          { label: "Today's Trips",       val: todayTrips.length,                color: G.info,     icon: "📋" },
+        ].map(s => (
+          <div key={s.label} style={{ ...css.card, borderTop: `3px solid ${s.color}` }}>
+            <div style={{ fontSize: 22, marginBottom: 6 }}>{s.icon}</div>
+            <div style={{ ...css.statNum, color: s.color }}>{s.val}</div>
+            <div style={css.statLabel}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── View toggle + search — admin only ── */}
+      {currentUser.isAdmin && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+          <div style={{ display: "flex", background: "#e2e8f0", borderRadius: 8, padding: 3, gap: 2 }}>
+            {[["pf","👤 PF ID Wise"],["driver","🧑‍✈️ Driver Wise"]].map(([v, label]) => (
+              <button key={v} onClick={() => { setView(v); setSearch(""); }}
+                style={{ padding: "7px 20px", borderRadius: 6, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13,
+                  background: view === v ? "#1e293b" : "transparent", color: view === v ? "#fff" : G.muted, transition: "all 0.15s" }}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <input
+            style={{ ...css.input, maxWidth: 260 }}
+            placeholder={view === "pf" ? "Search by name, PF ID or dept…" : "Search by driver or plate…"}
+            value={search} onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* ══ ADMIN ONLY VIEWS ══ */}
+      {!currentUser.isAdmin && (
+        <div style={{ ...css.card, textAlign: "center", padding: 40 }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🚗</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: G.text, marginBottom: 8 }}>
+            {cars.length - activeTrips.length} of {cars.length} vehicles available
+          </div>
+          <div style={{ fontSize: 13, color: G.muted, marginBottom: 20 }}>
+            {activeTrips.length > 0 ? `${activeTrips.length} vehicle${activeTrips.length > 1 ? "s" : ""} currently on duty` : "All vehicles are available for booking"}
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+            {cars.map(car => {
+              const busy = isCarBusy(car.id);
+              return (
+                <div key={car.id} style={{ padding: "12px 20px", borderRadius: 10, border: `2px solid ${busy ? G.danger : G.success}`, background: busy ? "#fef2f2" : "#f0fdf4", minWidth: 140 }}>
+                  <div style={{ fontSize: 20, marginBottom: 4 }}>🚙</div>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: G.text }}>{car.name}</div>
+                  <div style={{ fontSize: 11, color: G.muted }}>{car.plate}</div>
+                  <div style={{ marginTop: 6 }}>
+                    <span style={css.badge(busy ? G.danger : G.success)}>{busy ? "● On Duty" : "● Available"}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {currentUser.isAdmin && view === "pf" && (() => {
+        // Group all matching trips by date, sorted newest first
+        const allTrips = filteredPf.flatMap(r => r.trips);
+        const dateMap = {};
+        allTrips.forEach(t => {
+          const d = t.date || "unknown";
+          if (!dateMap[d]) dateMap[d] = [];
+          dateMap[d].push(t);
+        });
+        const sortedDates = Object.keys(dateMap).sort((a, b) => b.localeCompare(a));
+        if (sortedDates.length === 0) return (
+          <div style={css.card}>
+            <div style={{ textAlign: "center", padding: 40, color: G.muted }}>No trips recorded yet{search ? ` for "${search}"` : ""}.</div>
+          </div>
+        );
+        return (
+          <div>
+            {sortedDates.map(date => {
+              const dayTrips = dateMap[date];
+              const isToday = date === today();
+              const isOpen = expandedDates[date] !== false && (expandedDates[date] === true || isToday);
+              const activeCount = dayTrips.filter(t => !t.returnTime && t.approvalStatus === "approved").length;
+              const pendingCount2 = dayTrips.filter(t => t.approvalStatus === "pending").length;
+              return (
+                <div key={date} style={{ marginBottom: 12, borderRadius: 10, border: `1px solid ${isToday ? G.info : G.border}`, overflow: "hidden" }}>
+                  {/* Date header — clickable */}
+                  <div onClick={() => toggleDate(date)}
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isToday ? "#eff6ff" : G.light, cursor: "pointer", userSelect: "none", borderBottom: isOpen ? `1px solid ${G.border}` : "none" }}>
+                    <span style={{ fontSize: 16 }}>{isOpen ? "▾" : "▸"}</span>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontWeight: 800, fontSize: 14, color: isToday ? G.info : G.text }}>
+                        {isToday ? "📅 Today — " : "📅 "}{fmtDate(date)}
+                      </span>
+                      {isToday && <span style={{ marginLeft: 8, fontSize: 11, background: G.info, color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>TODAY</span>}
+                    </div>
+                    <div style={{ display: "flex", gap: 14, fontSize: 12 }}>
+                      <span style={{ color: G.muted }}><b style={{ color: G.text }}>{dayTrips.length}</b> trips</span>
+                      {activeCount > 0 && <span style={{ color: G.success, fontWeight: 700 }}>● {activeCount} active</span>}
+                      {pendingCount2 > 0 && <span style={{ color: G.warning, fontWeight: 700 }}>⏳ {pendingCount2} pending</span>}
+                    </div>
+                  </div>
+                  {/* Trip table — shown when expanded */}
+                  {isOpen && (
+                    <div className="scroll-table"><table style={css.table}>
+                      <thead><tr>
+                        {["#","Officer","PF ID","Vehicle","Driver","Destination","Purpose","Depart","Return","Start KM","End KM","Dist","Status"].map(h => <th key={h} style={css.th}>{h}</th>)}
+                      </tr></thead>
+                      <tbody>
+                        {dayTrips.map((t, i) => (
+                          <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? "#f0fdf4" : "transparent" }}>
+                            <td style={{ ...css.td, color: G.muted, fontSize: 11 }}>{i + 1}</td>
+                            <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
+                            <td style={{ ...css.td, fontSize: 12, color: G.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                            <td style={css.td}><div style={{ fontWeight: 600 }}>{t.carName}</div><div style={{ fontSize: 11, color: G.muted }}>{t.carPlate}</div></td>
+                            <td style={css.td}>{t.driver}</td>
+                            <td style={css.td}>{t.destination}</td>
+                            <td style={{ ...css.td, color: G.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
+                            <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
+                            <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: G.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
+                            <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
+                            <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
+                            <td style={css.td}>{statusBadge(t)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table></div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
+
+      {currentUser.isAdmin && view === "driver" && (
+        <div style={css.card}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={css.sectionTitle}>Trip Entries — Driver Wise</div>
+            <div style={{ fontSize: 12, color: G.muted }}>{cars.length} vehicles · {trips.length} total entries</div>
+          </div>
+          {filteredDriver.map(({ car, trips: carTrips }) => {
+            const dateMap2 = {};
+            carTrips.forEach(t => { const d = t.date || "unknown"; if (!dateMap2[d]) dateMap2[d] = []; dateMap2[d].push(t); });
+            const sortedDates2 = Object.keys(dateMap2).sort((a, b) => b.localeCompare(a));
+            const busy = isCarBusy(car.id);
+            const active = activeTripForCar(car.id);
+            const completed = carTrips.filter(t => t.returnTime).length;
+            const totalKm = carTrips.reduce((s, t) => s + (t.startKm && t.endKm ? parseInt(t.endKm) - parseInt(t.startKm) : 0), 0);
+            return (
+              <div key={car.id} style={{ marginBottom: 24, borderRadius: 10, border: `2px solid ${busy ? G.danger : G.border}`, overflow: "hidden" }}>
+                {/* Driver header */}
+                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: busy ? "#fff1f2" : G.light, borderBottom: `1px solid ${G.border}` }}>
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, color: "#fff", fontSize: 18, flexShrink: 0 }}>
+                    {car.driver.charAt(0)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: G.text }}>🧑‍✈️ {car.driver}</div>
+                    <div style={{ fontSize: 12, color: G.muted }}>{car.name} · <b>{car.plate}</b> · {car.model}</div>
+                    <div style={{ fontSize: 12, color: G.muted }}>📞 <a href={`tel:${car.driverPhone}`} style={{ color: G.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
+                  </div>
+                  <div style={{ display: "flex", gap: 16, fontSize: 12, textAlign: "center" }}>
+                    <div><div style={{ fontWeight: 800, fontSize: 20, color: G.text }}>{carTrips.length}</div><div style={{ color: G.muted }}>Trips</div></div>
+                    <div><div style={{ fontWeight: 800, fontSize: 20, color: G.success }}>{completed}</div><div style={{ color: G.muted }}>Done</div></div>
+                    {totalKm > 0 && <div><div style={{ fontWeight: 800, fontSize: 20, color: G.info }}>{totalKm}</div><div style={{ color: G.muted }}>km</div></div>}
+                    <span style={{ ...css.badge(busy ? G.danger : G.success), alignSelf: "center", fontSize: 12 }}>{busy ? "● On Duty" : "● Available"}</span>
+                  </div>
+                </div>
+
+                {/* Active trip highlight */}
+                {active && (
+                  <div style={{ padding: "10px 16px", background: "#f0fdf4", borderBottom: `1px solid #bbf7d0`, display: "flex", gap: 20, flexWrap: "wrap", fontSize: 13 }}>
+                    <div>🚦 <b>Currently with:</b> {active.officerName}</div>
+                    <div>📍 <b>To:</b> {active.destination}</div>
+                    <div>🏢 {active.department}</div>
+                    <div>🕐 Since {active.departureTime}</div>
+                    {active.startKm && <div>📏 Start KM: {active.startKm}</div>}
+                  </div>
+                )}
+
+                {carTrips.length === 0
+                  ? <div style={{ padding: "20px 16px", color: G.muted, fontSize: 13 }}>No trips recorded for this vehicle yet.</div>
+                  : sortedDates2.map(date => {
+                    const dayT = dateMap2[date];
+                    const isTodayD = date === today();
+                    const isOpenD = expandedDates["drv_"+car.id+"_"+date] !== false && (expandedDates["drv_"+car.id+"_"+date] === true || isTodayD);
+                    return (
+                      <div key={date}>
+                        <div onClick={() => toggleDate("drv_"+car.id+"_"+date)}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", background: isTodayD ? "#eff6ff" : "#fafafa", cursor: "pointer", borderBottom: `1px solid ${G.border}`, userSelect: "none" }}>
+                          <span style={{ fontSize: 13 }}>{isOpenD ? "▾" : "▸"}</span>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: isTodayD ? G.info : G.text }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
+                          {isTodayD && <span style={{ fontSize: 10, background: G.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
+                          <span style={{ marginLeft: "auto", fontSize: 12, color: G.muted }}>{dayT.length} trip{dayT.length !== 1 ? "s" : ""}</span>
+                        </div>
+                        {isOpenD && (
+                          <div className="scroll-table"><table style={css.table}>
+                            <thead><tr>
+                              {["#","Officer","PF ID","Department","Destination","Purpose","Depart","Return","Start KM","End KM","Dist","Status"].map(h => <th key={h} style={css.th}>{h}</th>)}
+                            </tr></thead>
+                            <tbody>
+                              {dayT.map((t, i) => (
+                                <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? "#f0fdf4" : "transparent" }}>
+                                  <td style={{ ...css.td, color: G.muted, fontSize: 11 }}>{i + 1}</td>
+                                  <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
+                                  <td style={{ ...css.td, fontSize: 12, color: G.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                                  <td style={{ ...css.td, fontSize: 12 }}>{t.department}</td>
+                                  <td style={css.td}>{t.destination}</td>
+                                  <td style={{ ...css.td, color: G.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
+                                  <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
+                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: G.muted }}>—</span>}</td>
+                                  <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
+                                  <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
+                                  <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
+                                  <td style={css.td}>{statusBadge(t)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table></div>
+                        )}
+                      </div>
+                    );
+                  })
+                }
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── BOOK TRIP ─────────────────────────────────────────────────
+function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab, currentUser }) {
+  const [allUsers, setAllUsers] = useState(AUTHORISED_USERS);
+
+  // Load Firebase users so newly added users appear in PF lookup too
+  useEffect(() => {
+    const db = window.__db;
+    if (!db) return;
+    try {
+      db.collection("config").doc("users").onSnapshot(snap => {
+        if (snap.exists) { const d = snap.data(); if (d.list && d.list.length > 0) setAllUsers(d.list); }
+      });
+    } catch(e) {}
+  }, []);
+
+  const freshUser = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
+  const initName = freshUser?.name || currentUser?.name || "";
+  const initDept = freshUser?.department || currentUser?.department || "";
+  const initPfId = currentUser?.pfId || "";
+
+  const [pfInput, setPfInput] = useState(initPfId);
+  const [matchedUser, setMatchedUser] = useState(initPfId ? { name: initName, pfId: initPfId, department: initDept } : null);
+  const [form, setForm] = useState({ carId: "", officerName: initName, department: initDept, officerPfId: initPfId, destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
+  const [returnForm, setReturnForm] = useState({ tripId: "", returnTime: now(), endKm: "", remarks: "" });
+  const [msg, setMsg] = useState("");
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const setR = (k, v) => setReturnForm(f => ({ ...f, [k]: v }));
+
+  // Live PF ID lookup — auto-populate name & department
+  const handlePfInput = (val) => {
+    setPfInput(val);
+    const trimmed = val.trim();
+    if (trimmed.length >= 5) {
+      const found = allUsers.find(u => u.pfId === trimmed);
+      if (found) {
+        setMatchedUser(found);
+        setForm(f => ({ ...f, officerName: found.name, department: found.department || "", officerPfId: found.pfId }));
+      } else {
+        setMatchedUser(null);
+        setForm(f => ({ ...f, officerName: "", department: "", officerPfId: "" }));
+      }
+    } else {
+      setMatchedUser(null);
+      setForm(f => ({ ...f, officerName: "", department: "", officerPfId: "" }));
+    }
+  };
+
+  // Check if the booking user (not officer) already has an active/pending trip
+  const userActiveTripPfId = currentUser?.pfId;
+  const userHasActiveTrip = !currentUser?.isAdmin && trips.some(t =>
+    !t.returnTime &&
+    (t.approvalStatus === "approved" || t.approvalStatus === "pending") &&
+    (t.bookedByPfId === userActiveTripPfId || t.officerPfId === userActiveTripPfId)
+  );
+  const userActiveTrip = userHasActiveTrip
+    ? trips.find(t => !t.returnTime && (t.approvalStatus === "approved" || t.approvalStatus === "pending") && (t.bookedByPfId === userActiveTripPfId || t.officerPfId === userActiveTripPfId))
+    : null;
+
+  const handleBook = () => {
+    if (!matchedUser) { setMsg("❌ Please enter a valid PF ID first."); return; }
+    if (!form.carId || !form.destination || !form.date || !form.departureTime) {
+      setMsg("❌ Please fill all required fields."); return;
+    }
+    if (isCarBusy(form.carId)) { setMsg("❌ This vehicle is currently on duty."); return; }
+    if (userHasActiveTrip && userActiveTrip) {
+      setMsg("❌ You already have an active/pending trip (" + userActiveTrip.carName + " → " + userActiveTrip.destination + "). Please cancel or return that vehicle before booking another.");
+      return;
+    }
+    const car = cars.find(c => c.id === form.carId);
+    const newTrip = {
+      id: Date.now().toString(), ...form,
+      carName: car.name, carPlate: car.plate, driver: car.driver, driverPhone: car.driverPhone,
+      bookedByPfId: currentUser?.pfId,
+      approvalStatus: "pending",
+      approvedBy: [],
+      rejectedBy: null, rejectionReason: "",
+      returnTime: "", endKm: "", remarks: "",
+      bookedAt: new Date().toISOString(),
+    };
+    saveTrips([...trips, newTrip]);
+    // Reset form — re-lookup current user's fresh data from merged list
+    const fresh = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
+    setPfInput(currentUser?.pfId || "");
+    setMatchedUser(fresh || null);
+    setForm({ carId: "", officerName: fresh?.name || currentUser?.name || "", department: fresh?.department || "", officerPfId: currentUser?.pfId || "", destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
+    setMsg("✅ Trip request submitted! Awaiting approval from admins.");
+    setTimeout(() => setMsg(""), 4000);
+  };
+
+  const handleReturn = () => {
+    const tripId = returnForm.tripId || (trips.filter(t => !t.returnTime && t.approvalStatus === "approved" && (t.bookedByPfId === currentUser?.pfId || t.officerPfId === currentUser?.pfId))[0]?.id);
+    if (!tripId || !returnForm.returnTime) { setMsg("❌ Please select trip and enter return time."); return; }
+    const returnDate = returnForm.returnDate || today();
+    const returnDateTime = returnDate + " " + returnForm.returnTime;
+    const updated = trips.map(t => t.id === tripId ? { ...t, returnTime: returnDateTime, endKm: returnForm.endKm, remarks: returnForm.remarks } : t);
+    saveTrips(updated);
+    setReturnForm({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
+    setMsg("✅ Vehicle released successfully!");
+    setTimeout(() => { setMsg(""); setTab("dashboard"); }, 1500);
+  };
+
+  // Only approved trips can be returned
+  const activeTrips = trips.filter(t => !t.returnTime && t.approvalStatus === "approved");
+  // Show current user's own pending/rejected trips
+  const myTrips = trips.filter(t => t.bookedByPfId === currentUser?.pfId).slice().reverse().slice(0, 5);
+
+  const approvalBadge = (t) => {
+    if (t.approvalStatus === "approved") return <span style={css.badge(G.success)}>✅ Approved</span>;
+    if (t.approvalStatus === "rejected") return <span style={css.badge(G.danger)}>❌ Rejected</span>;
+    const count = t.approvedBy?.length || 0;
+    return <span style={css.badge(G.warning)}>⏳ Awaiting Approval</span>;
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        {/* Book */}
+        <div style={css.card}>
+          <div style={css.sectionTitle}>📤 Request a Vehicle</div>
+          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13, fontWeight: 600 }}>{msg}</div>}
+
+          {/* Approval notice for non-admins */}
+          {!currentUser?.isAdmin && (
+            <div style={{ padding: "10px 14px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, marginBottom: 16, fontSize: 12, color: "#1e40af" }}>
+            ℹ️ Your trip request will be sent for approval to <b>Biswajit Bhattacharjee</b> and <b>Abhijit Bhattacharjee</b>. Approval from either one will confirm your vehicle.
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {/* PF ID lookup field */}
+            <div>
+              <label style={css.label}>Officer PF ID *</label>
+              <input
+                style={{ ...css.input, border: `1.5px solid ${pfInput.length >= 5 ? (matchedUser ? "#16a34a" : "#dc2626") : G.border}`, transition: "border-color 0.2s" }}
+                value={pfInput}
+                onChange={e => handlePfInput(e.target.value)}
+                placeholder="Enter PF ID to auto-fill name & department"
+                maxLength={10}
+              />
+              {pfInput.length >= 5 && !matchedUser && (
+                <div style={{ fontSize: 11, color: G.danger, marginTop: 4 }}>⚠ PF ID not found in authorised users list</div>
+              )}
+            </div>
+
+            {/* Auto-populated user info card */}
+            {matchedUser && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8 }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
+                  {matchedUser.name.charAt(0)}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: "#166534" }}>{matchedUser.name}</div>
+                  <div style={{ fontSize: 12, color: "#16a34a" }}>🏢 {matchedUser.department || "—"}</div>
+                </div>
+                <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 600 }}>✓ Verified</div>
+              </div>
+            )}
+
+            <div>
+              <label style={css.label}>Select Vehicle *</label>
+              <select style={css.select} value={form.carId} onChange={e => set("carId", e.target.value)}>
+                <option value="">-- Choose Vehicle --</option>
+                {cars.map(c => <option key={c.id} value={c.id} disabled={isCarBusy(c.id)}>{c.name} — {c.plate} | Driver: {c.driver} {isCarBusy(c.id) ? "(On Duty)" : "(Available)"}</option>)}
+              </select>
+            </div>
+
+            {/* Driver info + Call button — shown when a vehicle is selected */}
+            {form.carId && (() => {
+              const selCar = cars.find(c => c.id === form.carId);
+              if (!selCar) return null;
+              return (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: selCar.color || G.info, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
+                    {selCar.driver.charAt(0)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: "#0c4a6e" }}>🧑‍✈️ {selCar.driver}</div>
+                    <div style={{ fontSize: 12, color: "#0369a1" }}>{selCar.driverPhone}</div>
+                  </div>
+                  <a href={`tel:${selCar.driverPhone}`}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", flexShrink: 0 }}>
+                    📞 Call Driver
+                  </a>
+                </div>
+              );
+            })()}
+            <div style={css.formGrid}>
+              <div>
+                <label style={css.label}>Officer Name</label>
+                <input style={{ ...css.input, background: "#f8fafc", color: matchedUser ? G.text : G.muted }} value={form.officerName} readOnly placeholder="Auto-filled from PF ID" />
+              </div>
+              <div>
+                <label style={css.label}>Department</label>
+                <input style={{ ...css.input, background: "#f8fafc", color: matchedUser ? G.text : G.muted }} value={form.department} readOnly placeholder="Auto-filled from PF ID" />
+              </div>
+            </div>
+            <div>
+              <label style={css.label}>Destination *</label>
+              <input style={css.input} value={form.destination} onChange={e => set("destination", e.target.value)} placeholder="Where are you going?" />
+            </div>
+            <div>
+              <label style={css.label}>Purpose of Trip *</label>
+              <input style={css.input} value={form.purpose} onChange={e => set("purpose", e.target.value)} placeholder="Official purpose / meeting details" />
+            </div>
+            <div style={css.formGrid}>
+              <div>
+                <label style={css.label}>Date *</label>
+                <input type="date" style={css.input} value={form.date} onChange={e => set("date", e.target.value)} />
+              </div>
+              <div>
+                <label style={css.label}>Departure Time *</label>
+                <input type="time" style={css.input} value={form.departureTime} onChange={e => set("departureTime", e.target.value)} />
+              </div>
+            </div>
+            <div>
+              <label style={css.label}>Start Odometer (km)</label>
+              <input type="number" style={css.input} value={form.startKm} onChange={e => set("startKm", e.target.value)} placeholder="e.g. 45230" />
+            </div>
+            <button style={css.btn(G.info)} onClick={handleBook}>Submit Trip Request →</button>
+          </div>
+        </div>
+
+        {/* Return */}
+        <div style={css.card}>
+          <div style={css.sectionTitle}>📥 Release Vehicle</div>
+          {(() => {
+            // Non-admin: only show their own active trip
+            const myActiveTrips = currentUser.isAdmin
+              ? activeTrips
+              : activeTrips.filter(t => t.bookedByPfId === currentUser.pfId || t.officerPfId === currentUser.pfId);
+
+            return myActiveTrips.length === 0 ? (
+              <div style={{ textAlign: "center", color: G.muted, padding: 40 }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+                <div>{currentUser.isAdmin ? "No approved active trips to return" : "You have no active trip to release"}</div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {/* If admin, show dropdown. If user has only one trip, auto-select it */}
+                {myActiveTrips.length > 1 ? (
+                  <div>
+                    <label style={css.label}>Select Active Trip *</label>
+                    <select style={css.select} value={returnForm.tripId} onChange={e => setR("tripId", e.target.value)}>
+                      <option value="">-- Select Trip --</option>
+                      {myActiveTrips.map(t => <option key={t.id} value={t.id}>{t.carName} — {t.officerName} → {t.destination}</option>)}
+                    </select>
+                  </div>
+                ) : (
+                  // Auto-select single trip
+                  returnForm.tripId !== myActiveTrips[0].id && setR("tripId", myActiveTrips[0].id) || null
+                )}
+
+                {/* Trip details card */}
+                {(() => {
+                  const tripId = returnForm.tripId || (myActiveTrips.length === 1 ? myActiveTrips[0].id : null);
+                  const t = trips.find(x => x.id === tripId);
+                  return t ? (
+                    <div style={{ background: "#f0fdf4", borderRadius: 8, padding: 14, fontSize: 13, border: "1px solid #bbf7d0" }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: "#166534", marginBottom: 8 }}>🚙 {t.carName} — {t.carPlate}</div>
+                      <div style={{ color: G.muted }}><b>Driver:</b> {t.driver} · <b>Departed:</b> {fmtDate(t.date)} at {t.departureTime}</div>
+                      <div style={{ color: G.muted }}><b>Destination:</b> {t.destination}</div>
+                      {t.startKm && <div style={{ color: G.muted }}><b>Start KM:</b> {t.startKm}</div>}
+                    </div>
+                  ) : null;
+                })()}
+
+                {/* Return date + time */}
+                <div style={css.formGrid}>
+                  <div>
+                    <label style={css.label}>Return Date *</label>
+                    <input type="date" style={css.input} value={returnForm.returnDate || today()} onChange={e => setR("returnDate", e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={css.label}>Return Time *</label>
+                    <input type="time" style={css.input} value={returnForm.returnTime} onChange={e => setR("returnTime", e.target.value)} />
+                  </div>
+                </div>
+                <div style={css.formGrid}>
+                  <div>
+                    <label style={css.label}>End Odometer (km)</label>
+                    <input type="number" style={css.input} value={returnForm.endKm} onChange={e => setR("endKm", e.target.value)} placeholder="e.g. 45310" />
+                  </div>
+                  <div>
+                    <label style={css.label}>Remarks</label>
+                    <input style={css.input} value={returnForm.remarks} onChange={e => setR("remarks", e.target.value)} placeholder="Any issues, notes..." />
+                  </div>
+                </div>
+                <button style={{ ...css.btn(G.success), fontSize: 15, padding: "12px 20px" }} onClick={handleReturn}>
+                  🔓 Release Vehicle & Mark Returned
+                </button>
+              </div>
+            );
+          })()}
+
+          {/* Admin: show all currently out vehicles */}
+          {currentUser.isAdmin && activeTrips.length > 0 && (
+            <div style={{ marginTop: 24 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: G.muted, marginBottom: 10 }}>CURRENTLY OUT (APPROVED)</div>
+              {activeTrips.map(t => (
+                <div key={t.id} style={{ padding: "10px 12px", background: "#f0fdf4", borderRadius: 8, marginBottom: 8, borderLeft: "3px solid #16a34a" }}>
+                  <div style={{ fontWeight: 700, fontSize: 13 }}>{t.carName} — {t.carPlate}</div>
+                  <div style={{ fontSize: 12, color: G.muted }}>🧑‍✈️ {t.driver} | {t.officerName} ({t.department})</div>
+                  <div style={{ fontSize: 12, color: G.muted }}>→ {t.destination} · Left at {t.departureTime}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* My recent trip requests */}
+      {myTrips.length > 0 && (
+        <div style={css.card}>
+          <div style={css.sectionTitle}>📋 My Recent Trip Requests</div>
+          <div className="scroll-table"><table style={css.table}>
+            <thead><tr>{["Vehicle","Destination","Purpose","Date","Time","Approval Status","Approvals","Action"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr></thead>
+            <tbody>
+              {myTrips.map(t => (
+                <tr key={t.id}>
+                  <td style={css.td}>{t.carName}</td>
+                  <td style={css.td}>{t.destination}</td>
+                  <td style={{ ...css.td, color: G.muted }}>{t.purpose || "—"}</td>
+                  <td style={css.td}>{fmtDate(t.date)}</td>
+                  <td style={css.td}>{t.departureTime}</td>
+                  <td style={css.td}>{approvalBadge(t)}</td>
+                  <td style={css.td}>
+                    {t.approvalStatus === "rejected"
+                      ? <span style={{ color: G.danger, fontSize: 12 }}>Reason: {t.rejectionReason || "—"}</span>
+                      : <span style={{ fontSize: 12, color: G.muted }}>
+                          {ADMIN_1.name}: {t.approvedBy?.includes(ADMIN_1.pfId) ? "✅" : "⏳"} &nbsp;
+                          {ADMIN_2.name}: {t.approvedBy?.includes(ADMIN_2.pfId) ? "✅" : "⏳"}
+                        </span>
+                    }
+                  </td>
+                  <td style={css.td}>
+                    {t.approvalStatus === "pending" ? (
+                      <button
+                        onClick={() => {
+                          if (window.confirm("Cancel this trip request for " + t.carName + " to " + t.destination + "?")) {
+                            saveTrips(trips.filter(x => x.id !== t.id));
+                            setMsg("✅ Trip request cancelled.");
+                            setTimeout(() => setMsg(""), 3000);
+                          }
+                        }}
+                        style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #fca5a5", background: "#fef2f2", color: "#dc2626", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                      >✕ Cancel</button>
+                    ) : (
+                      <span style={{ fontSize: 12, color: G.muted }}>—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── APPROVALS ─────────────────────────────────────────────────
+function Approvals({ trips, saveTrips, currentUser }) {
+  const [rejectId, setRejectId] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [filter, setFilter] = useState("pending");
+
+  const pending = trips.filter(t => t.approvalStatus === "pending");
+  const approved = trips.filter(t => t.approvalStatus === "approved");
+  const rejected = trips.filter(t => t.approvalStatus === "rejected");
+
+  const handleApprove = (tripId) => {
+    const updated = trips.map(t => {
+      if (t.id !== tripId) return t;
+      const newApprovedBy = [...(t.approvedBy || [])];
+      if (!newApprovedBy.includes(currentUser.pfId)) newApprovedBy.push(currentUser.pfId);
+      const fullyApproved = newApprovedBy.includes(ADMIN_1.pfId) || newApprovedBy.includes(ADMIN_2.pfId);
+      return { ...t, approvedBy: newApprovedBy, approvalStatus: fullyApproved ? "approved" : "pending" };
+    });
+    saveTrips(updated);
+  };
+
+  const handleReject = (tripId) => {
+    const updated = trips.map(t => t.id !== tripId ? t : {
+      ...t, approvalStatus: "rejected", rejectedBy: currentUser.pfId,
+      rejectedByName: currentUser.name, rejectionReason: rejectReason, rejectedAt: new Date().toISOString()
+    });
+    saveTrips(updated);
+    setRejectId(null);
+    setRejectReason("");
+  };
+
+  const displayTrips = filter === "pending" ? pending : filter === "approved" ? approved : rejected;
+
+  const ApprovalCard = ({ t }) => {
+    const myApproved = t.approvedBy?.includes(currentUser.pfId);
+    const admin1Done = t.approvedBy?.includes(ADMIN_1.pfId);
+    const admin2Done = t.approvedBy?.includes(ADMIN_2.pfId);
+    return (
+      <div style={{ ...css.card, marginBottom: 16, borderLeft: `4px solid ${t.approvalStatus === "approved" ? G.success : t.approvalStatus === "rejected" ? G.danger : G.warning}` }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+              <div style={{ fontWeight: 800, fontSize: 15 }}>{t.officerName}</div>
+              <span style={{ fontSize: 11, color: G.muted }}>PF: {t.bookedByPfId}</span>
+              {t.approvalStatus === "pending" && <span style={css.badge(G.warning)}>⏳ Pending</span>}
+              {t.approvalStatus === "approved" && <span style={css.badge(G.success)}>✅ Approved</span>}
+              {t.approvalStatus === "rejected" && <span style={css.badge(G.danger)}>❌ Rejected</span>}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", fontSize: 13 }}>
+              <div><span style={{ color: G.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</div>
+              <div><span style={{ color: G.muted }}>Driver:</span> {t.driver}</div>
+              <div><span style={{ color: G.muted }}>Department:</span> {t.department}</div>
+              <div><span style={{ color: G.muted }}>Date:</span> {fmtDate(t.date)} at {t.departureTime}</div>
+              <div><span style={{ color: G.muted }}>Destination:</span> <b>{t.destination}</b></div>
+              <div><span style={{ color: G.muted }}>Purpose:</span> {t.purpose || "—"}</div>
+            </div>
+            {t.approvalStatus === "rejected" && (
+              <div style={{ marginTop: 8, padding: "6px 10px", background: "#fee2e2", borderRadius: 6, fontSize: 12, color: G.danger }}>
+                ❌ Rejected by {t.rejectedByName} — "{t.rejectionReason || 'No reason given'}"
+              </div>
+            )}
+          </div>
+
+          {/* Approval status indicators */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 200 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: "0.05em" }}>Approval Status</div>
+            {[ADMIN_1, ADMIN_2].map(admin => (
+              <div key={admin.pfId} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: t.approvedBy?.includes(admin.pfId) ? "#f0fdf4" : "#fafafa", borderRadius: 6, border: `1px solid ${t.approvedBy?.includes(admin.pfId) ? "#bbf7d0" : G.border}` }}>
+                <div style={{ fontSize: 16 }}>{t.approvedBy?.includes(admin.pfId) ? "✅" : "⏳"}</div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700 }}>{admin.name}</div>
+                  <div style={{ fontSize: 11, color: G.muted }}>{t.approvedBy?.includes(admin.pfId) ? "Approved" : "Awaiting"}</div>
+                </div>
+              </div>
+            ))}
+
+            {/* Action buttons — only show for pending trips */}
+            {t.approvalStatus === "pending" && !myApproved && (
+              <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => handleApprove(t.id)}>✅ Approve</button>
+                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => setRejectId(t.id)}>❌ Reject</button>
+              </div>
+            )}
+            {t.approvalStatus === "pending" && myApproved && (
+              <div style={{ padding: "6px 10px", background: "#f0fdf4", borderRadius: 6, fontSize: 12, color: G.success, fontWeight: 600 }}>
+                ✅ You have approved this request
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Reject modal inline */}
+        {rejectId === t.id && (
+          <div style={{ marginTop: 14, padding: 14, background: "#fff1f2", borderRadius: 8, border: "1px solid #fecdd3" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: G.danger, marginBottom: 8 }}>Reason for Rejection</div>
+            <input style={{ ...css.input, marginBottom: 10 }} value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Enter reason (optional)" autoFocus />
+            <div style={{ display: "flex", gap: 8 }}>
+              <button style={css.btn(G.danger)} onClick={() => handleReject(t.id)}>Confirm Rejection</button>
+              <button style={css.btn(G.muted, true)} onClick={() => { setRejectId(null); setRejectReason(""); }}>Cancel</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {/* Summary stats */}
+      <div style={{ ...css.grid4, gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 24 }}>
+        <div style={{ ...css.card, borderTop: `3px solid ${G.warning}`, cursor: "pointer" }} onClick={() => setFilter("pending")}>
+          <div style={{ ...css.statNum, color: G.warning }}>{pending.length}</div>
+          <div style={css.statLabel}>Pending Approval</div>
+        </div>
+        <div style={{ ...css.card, borderTop: `3px solid ${G.success}`, cursor: "pointer" }} onClick={() => setFilter("approved")}>
+          <div style={{ ...css.statNum, color: G.success }}>{approved.length}</div>
+          <div style={css.statLabel}>Approved</div>
+        </div>
+        <div style={{ ...css.card, borderTop: `3px solid ${G.danger}`, cursor: "pointer" }} onClick={() => setFilter("rejected")}>
+          <div style={{ ...css.statNum, color: G.danger }}>{rejected.length}</div>
+          <div style={css.statLabel}>Rejected</div>
+        </div>
+      </div>
+
+      {/* Filter tabs */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        {[["pending","⏳ Pending"],["approved","✅ Approved"],["rejected","❌ Rejected"]].map(([f, label]) => (
+          <button key={f} style={{ ...css.btn(f === "pending" ? G.warning : f === "approved" ? G.success : G.danger, filter !== f), fontSize: 13 }} onClick={() => setFilter(f)}>{label}</button>
+        ))}
+      </div>
+
+      {displayTrips.length === 0
+        ? <div style={{ ...css.card, textAlign: "center", padding: 48, color: G.muted }}>No {filter} trip requests.</div>
+        : displayTrips.slice().reverse().map(t => <ApprovalCard key={t.id} t={t} />)
+      }
+    </div>
+  );
+}
+
+// ── LIVE TRACKING ─────────────────────────────────────────────
+function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeTripForCar }) {
+  const [selected, setSelected] = useState(null);
+  const [linkInput, setLinkInput] = useState("");
+  const [msg, setMsg] = useState("");
+
+  // Convert various Google Maps share link formats to embeddable src
+  const toEmbedUrl = (url) => {
+    if (!url) return null;
+    // Already an embed link
+    if (url.includes("google.com/maps/embed")) return url;
+    // Live location share link: maps.app.goo.gl or goo.gl/maps
+    if (url.includes("goo.gl") || url.includes("maps.app")) {
+      // We embed via redirect — pass through as iframe src with output=embed
+      return url;
+    }
+    // Standard google maps link — try to extract coords
+    const coordMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (coordMatch) {
+      return `https://maps.google.com/maps?q=${coordMatch[1]},${coordMatch[2]}&z=15&output=embed`;
+    }
+    // place search link
+    const placeMatch = url.match(/place\/([^/]+)/);
+    if (placeMatch) {
+      return `https://maps.google.com/maps?q=${encodeURIComponent(placeMatch[1])}&output=embed`;
+    }
+    // fallback — try direct embed
+    return url;
+  };
+
+  const handleSaveLink = (carId) => {
+    if (!linkInput.trim()) { setMsg("❌ Please paste a valid Google Maps link."); return; }
+    const updated = { ...liveLocations, [carId]: { url: linkInput.trim(), updatedAt: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }), updatedDate: today() } };
+    saveLive(updated);
+    setLinkInput("");
+    setMsg("✅ Live location link saved!");
+    setTimeout(() => setMsg(""), 2500);
+  };
+
+  const handleClear = (carId) => {
+    const updated = { ...liveLocations };
+    delete updated[carId];
+    saveLive(updated);
+    if (selected === carId) setSelected(null);
+  };
+
+  const activeTrip = selected ? activeTripForCar(selected) : null;
+  const selectedCar = cars.find(c => c.id === selected);
+  const embedUrl = selected && liveLocations[selected] ? toEmbedUrl(liveLocations[selected].url) : null;
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16, padding: "12px 16px", background: "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe", fontSize: 13 }}>
+        <b>📱 How to share live location from Google Maps:</b>
+        <ol style={{ marginTop: 8, paddingLeft: 20, lineHeight: 2 }}>
+          <li>Driver opens <b>Google Maps</b> on their phone</li>
+          <li>Taps their <b>profile photo → Share location</b></li>
+          <li>Selects duration (1 hr / until turned off) → taps <b>Share</b></li>
+          <li>Copies the link and sends it to the admin via WhatsApp</li>
+          <li>Admin pastes the link below for the respective vehicle</li>
+        </ol>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
+        {/* Left panel — vehicle list */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {cars.map(car => {
+            const busy = isCarBusy(car.id);
+            const trip = activeTripForCar(car.id);
+            const hasLink = !!liveLocations[car.id];
+            const isSelected = selected === car.id;
+            return (
+              <div key={car.id} style={{ ...css.card, border: `2px solid ${isSelected ? car.color : G.border}`, cursor: "pointer", transition: "all 0.15s" }}
+                onClick={() => setSelected(isSelected ? null : car.id)}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: busy ? G.danger : G.success, flexShrink: 0 }} />
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{car.name}</div>
+                  <div style={{ marginLeft: "auto" }}>
+                    {hasLink
+                      ? <span style={css.badge("#0891b2")}>📍 Link Active</span>
+                      : <span style={css.badge(G.muted)}>No Link</span>}
+                  </div>
+                </div>
+                <div style={{ fontSize: 12, color: G.muted }}>{car.plate}</div>
+                <div style={{ fontSize: 12, color: G.muted }}>🧑‍✈️ {car.driver} · <a href={`tel:${car.driverPhone}`} style={{ color: "#2563eb" }} onClick={e => e.stopPropagation()}>{car.driverPhone}</a></div>
+                {trip && <div style={{ marginTop: 6, fontSize: 12, color: G.warning, fontWeight: 600 }}>🔄 En route to {trip.destination}</div>}
+                {hasLink && liveLocations[car.id]?.updatedAt && (
+                  <div style={{ fontSize: 11, color: G.muted, marginTop: 4 }}>Updated: {liveLocations[car.id].updatedDate} at {liveLocations[car.id].updatedAt}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right panel — map + link input */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", fontSize: 13, fontWeight: 600 }}>{msg}</div>}
+
+          {/* Link paste panel */}
+          {selected && (
+            <div style={css.card}>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>
+                📍 {selectedCar?.name} — {selectedCar?.plate}
+                <span style={{ fontSize: 12, fontWeight: 400, color: G.muted, marginLeft: 8 }}>Driver: {selectedCar?.driver}</span>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <input
+                  style={{ ...css.input, flex: 1 }}
+                  value={linkInput}
+                  onChange={e => setLinkInput(e.target.value)}
+                  placeholder="Paste Google Maps live location link here..."
+                />
+                <button style={css.btn("#0891b2")} onClick={() => handleSaveLink(selected)}>Save Link</button>
+                {liveLocations[selected] && (
+                  <button style={css.btn(G.danger, true)} onClick={() => handleClear(selected)}>Clear</button>
+                )}
+              </div>
+              {liveLocations[selected] && (
+                <div style={{ marginTop: 8, fontSize: 12, color: G.muted, wordBreak: "break-all" }}>
+                  Current link: <a href={liveLocations[selected].url} target="_blank" rel="noreferrer" style={{ color: "#2563eb" }}>{liveLocations[selected].url}</a>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Map embed */}
+          {selected && embedUrl ? (
+            <div style={{ ...css.card, padding: 0, overflow: "hidden", borderRadius: 10 }}>
+              <div style={{ padding: "12px 16px", background: G.light, borderBottom: `1px solid ${G.border}`, display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 0 3px #bbf7d0", animation: "pulse 1.5s infinite" }} />
+                <span style={{ fontSize: 13, fontWeight: 700 }}>Live Location — {selectedCar?.name}</span>
+                <a href={liveLocations[selected]?.url} target="_blank" rel="noreferrer"
+                  style={{ marginLeft: "auto", fontSize: 12, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}>
+                  Open in Google Maps ↗
+                </a>
+              </div>
+              <iframe
+                src={embedUrl}
+                width="100%"
+                height="480"
+                style={{ border: "none", display: "block" }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title={`Live location - ${selectedCar?.name}`}
+              />
+              <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
+            </div>
+          ) : selected ? (
+            <div style={{ ...css.card, textAlign: "center", padding: 60, color: G.muted }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>📍</div>
+              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>No live location link yet</div>
+              <div style={{ fontSize: 13 }}>Ask the driver to share their live location via Google Maps and paste the link above.</div>
+            </div>
+          ) : (
+            <div style={{ ...css.card, textAlign: "center", padding: 60, color: G.muted }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🗺️</div>
+              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Select a vehicle to view its location</div>
+              <div style={{ fontSize: 13 }}>Click any vehicle card on the left to manage its live location link.</div>
+            </div>
+          )}
+
+          {/* All active trips quick view */}
+          {!selected && (
+            <div style={css.card}>
+              <div style={css.sectionTitle}>🔄 Vehicles Currently Out</div>
+              {cars.filter(c => isCarBusy(c.id)).length === 0 ? (
+                <div style={{ color: G.muted, fontSize: 13 }}>All vehicles are currently at the office.</div>
+              ) : cars.filter(c => isCarBusy(c.id)).map(car => {
+                const trip = activeTripForCar(car.id);
+                const hasLink = !!liveLocations[car.id];
+                return (
+                  <div key={car.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", background: G.light, borderRadius: 8, marginBottom: 8, border: `1px solid ${G.border}` }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name} — {car.plate}</div>
+                      <div style={{ fontSize: 12, color: G.muted }}>🧑‍✈️ {car.driver} · {trip?.officerName} ({trip?.department})</div>
+                      <div style={{ fontSize: 12, color: G.muted }}>→ {trip?.destination} since {trip?.departureTime}</div>
+                    </div>
+                    {hasLink ? (
+                      <a href={liveLocations[car.id].url} target="_blank" rel="noreferrer"
+                        style={{ ...css.btn("#0891b2"), textDecoration: "none", fontSize: 12 }}>
+                        📍 Track
+                      </a>
+                    ) : (
+                      <button style={css.btn(G.muted, true)} onClick={() => setSelected(car.id)}>+ Add Link</button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── TRIP LOG ──────────────────────────────────────────────────
+function TripLog({ cars, trips, currentUser }) {
+  const [filter, setFilter] = useState({ car: "", dept: "", from: "", to: "" });
+  const set = (k, v) => setFilter(f => ({ ...f, [k]: v }));
+
+  // Non-admins only see their own trips
+  const visibleTrips = currentUser?.isAdmin
+    ? trips
+    : trips.filter(t => t.bookedByPfId === currentUser?.pfId || t.officerPfId === currentUser?.pfId);
+
+  const filtered = visibleTrips.filter(t =>
+    (!filter.car || t.carId === filter.car) &&
+    (!filter.dept || t.department === filter.dept) &&
+    (!filter.from || t.date >= filter.from) &&
+    (!filter.to || t.date <= filter.to)
+  ).slice().reverse();
+
+  const totalKm = filtered.reduce((s, t) => {
+    if (t.startKm && t.endKm) return s + (parseFloat(t.endKm) - parseFloat(t.startKm));
+    return s;
+  }, 0);
+
+  // Calculate total duration in minutes between out date+time and in date+time
+  const calcDuration = (t) => {
+    if (!t.returnTime) return null;
+    try {
+      // outDateTime: t.date + " " + t.departureTime  e.g. "2026-03-09 10:30"
+      // returnTime stored as "YYYY-MM-DD HH:MM"
+      const outStr = t.date + " " + t.departureTime;
+      const inStr  = t.returnTime; // already "YYYY-MM-DD HH:MM"
+      const outDt  = new Date(outStr.replace(" ", "T"));
+      const inDt   = new Date(inStr.replace(" ", "T"));
+      if (isNaN(outDt) || isNaN(inDt)) return null;
+      const diffMs  = inDt - outDt;
+      if (diffMs < 0) return null;
+      const totalMin = Math.round(diffMs / 60000);
+      const hrs  = Math.floor(totalMin / 60);
+      const mins = totalMin % 60;
+      if (hrs === 0) return `${mins}m`;
+      if (mins === 0) return `${hrs}h`;
+      return `${hrs}h ${mins}m`;
+    } catch { return null; }
+  };
+
+  // Split returnTime "YYYY-MM-DD HH:MM" into date and time parts
+  const splitReturn = (returnTime) => {
+    if (!returnTime) return { date: null, time: null };
+    const parts = returnTime.split(" ");
+    return { date: parts[0] || null, time: parts[1] || null };
+  };
+
+  const [expandedLogDates, setExpandedLogDates] = useState({ [today()]: true });
+  const toggleLogDate = (d) => setExpandedLogDates(prev => ({ ...prev, [d]: !prev[d] }));
+
+  // Group filtered trips by date
+  const logDateMap = {};
+  filtered.forEach(t => { const d = t.date || "unknown"; if (!logDateMap[d]) logDateMap[d] = []; logDateMap[d].push(t); });
+  const logSortedDates = Object.keys(logDateMap).sort((a, b) => b.localeCompare(a));
+
+  return (
+    <div>
+      <div style={css.card}>
+        <div style={{ ...css.row, marginBottom: 16, flexWrap: "wrap" }}>
+          <div style={css.sectionTitle}>📋 Trip Log{!currentUser?.isAdmin ? " (My Trips)" : ""}</div>
+          <div style={{ marginLeft: "auto", fontSize: 13, color: G.muted }}>{filtered.length} records · {totalKm.toFixed(0)} km total</div>
+        </div>
+        <div style={{ ...css.formGrid, marginBottom: 20 }}>
+          <div>
+            <label style={css.label}>Filter by Car</label>
+            <select style={css.select} value={filter.car} onChange={e => set("car", e.target.value)}>
+              <option value="">All Cars</option>
+              {cars.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={css.label}>Filter by Department</label>
+            <select style={css.select} value={filter.dept} onChange={e => set("dept", e.target.value)}>
+              <option value="">All Departments</option>
+              {[...new Set(trips.map(t => t.department).filter(Boolean))].sort().map(d => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={css.label}>From Date</label>
+            <input type="date" style={css.input} value={filter.from} onChange={e => set("from", e.target.value)} />
+          </div>
+          <div>
+            <label style={css.label}>To Date</label>
+            <input type="date" style={css.input} value={filter.to} onChange={e => set("to", e.target.value)} />
+          </div>
+        </div>
+        {filtered.length === 0
+          ? <div style={{ textAlign: "center", padding: 40, color: G.muted }}>No trips found</div>
+          : logSortedDates.map(date => {
+            const dayTripsLog = logDateMap[date];
+            const isTodayLog = date === today();
+            const isOpenLog = expandedLogDates[date] !== false && (expandedLogDates[date] === true || isTodayLog);
+            return (
+              <div key={date} style={{ marginBottom: 10, borderRadius: 8, border: `1px solid ${isTodayLog ? G.info : G.border}`, overflow: "hidden" }}>
+                <div onClick={() => toggleLogDate(date)}
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: isTodayLog ? "#eff6ff" : G.light, cursor: "pointer", userSelect: "none", borderBottom: isOpenLog ? `1px solid ${G.border}` : "none" }}>
+                  <span style={{ fontSize: 13 }}>{isOpenLog ? "▾" : "▸"}</span>
+                  <span style={{ fontWeight: 800, fontSize: 13, color: isTodayLog ? G.info : G.text }}>{isTodayLog ? "Today — " : ""}{fmtDate(date)}</span>
+                  {isTodayLog && <span style={{ fontSize: 10, background: G.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
+                  <span style={{ marginLeft: "auto", fontSize: 12, color: G.muted }}>{dayTripsLog.length} trip{dayTripsLog.length !== 1 ? "s" : ""}</span>
+                </div>
+                {isOpenLog && (
+                  <div className="scroll-table"><table style={css.table}>
+                    <thead><tr>
+                      {["#","Vehicle","Plate","Driver","Officer","Department","Destination","Purpose","Out Time","In Date","In Time","Total Time","Start KM","End KM","Distance","Status"].map(h =>
+                        <th key={h} style={{ ...css.th, whiteSpace: "nowrap" }}>{h}</th>
+                      )}
+                    </tr></thead>
+                    <tbody>
+                      {dayTripsLog.map((t, i) => {
+                        const dist = (t.startKm && t.endKm) ? (parseFloat(t.endKm) - parseFloat(t.startKm)).toFixed(0) + " km" : "—";
+                        const duration = calcDuration(t);
+                        const ret = splitReturn(t.returnTime);
+                        return (
+                          <tr key={t.id}>
+                            <td style={{ ...css.td, color: G.muted }}>{i + 1}</td>
+                            <td style={css.td}>{t.carName}</td>
+                            <td style={css.td}>{t.carPlate || "—"}</td>
+                            <td style={{ ...css.td, fontWeight: 600 }}>{t.driver || "—"}</td>
+                            <td style={{ ...css.td, fontWeight: 600 }}>{t.officerName}</td>
+                            <td style={css.td}>{t.department}</td>
+                            <td style={css.td}>{t.destination}</td>
+                            <td style={{ ...css.td, color: G.muted }}>{t.purpose || "—"}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap", color: "#2563eb", fontWeight: 600 }}>{fmtTime(t.departureTime)}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap" }}>{ret.date ? fmtDate(ret.date) : <span style={{ color: G.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap", color: "#16a34a", fontWeight: 600 }}>{ret.time ? fmtTime(ret.time) : <span style={{ color: G.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap" }}>
+                              {duration ? <span style={{ fontWeight: 700, color: "#7c3aed", background: "#ede9fe", padding: "2px 8px", borderRadius: 6, fontSize: 12 }}>⏱ {duration}</span> : <span style={{ color: G.muted }}>—</span>}
+                            </td>
+                            <td style={css.td}>{t.startKm || "—"}</td>
+                            <td style={css.td}>{t.endKm || "—"}</td>
+                            <td style={{ ...css.td, fontWeight: 600 }}>{dist}</td>
+                            <td style={css.td}><span style={css.badge(t.returnTime ? G.success : G.warning)}>{t.returnTime ? "Done" : "Active"}</span></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table></div>
+                )}
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  );
+}
+
+// ── CHARGING LOG ──────────────────────────────────────────────
+function FuelLog({ cars, fuelLogs, saveFuel }) {
+  const [form, setForm] = useState({ carId: "", date: today(), kwh: "", batteryBefore: "", batteryAfter: "", chargingCost: "", chargingDuration: "", chargerType: "AC Slow (15A)", chargedBy: "", location: "", odometer: "" });
+  const [msg, setMsg] = useState("");
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const CHARGER_TYPES = ["AC Slow (15A)", "AC Fast (7.2 kW)", "DC Fast Charger (50 kW)", "DC Super Fast (100 kW)", "Home Charging", "Office Charger"];
+
+  const handleAdd = () => {
+    if (!form.carId || !form.date) { setMsg("❌ Car and date are required."); return; }
+    const car = cars.find(c => c.id === form.carId);
+    const entry = { id: Date.now().toString(), ...form, carName: car.name };
+    saveFuel([...fuelLogs, entry]);
+    setForm({ carId: "", date: today(), kwh: "", batteryBefore: "", batteryAfter: "", chargingCost: "", chargingDuration: "", chargerType: "AC Slow (15A)", chargedBy: "", location: "", odometer: "" });
+    setMsg("✅ Charging session logged!");
+    setTimeout(() => setMsg(""), 2000);
+  };
+
+  const totalKwh = fuelLogs.reduce((s, f) => s + (parseFloat(f.kwh) || 0), 0).toFixed(1);
+  const totalCost = fuelLogs.reduce((s, f) => s + (parseFloat(f.chargingCost) || 0), 0).toFixed(0);
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "380px 1fr", gap: 20 }}>
+      <div style={css.card}>
+        <div style={css.sectionTitle}>🔋 Log Charging Session</div>
+        {msg && <div style={{ padding: "8px 12px", borderRadius: 6, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13 }}>{msg}</div>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div><label style={css.label}>Vehicle *</label>
+            <select style={css.select} value={form.carId} onChange={e => set("carId", e.target.value)}>
+              <option value="">-- Select EV --</option>
+              {cars.map(c => <option key={c.id} value={c.id}>{c.name} — {c.plate}</option>)}
+            </select>
+          </div>
+          <div><label style={css.label}>Date *</label>
+            <input type="date" style={css.input} value={form.date} onChange={e => set("date", e.target.value)} />
+          </div>
+          <div style={css.formGrid}>
+            <div><label style={css.label}>Battery Before (%)</label>
+              <input type="number" min="0" max="100" style={css.input} value={form.batteryBefore} onChange={e => set("batteryBefore", e.target.value)} placeholder="e.g. 20" />
+            </div>
+            <div><label style={css.label}>Battery After (%)</label>
+              <input type="number" min="0" max="100" style={css.input} value={form.batteryAfter} onChange={e => set("batteryAfter", e.target.value)} placeholder="e.g. 95" />
+            </div>
+          </div>
+          <div style={css.formGrid}>
+            <div><label style={css.label}>Energy Added (kWh)</label>
+              <input type="number" style={css.input} value={form.kwh} onChange={e => set("kwh", e.target.value)} placeholder="e.g. 30.6" />
+            </div>
+            <div><label style={css.label}>Duration (mins)</label>
+              <input type="number" style={css.input} value={form.chargingDuration} onChange={e => set("chargingDuration", e.target.value)} placeholder="e.g. 90" />
+            </div>
+          </div>
+          <div><label style={css.label}>Charger Type</label>
+            <select style={css.select} value={form.chargerType} onChange={e => set("chargerType", e.target.value)}>
+              {CHARGER_TYPES.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+          <div><label style={css.label}>Charging Cost (₹)</label>
+            <input type="number" style={css.input} value={form.chargingCost} onChange={e => set("chargingCost", e.target.value)} placeholder="e.g. 245" />
+          </div>
+          <div><label style={css.label}>Charging Location / Station</label>
+            <input style={css.input} value={form.location} onChange={e => set("location", e.target.value)} placeholder="e.g. Office Charger / Tata Power" />
+          </div>
+          <div><label style={css.label}>Odometer (km)</label>
+            <input type="number" style={css.input} value={form.odometer} onChange={e => set("odometer", e.target.value)} placeholder="e.g. 12340" />
+          </div>
+          <div><label style={css.label}>Logged By</label>
+            <input style={css.input} value={form.chargedBy} onChange={e => set("chargedBy", e.target.value)} placeholder="Officer / Driver name" />
+          </div>
+          <button style={css.btn("#0891b2")} onClick={handleAdd}>Add Charging Log ⚡</button>
+        </div>
+      </div>
+
+      <div>
+        <div style={{ ...css.grid4, gridTemplateColumns: "1fr 1fr 1fr" }}>
+          <div style={{ ...css.card, borderTop: "3px solid #0891b2" }}><div style={css.statNum}>{totalKwh} kWh</div><div style={css.statLabel}>Total Energy Charged</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${G.info}` }}><div style={css.statNum}>₹{parseInt(totalCost).toLocaleString()}</div><div style={css.statLabel}>Total Charging Cost</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${G.success}` }}><div style={css.statNum}>{fuelLogs.length}</div><div style={css.statLabel}>Sessions Logged</div></div>
+        </div>
+
+        <div style={{ ...css.card, marginBottom: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>⚡ Latest Battery Level per Vehicle</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            {cars.map(car => {
+              const lastCharge = fuelLogs.filter(f => f.carId === car.id).slice(-1)[0];
+              const pct = lastCharge?.batteryAfter ? parseInt(lastCharge.batteryAfter) : null;
+              const barColor = pct === null ? "#e2e8f0" : pct > 60 ? "#16a34a" : pct > 25 ? "#d97706" : "#dc2626";
+              return (
+                <div key={car.id} style={{ textAlign: "center", padding: "14px 10px", background: G.light, borderRadius: 8, border: `1px solid ${G.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: G.muted, marginBottom: 8 }}>{car.name}</div>
+                  <div style={{ height: 10, background: "#e2e8f0", borderRadius: 5, marginBottom: 8, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: pct ? `${pct}%` : "0%", background: barColor, borderRadius: 5, transition: "width 0.4s" }} />
+                  </div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: barColor }}>{pct !== null ? `${pct}%` : "—"}</div>
+                  <div style={{ fontSize: 10, color: G.muted, marginTop: 2 }}>{lastCharge ? fmtDate(lastCharge.date) : "No data yet"}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={css.card}>
+          <div style={css.sectionTitle}>Charging History</div>
+          <div style={{ overflowX: "auto" }}>
+            <div className="scroll-table"><table style={css.table}>
+              <thead><tr>{["Vehicle","Date","Before","After","kWh","Duration","Charger","Cost","Location","Odometer","Logged By"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr></thead>
+              <tbody>
+                {fuelLogs.slice().reverse().map(f => (
+                  <tr key={f.id}>
+                    <td style={css.td}>{f.carName}</td>
+                    <td style={css.td}>{fmtDate(f.date)}</td>
+                    <td style={css.td}>{f.batteryBefore ? `${f.batteryBefore}%` : "—"}</td>
+                    <td style={{ ...css.td, fontWeight: 700, color: G.success }}>{f.batteryAfter ? `${f.batteryAfter}%` : "—"}</td>
+                    <td style={{ ...css.td, fontWeight: 700 }}>{f.kwh ? `${f.kwh} kWh` : "—"}</td>
+                    <td style={css.td}>{f.chargingDuration ? `${f.chargingDuration} min` : "—"}</td>
+                    <td style={css.td}>{f.chargerType || "—"}</td>
+                    <td style={css.td}>{f.chargingCost ? `₹${f.chargingCost}` : "—"}</td>
+                    <td style={css.td}>{f.location || "—"}</td>
+                    <td style={css.td}>{f.odometer || "—"}</td>
+                    <td style={css.td}>{f.chargedBy || "—"}</td>
+                  </tr>
+                ))}
+                {fuelLogs.length === 0 && <tr><td colSpan={11} style={{ ...css.td, textAlign: "center", color: G.muted }}>No charging sessions logged yet</td></tr>}
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MAINTENANCE ───────────────────────────────────────────────
+function Maintenance({ cars, maintenance, saveMaint }) {
+  const [form, setForm] = useState({ carId: "", type: "", description: "", date: today(), cost: "", vendor: "", nextDueDate: "", status: "Pending", loggedBy: "" });
+  const [msg, setMsg] = useState("");
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const TYPES = ["Tyre Rotation/Change", "Brake Service", "EV Battery Check", "AC Service", "Body Repair", "Software/Firmware Update", "Insurance Renewal", "Fitness/Permit Renewal", "Suspension Check", "Wheel Alignment", "General Servicing", "Other"];
+
+  const handleAdd = () => {
+    if (!form.carId || !form.type || !form.date) { setMsg("❌ Car, type and date required."); return; }
+    const car = cars.find(c => c.id === form.carId);
+    const entry = { id: Date.now().toString(), ...form, carName: car.name };
+    saveMaint([...maintenance, entry]);
+    setForm({ carId: "", type: "", description: "", date: today(), cost: "", vendor: "", nextDueDate: "", status: "Pending", loggedBy: "" });
+    setMsg("✅ Maintenance record added!");
+    setTimeout(() => setMsg(""), 2000);
+  };
+
+  const toggleStatus = (id) => {
+    const updated = maintenance.map(m => m.id === id ? { ...m, status: m.status === "Pending" ? "Completed" : "Pending" } : m);
+    saveMaint(updated);
+  };
+
+  const pending = maintenance.filter(m => m.status === "Pending").length;
+  const totalCost = maintenance.reduce((s, m) => s + (parseFloat(m.cost) || 0), 0);
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 20 }}>
+      <div style={css.card}>
+        <div style={css.sectionTitle}>🔧 Log Maintenance</div>
+        {msg && <div style={{ padding: "8px 12px", borderRadius: 6, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13 }}>{msg}</div>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div><label style={css.label}>Vehicle *</label>
+            <select style={css.select} value={form.carId} onChange={e => set("carId", e.target.value)}>
+              <option value="">-- Select Car --</option>
+              {cars.map(c => <option key={c.id} value={c.id}>{c.name} — {c.model}</option>)}
+            </select>
+          </div>
+          <div><label style={css.label}>Type *</label>
+            <select style={css.select} value={form.type} onChange={e => set("type", e.target.value)}>
+              <option value="">-- Select Type --</option>
+              {TYPES.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+          <div><label style={css.label}>Description</label>
+            <input style={css.input} value={form.description} onChange={e => set("description", e.target.value)} placeholder="Details..." />
+          </div>
+          <div style={css.formGrid}>
+            <div><label style={css.label}>Date *</label>
+              <input type="date" style={css.input} value={form.date} onChange={e => set("date", e.target.value)} />
+            </div>
+            <div><label style={css.label}>Cost (₹)</label>
+              <input type="number" style={css.input} value={form.cost} onChange={e => set("cost", e.target.value)} />
+            </div>
+          </div>
+          <div><label style={css.label}>Vendor / Workshop</label>
+            <input style={css.input} value={form.vendor} onChange={e => set("vendor", e.target.value)} />
+          </div>
+          <div><label style={css.label}>Next Due Date</label>
+            <input type="date" style={css.input} value={form.nextDueDate} onChange={e => set("nextDueDate", e.target.value)} />
+          </div>
+          <div><label style={css.label}>Status</label>
+            <select style={css.select} value={form.status} onChange={e => set("status", e.target.value)}>
+              <option>Pending</option><option>Completed</option>
+            </select>
+          </div>
+          <div><label style={css.label}>Logged By</label>
+            <input style={css.input} value={form.loggedBy} onChange={e => set("loggedBy", e.target.value)} />
+          </div>
+          <button style={css.btn(G.danger)} onClick={handleAdd}>Log Maintenance 🔧</button>
+        </div>
+      </div>
+
+      <div>
+        <div style={{ ...css.grid4, gridTemplateColumns: "1fr 1fr 1fr" }}>
+          <div style={{ ...css.card, borderTop: `3px solid ${G.danger}` }}><div style={css.statNum}>{pending}</div><div style={css.statLabel}>Pending</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${G.success}` }}><div style={css.statNum}>{maintenance.length - pending}</div><div style={css.statLabel}>Completed</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${G.info}` }}><div style={css.statNum}>₹{totalCost.toLocaleString()}</div><div style={css.statLabel}>Total Spent</div></div>
+        </div>
+        <div style={css.card}>
+          <div style={css.sectionTitle}>Maintenance Records</div>
+          <div style={{ overflowX: "auto" }}>
+            <div className="scroll-table"><table style={css.table}>
+              <thead><tr>{["Car","Type","Description","Date","Cost","Vendor","Next Due","Logged By","Status","Action"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr></thead>
+              <tbody>
+                {maintenance.slice().reverse().map(m => (
+                  <tr key={m.id}>
+                    <td style={css.td}>{m.carName}</td>
+                    <td style={{ ...css.td, fontWeight: 600 }}>{m.type}</td>
+                    <td style={{ ...css.td, color: G.muted }}>{m.description || "—"}</td>
+                    <td style={css.td}>{fmtDate(m.date)}</td>
+                    <td style={css.td}>{m.cost ? `₹${m.cost}` : "—"}</td>
+                    <td style={css.td}>{m.vendor || "—"}</td>
+                    <td style={css.td}>{fmtDate(m.nextDueDate)}</td>
+                    <td style={css.td}>{m.loggedBy || "—"}</td>
+                    <td style={css.td}><span style={css.badge(m.status === "Completed" ? G.success : G.warning)}>{m.status}</span></td>
+                    <td style={css.td}><button style={css.btnSm(m.status === "Pending" ? G.success : G.muted)} onClick={() => toggleStatus(m.id)}>{m.status === "Pending" ? "✓ Done" : "↩ Reopen"}</button></td>
+                  </tr>
+                ))}
+                {maintenance.length === 0 && <tr><td colSpan={10} style={{ ...css.td, textAlign: "center", color: G.muted }}>No maintenance records yet</td></tr>}
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+// ── DRIVER EDIT CARD ─────────────────────────────────────────
+function DriverEditCard({ car, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(car.driver);
+  const [phone, setPhone] = useState(car.driverPhone.replace("+91",""));
+
+  const handleSave = () => {
+    if (!name.trim() || !phone.trim()) return;
+    onSave({ ...car, driver: name.trim(), driverPhone: "+91" + phone.trim().slice(-10) });
+    setEditing(false);
+  };
+
+  return (
+    <div style={{ border: `1px solid ${G.border}`, borderRadius: 10, overflow: "hidden" }}>
+      <div style={{ background: car.color + "15", borderBottom: `3px solid ${car.color}`, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ width: 36, height: 36, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16 }}>{car.driver.charAt(0)}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name}</div>
+          <div style={{ fontSize: 11, color: G.muted }}>{car.plate}</div>
+        </div>
+        <button onClick={() => { setEditing(e => !e); setName(car.driver); setPhone(car.driverPhone.replace("+91","")); }}
+          style={{ ...css.btnSm(editing ? G.muted : G.info), fontSize: 11 }}>{editing ? "Cancel" : "✏️ Edit"}</button>
+      </div>
+      <div style={{ padding: "12px 14px" }}>
+        {editing ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div>
+              <label style={css.label}>Driver Name *</label>
+              <input style={css.input} value={name} onChange={e => setName(e.target.value)} placeholder="Driver name" />
+            </div>
+            <div>
+              <label style={css.label}>Mobile Number *</label>
+              <input style={css.input} value={phone} onChange={e => setPhone(e.target.value)} placeholder="10-digit mobile" maxLength={10} />
+            </div>
+            <button style={css.btn(G.success)} onClick={handleSave}>💾 Save Changes</button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13 }}>
+            <div>🧑‍✈️ <b>{car.driver}</b></div>
+            <div>📞 <a href={`tel:${car.driverPhone}`} style={{ color: G.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── USER MANAGEMENT ──────────────────────────────────────────
+function UserManagement({ currentUser, cars, saveCars }) {
+  const [users, setUsers] = useState([...AUTHORISED_USERS]);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState({ name: "", pfId: "", department: "" });
+  const [msg, setMsg] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [editUser, setEditUser] = useState(null);
+
+  useEffect(() => {
+    const db = window.__db;
+    if (!db) return;
+    const unsub = db.collection("config").doc("users").onSnapshot(snap => {
+      if (snap.exists) {
+        const data = snap.data();
+        if (data.list && data.list.length > 0) setUsers(data.list);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const saveUsers = async (list) => {
+    setUsers(list);
+    try { const db = window.__db; if (db) await db.collection("config").doc("users").set({ list }); } catch(e) {}
+  };
+
+  const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
+
+  const handleAdd = () => {
+    if (!form.name.trim() || !form.pfId.trim() || !form.department.trim()) { showMsg("❌ All fields are required."); return; }
+    if (users.find(u => u.pfId === form.pfId.trim())) { showMsg("❌ PF ID already exists."); return; }
+    saveUsers([...users, { name: form.name.trim().toUpperCase(), pfId: form.pfId.trim(), department: form.department.trim() }]);
+    setForm({ name: "", pfId: "", department: "" });
+    showMsg("✅ User added successfully!");
+  };
+
+  const handleDelete = (pfId) => {
+    if (pfId === ADMIN_1.pfId || pfId === ADMIN_2.pfId) { showMsg("❌ Cannot delete admin accounts."); return; }
+    saveUsers(users.filter(u => u.pfId !== pfId));
+    setConfirmDelete(null);
+    showMsg("✅ User removed.");
+  };
+
+  const handleEdit = () => {
+    if (!editUser.name.trim() || !editUser.department.trim()) { showMsg("❌ Name and department are required."); return; }
+    saveUsers(users.map(u => u.pfId === editUser.pfId ? { ...u, name: editUser.name.trim().toUpperCase(), department: editUser.department.trim() } : u));
+    setEditUser(null);
+    showMsg("✅ User updated.");
+  };
+
+  const filtered = users.filter(u =>
+    !search || u.name.toLowerCase().includes(search.toLowerCase()) ||
+    u.pfId.includes(search) || u.department.toLowerCase().includes(search.toLowerCase())
+  );
+  const depts = [...new Set(users.map(u => u.department))].sort();
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={css.grid4}>
+        {[
+          { icon: "👥", val: users.length, label: "Total Users", color: G.info },
+          { icon: "🏢", val: depts.length, label: "Departments", color: G.success },
+          { icon: "🔑", val: 2, label: "Admins", color: G.warning },
+          { icon: "👤", val: users.length - 2, label: "Regular Users", color: G.muted },
+        ].map(s => (
+          <div key={s.label} style={{ ...css.card, borderTop: `3px solid ${s.color}` }}>
+            <div style={{ fontSize: 22, marginBottom: 4 }}>{s.icon}</div>
+            <div style={{ ...css.statNum, color: s.color }}>{s.val}</div>
+            <div style={css.statLabel}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <div style={css.card}>
+          <div style={css.sectionTitle}>➕ Add New User</div>
+          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13, fontWeight: 600, color: msg.startsWith("✅") ? "#166534" : "#991b1b" }}>{msg}</div>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div><label style={css.label}>Full Name *</label>
+              <input style={css.input} value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} placeholder="e.g. RAMESH KUMAR SINGH" /></div>
+            <div><label style={css.label}>PF ID *</label>
+              <input style={css.input} value={form.pfId} onChange={e => setForm(f => ({...f, pfId: e.target.value}))} placeholder="e.g. 3612345" maxLength={10} /></div>
+            <div><label style={css.label}>Department *</label>
+              <input style={css.input} value={form.department} onChange={e => setForm(f => ({...f, department: e.target.value}))} placeholder="e.g. Human Resources" list="dept-list" />
+              <datalist id="dept-list">{depts.map(d => <option key={d} value={d} />)}</datalist></div>
+            <button style={css.btn(G.info)} onClick={handleAdd}>➕ Add User</button>
+          </div>
+        </div>
+        <div style={css.card}>
+          <div style={css.sectionTitle}>ℹ️ Instructions</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13, lineHeight: 1.6 }}>
+            <div style={{ padding: 12, background: "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe", color: "#1e40af" }}>
+              <b>Adding:</b> Fill name, PF ID and department. The user can log in immediately with their PF ID.
+            </div>
+            <div style={{ padding: 12, background: "#fef9c3", borderRadius: 8, border: "1px solid #fde68a", color: "#92400e" }}>
+              <b>Editing:</b> Click ✏️ to update a user's name or department. PF ID cannot be changed.
+            </div>
+            <div style={{ padding: 12, background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca", color: "#991b1b" }}>
+              <b>Deleting:</b> Click 🗑️ — a confirmation will appear. Admin accounts cannot be deleted.
+            </div>
+            <div style={{ padding: 12, background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0", color: "#166534" }}>
+              <b>Note:</b> All changes sync instantly across all devices.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={css.card}>
+      {/* ── DRIVER MANAGEMENT ── */}
+      <div style={{ ...css.card, marginBottom: 20 }}>
+        <div style={css.sectionTitle}>🧑‍✈️ Driver Details</div>
+        <div style={{ fontSize: 12, color: G.muted, marginBottom: 14 }}>Update driver name and contact number for any vehicle.</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
+          {(cars || []).map(car => (
+            <DriverEditCard key={car.id} car={car} onSave={updated => {
+              saveCars((cars || []).map(c => c.id === updated.id ? updated : c));
+              showMsg("✅ Driver updated for " + updated.name + "!");
+            }} />
+          ))}
+        </div>
+      </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+          <div style={css.sectionTitle}>👥 Authorised Users ({filtered.length})</div>
+          <input style={{ ...css.input, maxWidth: 280 }} placeholder="Search name, PF ID or department…" value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <div className="scroll-table"><table style={css.table}>
+          <thead><tr>{["#","Name","PF ID","Department","Role","Actions"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr></thead>
+          <tbody>
+            {filtered.map((u, i) => {
+              const isAdmin = u.pfId === ADMIN_1.pfId || u.pfId === ADMIN_2.pfId;
+              return (
+                <tr key={u.pfId} style={{ background: isAdmin ? "#eff6ff" : "transparent" }}>
+                  <td style={{ ...css.td, color: G.muted, fontSize: 11 }}>{i+1}</td>
+                  <td style={css.td}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: isAdmin ? G.info : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 11, flexShrink: 0 }}>{u.name.charAt(0)}</div>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>{u.name}</div>
+                    </div>
+                  </td>
+                  <td style={{ ...css.td, fontFamily: "monospace" }}>{u.pfId}</td>
+                  <td style={{ ...css.td, fontSize: 12, color: G.muted }}>{u.department}</td>
+                  <td style={css.td}>{isAdmin ? <span style={css.badge(G.info)}>🔑 Admin</span> : <span style={css.badge(G.muted)}>👤 Staff</span>}</td>
+                  <td style={css.td}>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button onClick={() => setEditUser({...u})} style={{ ...css.btnSm(G.info), padding: "4px 10px" }}>✏️</button>
+                      {!isAdmin && <button onClick={() => setConfirmDelete(u.pfId)} style={{ ...css.btnSm(G.danger), padding: "4px 10px" }}>🗑️</button>}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table></div>
+      </div>
+
+      {editUser && (
+        <div style={css.modal} onClick={() => setEditUser(null)}>
+          <div style={css.modalBox} onClick={e => e.stopPropagation()}>
+            <div style={{ ...css.sectionTitle, marginBottom: 16 }}>✏️ Edit User</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div><label style={css.label}>PF ID (cannot change)</label>
+                <input style={{ ...css.input, background: "#f8fafc", color: G.muted }} value={editUser.pfId} readOnly /></div>
+              <div><label style={css.label}>Full Name *</label>
+                <input style={css.input} value={editUser.name} onChange={e => setEditUser(u => ({...u, name: e.target.value}))} /></div>
+              <div><label style={css.label}>Department *</label>
+                <input style={css.input} value={editUser.department} onChange={e => setEditUser(u => ({...u, department: e.target.value}))} list="dept-list2" />
+                <datalist id="dept-list2">{depts.map(d => <option key={d} value={d} />)}</datalist></div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button style={css.btn(G.success)} onClick={handleEdit}>💾 Save Changes</button>
+                <button style={css.btn(G.muted, true)} onClick={() => setEditUser(null)}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div style={css.modal} onClick={() => setConfirmDelete(null)}>
+          <div style={{ ...css.modalBox, maxWidth: 400 }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 40, textAlign: "center", marginBottom: 12 }}>⚠️</div>
+            <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 8 }}>Confirm Deletion</div>
+            {(() => {
+              const u = users.find(x => x.pfId === confirmDelete);
+              return u ? <div style={{ textAlign: "center", marginBottom: 20, color: G.muted, fontSize: 13 }}>
+                Remove <b style={{ color: G.text }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
+              </div> : null;
+            })()}
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button style={css.btn(G.danger)} onClick={() => handleDelete(confirmDelete)}>🗑️ Yes, Delete</button>
+              <button style={css.btn(G.muted, true)} onClick={() => setConfirmDelete(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
