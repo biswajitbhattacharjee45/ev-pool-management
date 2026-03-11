@@ -773,8 +773,9 @@ function LoginScreen({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [matched, setMatched] = useState(null);
   const [firebaseUsers, setFirebaseUsers] = useState([]);
+  const [fbUsersLoaded, setFbUsersLoaded] = useState(false);
 
-  // Load Firebase users list on mount so newly added users can log in
+  // Load Firebase users list on mount so newly added/deleted users are reflected
   useEffect(() => {
     const db = window.__db;
     if (!db) return;
@@ -782,15 +783,20 @@ function LoginScreen({ onLogin }) {
       db.collection("config").doc("users").onSnapshot(snap => {
         if (snap.exists) {
           const data = snap.data();
-          if (data.list && data.list.length > 0) setFirebaseUsers(data.list);
+          if (Array.isArray(data.list)) {
+            setFirebaseUsers(data.list);
+            setFbUsersLoaded(true);
+          }
+        } else {
+          setFbUsersLoaded(true);
         }
       });
     } catch(e) {}
   }, []);
 
-  // Merge: Firebase list takes priority (has latest additions/edits), fallback to hardcoded
+  // Always use Firebase list once loaded (respects deletions); fallback to hardcoded only before Firebase responds
   const getAllUsers = () => {
-    if (firebaseUsers.length > 0) return firebaseUsers;
+    if (fbUsersLoaded) return firebaseUsers;
     return AUTHORISED_USERS;
   };
 
@@ -2555,6 +2561,7 @@ function DriverEditCard({ car, onSave }) {
 // ── USER MANAGEMENT ──────────────────────────────────────────
 function UserManagement({ currentUser, cars, saveCars }) {
   const [users, setUsers] = useState([...AUTHORISED_USERS]);
+  const [fbLoaded, setFbLoaded] = useState(false);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ name: "", pfId: "", department: "" });
   const [msg, setMsg] = useState("");
@@ -2566,10 +2573,17 @@ function UserManagement({ currentUser, cars, saveCars }) {
     const db = window.__db;
     if (!db) return;
     const unsub = db.collection("config").doc("users").onSnapshot(snap => {
-      if (isSaving.current) return; // ignore snapshot triggered by our own save
+      if (isSaving.current) return;
       if (snap.exists) {
         const data = snap.data();
-        if (data.list && data.list.length > 0) setUsers(data.list);
+        // Always use Firebase list once loaded — even if smaller than hardcoded
+        if (Array.isArray(data.list)) {
+          setUsers(data.list);
+          setFbLoaded(true);
+        }
+      } else {
+        // No Firebase doc yet — keep hardcoded but mark as loaded
+        setFbLoaded(true);
       }
     });
     return () => unsub();
@@ -2578,8 +2592,11 @@ function UserManagement({ currentUser, cars, saveCars }) {
   const saveUsers = async (list) => {
     isSaving.current = true;
     setUsers(list);
-    try { const db = window.__db; if (db) await db.collection("config").doc("users").set({ list }); } catch(e) {}
-    setTimeout(() => { isSaving.current = false; }, 2000);
+    try {
+      const db = window.__db;
+      if (db) await db.collection("config").doc("users").set({ list });
+    } catch(e) {}
+    setTimeout(() => { isSaving.current = false; }, 3000);
   };
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
