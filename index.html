@@ -34,9 +34,7 @@
       messagingSenderId: "420704956913",
       appId: "1:420704956913:web:30935786b294645680d450"
     });
-    // Disable Firebase local cache — always read fresh from server
     const db = firebase.firestore();
-    db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
     firebase.firestore().clearPersistence().catch(() => {});
     window.__db = db;
   </script>
@@ -627,16 +625,16 @@ function App() {
     const db = window.__db;
     if (!db) return;
 
-    // Load users ONCE at app start — never again
-    db.collection("config").doc("users").get().then(snap => {
+    // Load users ONCE at app start — always from server, never cache
+    db.collection("config").doc("users").get({ source: 'server' }).then(snap => {
       if (snap.exists) {
         const d = snap.data();
         if (Array.isArray(d.list) && d.list.length > 0) setAllUsers(d.list);
       }
     }).catch(e => {});
 
-    // Cars: load once
-    db.collection("config").doc("cars").get().then(snap => {
+    // Cars: load once from server
+    db.collection("config").doc("cars").get({ source: 'server' }).then(snap => {
       if (snap.exists) {
         const d = snap.data();
         if (Array.isArray(d.list) && d.list.length > 0) setCars(d.list);
