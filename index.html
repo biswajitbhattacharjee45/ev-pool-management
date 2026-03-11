@@ -614,44 +614,16 @@ function App() {
     const db = window.__db;
     if (!db) return;
 
-    // Cars: always use Firebase if exists, seed on first run
+    // Cars: load once with get(), no live listener needed
     try {
-      db.collection("config").doc("cars").onSnapshot(async snap => {
-        if (isSavingCars.current) return;
+      db.collection("config").doc("cars").get().then(snap => {
         if (snap.exists) {
           const d = snap.data();
-          if (Array.isArray(d.list)) {
-            setCars(d.list);
-            // Auto-stamp _seeded if missing
-            if (!d._seeded) {
-              try { await db.collection("config").doc("cars").set({ list: d.list, _seeded: true }); } catch(e) {}
-            }
-          }
-        } else {
-          // First ever run — seed Firebase with hardcoded cars
-          await db.collection("config").doc("cars").set({ list: INITIAL_CARS, _seeded: true });
+          if (Array.isArray(d.list) && d.list.length > 0) setCars(d.list);
         }
       });
     } catch(e) {}
 
-    // Users: seed once on first run, then always use Firebase
-    try {
-      db.collection("config").doc("users").onSnapshot(async snap => {
-        if (snap.exists) {
-          const d = snap.data();
-          // Only update if it has been seeded — never fall back to hardcoded
-          if (Array.isArray(d.list) && d._seeded) {
-            // users are managed in UserManagement component
-          } else if (!d._seeded) {
-            // Seed Firebase with hardcoded users (first run only)
-            await db.collection("config").doc("users").set({ list: AUTHORISED_USERS, _seeded: true });
-          }
-        } else {
-          // No doc at all — seed
-          await db.collection("config").doc("users").set({ list: AUTHORISED_USERS, _seeded: true });
-        }
-      });
-    } catch(e) {}
 
     const unsubs = [];
     try {
@@ -806,30 +778,22 @@ function LoginScreen({ onLogin }) {
   const [firebaseUsers, setFirebaseUsers] = useState([]);
   const [fbUsersLoaded, setFbUsersLoaded] = useState(false);
 
-  // Load Firebase users list on mount so newly added/deleted users are reflected
+  // Load Firebase users ONCE on mount using get() — respects all admin edits/deletions
   useEffect(() => {
     const db = window.__db;
     if (!db) return;
-    try {
-      db.collection("config").doc("users").onSnapshot(async snap => {
-        if (snap.exists) {
-          const data = snap.data();
-          if (Array.isArray(data.list)) {
-            setFirebaseUsers(data.list);
-            setFbUsersLoaded(true);
-            // Auto-stamp _seeded if missing
-            if (!data._seeded) {
-              try { await db.collection("config").doc("users").set({ list: data.list, _seeded: true }); } catch(e) {}
-            }
-          }
-        } else {
-          setFbUsersLoaded(true);
+    db.collection("config").doc("users").get().then(snap => {
+      if (snap.exists) {
+        const data = snap.data();
+        if (Array.isArray(data.list) && data.list.length > 0) {
+          setFirebaseUsers(data.list);
         }
-      });
-    } catch(e) {}
+      }
+      setFbUsersLoaded(true);
+    }).catch(() => setFbUsersLoaded(true));
   }, []);
 
-  // Always use Firebase list once loaded (respects deletions/edits); fallback to hardcoded only before Firebase responds
+  // Use Firebase list once loaded; fallback to hardcoded only before Firebase responds
   const getAllUsers = () => {
     if (fbUsersLoaded) return firebaseUsers;
     return AUTHORISED_USERS;
@@ -1462,11 +1426,9 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
   useEffect(() => {
     const db = window.__db;
     if (!db) return;
-    try {
-      db.collection("config").doc("users").onSnapshot(snap => {
-        if (snap.exists) { const d = snap.data(); if (d.list && d.list.length > 0) setAllUsers(d.list); }
-      });
-    } catch(e) {}
+    db.collection("config").doc("users").get().then(snap => {
+      if (snap.exists) { const d = snap.data(); if (Array.isArray(d.list) && d.list.length > 0) setAllUsers(d.list); }
+    }).catch(e => {});
   }, []);
 
   const freshUser = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
@@ -2596,53 +2558,33 @@ function DriverEditCard({ car, onSave }) {
 // ── USER MANAGEMENT ──────────────────────────────────────────
 function UserManagement({ currentUser, cars, saveCars }) {
   const [users, setUsers] = useState([...AUTHORISED_USERS]);
-  const [fbLoaded, setFbLoaded] = useState(false);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ name: "", pfId: "", department: "" });
   const [msg, setMsg] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [editUser, setEditUser] = useState(null);
-  const isSaving = React.useRef(false);
-  const savedList = React.useRef(null); // holds the latest admin-saved list
 
+  // Load users ONCE on mount using get() — no live listener, no race condition
   useEffect(() => {
     const db = window.__db;
     if (!db) return;
-    const unsub = db.collection("config").doc("users").onSnapshot(async snap => {
+    db.collection("config").doc("users").get().then(snap => {
       if (snap.exists) {
         const data = snap.data();
-        if (Array.isArray(data.list)) {
-          // If admin just saved, ignore any snapshot that doesn't match our saved list
-          if (savedList.current !== null) {
-            const incomingIds = data.list.map(u => u.pfId).sort().join(",");
-            const savedIds = savedList.current.map(u => u.pfId).sort().join(",");
-            if (incomingIds !== savedIds) return; // stale snapshot, ignore
-          }
+        if (Array.isArray(data.list) && data.list.length > 0) {
           setUsers(data.list);
-          setFbLoaded(true);
-          // Auto-stamp _seeded once if missing
-          if (!data._seeded && !isSaving.current) {
-            isSaving.current = true;
-            try { await db.collection("config").doc("users").set({ list: data.list, _seeded: true }); } catch(e) {}
-            setTimeout(() => { isSaving.current = false; }, 3000);
-          }
         }
-      } else {
-        setFbLoaded(true);
       }
-    });
-    return () => unsub();
+    }).catch(e => {});
   }, []);
 
+  // Save to Firebase and update local state — no listener to fight with
   const saveUsers = async (list) => {
-    isSaving.current = true;
-    savedList.current = list; // remember what we saved
-    setUsers(list);
+    setUsers(list); // update UI immediately
     try {
       const db = window.__db;
       if (db) await db.collection("config").doc("users").set({ list, _seeded: true });
     } catch(e) {}
-    setTimeout(() => { isSaving.current = false; }, 5000);
   };
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
@@ -2805,4 +2747,22 @@ function UserManagement({ currentUser, cars, saveCars }) {
               const u = users.find(x => x.pfId === confirmDelete);
               return u ? <div style={{ textAlign: "center", marginBottom: 20, color: G.muted, fontSize: 13 }}>
                 Remove <b style={{ color: G.text }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
-    
+              </div> : null;
+            })()}
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button style={css.btn(G.danger)} onClick={() => handleDelete(confirmDelete)}>🗑️ Yes, Delete</button>
+              <button style={css.btn(G.muted, true)} onClick={() => setConfirmDelete(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
