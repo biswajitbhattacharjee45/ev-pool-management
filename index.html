@@ -597,6 +597,17 @@ function App() {
     try { const db = window.__db; if (db) await db.collection("config").doc("cars").set({ list: data, _seeded: true }); } catch(e) {}
     setTimeout(() => { isSavingCars.current = false; }, 3000);
   };
+
+  // ── Single source of truth for users ──
+  const [allUsers, setAllUsers] = useState([...AUTHORISED_USERS]);
+  const saveAllUsers = async (list) => {
+    setAllUsers(list); // update instantly, never reloads from Firebase again
+    try {
+      const db = window.__db;
+      if (db) await db.collection("config").doc("users").set({ list, _seeded: true });
+    } catch(e) {}
+  };
+
   const [trips, setTrips] = useState([]);
   const [maintenance, setMaintenance] = useState([]);
   const [fuelLogs, setFuelLogs] = useState([]);
@@ -606,23 +617,27 @@ function App() {
 
   // Load from storage
   useEffect(() => {
-    // Load session immediately
     try { const u = localStorage.getItem("ev_session"); if (u) setCurrentUser(JSON.parse(u)); } catch {}
     setLoaded(true);
 
-    // Then attach Firebase listeners asynchronously
     const db = window.__db;
     if (!db) return;
 
-    // Cars: load once with get(), no live listener needed
-    try {
-      db.collection("config").doc("cars").get().then(snap => {
-        if (snap.exists) {
-          const d = snap.data();
-          if (Array.isArray(d.list) && d.list.length > 0) setCars(d.list);
-        }
-      });
-    } catch(e) {}
+    // Load users ONCE at app start — never again
+    db.collection("config").doc("users").get().then(snap => {
+      if (snap.exists) {
+        const d = snap.data();
+        if (Array.isArray(d.list) && d.list.length > 0) setAllUsers(d.list);
+      }
+    }).catch(e => {});
+
+    // Cars: load once
+    db.collection("config").doc("cars").get().then(snap => {
+      if (snap.exists) {
+        const d = snap.data();
+        if (Array.isArray(d.list) && d.list.length > 0) setCars(d.list);
+      }
+    }).catch(e => {});
 
 
     const unsubs = [];
@@ -675,13 +690,13 @@ function App() {
 
   if (!loaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted }}>Loading...</div>;
 
-  if (!currentUser) return <LoginScreen onLogin={handleLogin} />;
+  if (!currentUser) return <LoginScreen onLogin={handleLogin} allUsers={allUsers} />;
 
   // Driver portal — separate minimal interface
   if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} />;
 
 
-  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser };
+  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers };
 
   const pendingCount = trips.filter(t => t.approvalStatus === "pending").length;
 
@@ -767,44 +782,24 @@ function App() {
 }
 
 // ── LOGIN SCREEN ──────────────────────────────────────────────
-function LoginScreen({ onLogin }) {
-  const [portal, setPortal] = useState(null); // "staff" | "driver"
+function LoginScreen({ onLogin, allUsers }) {
+  const [portal, setPortal] = useState(null);
   const [pfId, setPfId] = useState("");
   const [driverPhone, setDriverPhone] = useState("");
   const [driverName, setDriverName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [matched, setMatched] = useState(null);
-  const [firebaseUsers, setFirebaseUsers] = useState([]);
-  const [fbUsersLoaded, setFbUsersLoaded] = useState(false);
 
-  // Load Firebase users ONCE on mount using get() — respects all admin edits/deletions
-  useEffect(() => {
-    const db = window.__db;
-    if (!db) return;
-    db.collection("config").doc("users").get().then(snap => {
-      if (snap.exists) {
-        const data = snap.data();
-        if (Array.isArray(data.list) && data.list.length > 0) {
-          setFirebaseUsers(data.list);
-        }
-      }
-      setFbUsersLoaded(true);
-    }).catch(() => setFbUsersLoaded(true));
-  }, []);
-
-  // Use Firebase list once loaded; fallback to hardcoded only before Firebase responds
-  const getAllUsers = () => {
-    if (fbUsersLoaded) return firebaseUsers;
-    return AUTHORISED_USERS;
-  };
+  // allUsers is passed from App — already loaded from Firebase, always up to date
+  const getAllUsers = () => allUsers || AUTHORISED_USERS;
 
   useEffect(() => {
     if (pfId.length >= 5) {
       const found = getAllUsers().find(u => u.pfId === pfId.trim());
       setMatched(found || null);
     } else { setMatched(null); }
-  }, [pfId, firebaseUsers]);
+  }, [pfId, allUsers]);
 
   const handleStaffLogin = () => {
     setError("");
@@ -1419,17 +1414,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
 }
 
 // ── BOOK TRIP ─────────────────────────────────────────────────
-function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab, currentUser }) {
-  const [allUsers, setAllUsers] = useState(AUTHORISED_USERS);
-
-  // Load Firebase users so newly added users appear in PF lookup too
-  useEffect(() => {
-    const db = window.__db;
-    if (!db) return;
-    db.collection("config").doc("users").get().then(snap => {
-      if (snap.exists) { const d = snap.data(); if (Array.isArray(d.list) && d.list.length > 0) setAllUsers(d.list); }
-    }).catch(e => {});
-  }, []);
+function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab, currentUser, allUsers }) {
 
   const freshUser = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
   const initName = freshUser?.name || currentUser?.name || "";
@@ -2556,36 +2541,14 @@ function DriverEditCard({ car, onSave }) {
 }
 
 // ── USER MANAGEMENT ──────────────────────────────────────────
-function UserManagement({ currentUser, cars, saveCars }) {
-  const [users, setUsers] = useState([...AUTHORISED_USERS]);
+function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers }) {
+  const users = allUsers;
+  const saveUsers = saveAllUsers;
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ name: "", pfId: "", department: "" });
   const [msg, setMsg] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [editUser, setEditUser] = useState(null);
-
-  // Load users ONCE on mount using get() — no live listener, no race condition
-  useEffect(() => {
-    const db = window.__db;
-    if (!db) return;
-    db.collection("config").doc("users").get().then(snap => {
-      if (snap.exists) {
-        const data = snap.data();
-        if (Array.isArray(data.list) && data.list.length > 0) {
-          setUsers(data.list);
-        }
-      }
-    }).catch(e => {});
-  }, []);
-
-  // Save to Firebase and update local state — no listener to fight with
-  const saveUsers = async (list) => {
-    setUsers(list); // update UI immediately
-    try {
-      const db = window.__db;
-      if (db) await db.collection("config").doc("users").set({ list, _seeded: true });
-    } catch(e) {}
-  };
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
 
