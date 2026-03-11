@@ -35,10 +35,7 @@
       appId: "1:420704956913:web:30935786b294645680d450"
     });
     const db = firebase.firestore();
-    // Disable offline persistence entirely — always use server data
-    // This works on ALL devices including mobile
-    db.settings({ experimentalForceLongPolling: true });
-    db.disableNetwork().then(() => db.enableNetwork()).catch(() => {});
+    firebase.firestore().clearPersistence().catch(() => {});
     window.__db = db;
   </script>
   <script type="text/babel" data-presets="react">
@@ -604,9 +601,11 @@ function App() {
   };
 
   // ── Single source of truth for users ──
-  const [allUsers, setAllUsers] = useState([...AUTHORISED_USERS]);
+  // Start EMPTY — never show hardcoded list. Wait for Firebase.
+  const [allUsers, setAllUsers] = useState([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
   const saveAllUsers = async (list) => {
-    setAllUsers(list); // update instantly, never reloads from Firebase again
+    setAllUsers(list);
     try {
       const db = window.__db;
       if (db) await db.collection("config").doc("users").set({ list, _seeded: true });
@@ -628,13 +627,23 @@ function App() {
     const db = window.__db;
     if (!db) return;
 
-    // Load users ONCE at app start — always from server, never cache
+    // Load users from server — wait for response before rendering login
     db.collection("config").doc("users").get({ source: 'server' }).then(snap => {
       if (snap.exists) {
         const d = snap.data();
-        if (Array.isArray(d.list) && d.list.length > 0) setAllUsers(d.list);
+        if (Array.isArray(d.list) && d.list.length > 0) {
+          setAllUsers(d.list);
+        } else {
+          setAllUsers([...AUTHORISED_USERS]); // Firebase empty, use hardcoded
+        }
+      } else {
+        setAllUsers([...AUTHORISED_USERS]); // No Firebase doc, use hardcoded
       }
-    }).catch(e => {});
+      setUsersLoaded(true);
+    }).catch(e => {
+      setAllUsers([...AUTHORISED_USERS]); // Network error, fall back
+      setUsersLoaded(true);
+    });
 
     // Cars: load once from server
     db.collection("config").doc("cars").get({ source: 'server' }).then(snap => {
@@ -693,7 +702,7 @@ function App() {
   const activeTripForCar = (carId) => trips.find(t => t.carId === carId && !t.returnTime && t.approvalStatus === "approved");
   const isCarBusy = (carId) => !!activeTripForCar(carId);
 
-  if (!loaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted }}>Loading...</div>;
+  if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
 
   if (!currentUser) return <LoginScreen onLogin={handleLogin} allUsers={allUsers} />;
 
