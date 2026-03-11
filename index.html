@@ -610,21 +610,24 @@ function App() {
     const db = window.__db;
     if (!db) return;
 
-    // Load users from server — wait for response before rendering login
+    // Load users — use hardcoded AUTHORISED_USERS as master truth
+    // Only use Firebase if it has FEWER users (admin deleted some)
     db.collection("config").doc("users").get({ source: 'server' }).then(snap => {
       if (snap.exists) {
         const d = snap.data();
-        if (Array.isArray(d.list) && d.list.length > 0) {
+        if (Array.isArray(d.list) && d._seeded && d.list.length <= AUTHORISED_USERS.length) {
+          // Firebase has same or fewer users — admin has made deletions, respect them
           setAllUsers(d.list);
         } else {
-          setAllUsers([...AUTHORISED_USERS]); // Firebase empty, use hardcoded
+          // Firebase has more users than hardcoded — stale old data, use hardcoded
+          setAllUsers([...AUTHORISED_USERS]);
         }
       } else {
-        setAllUsers([...AUTHORISED_USERS]); // No Firebase doc, use hardcoded
+        setAllUsers([...AUTHORISED_USERS]);
       }
       setUsersLoaded(true);
     }).catch(e => {
-      setAllUsers([...AUTHORISED_USERS]); // Network error, fall back
+      setAllUsers([...AUTHORISED_USERS]);
       setUsersLoaded(true);
     });
 
