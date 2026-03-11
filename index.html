@@ -2603,20 +2603,28 @@ function UserManagement({ currentUser, cars, saveCars }) {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [editUser, setEditUser] = useState(null);
   const isSaving = React.useRef(false);
+  const savedList = React.useRef(null); // holds the latest admin-saved list
 
   useEffect(() => {
     const db = window.__db;
     if (!db) return;
     const unsub = db.collection("config").doc("users").onSnapshot(async snap => {
-      if (isSaving.current) return;
       if (snap.exists) {
         const data = snap.data();
         if (Array.isArray(data.list)) {
+          // If admin just saved, ignore any snapshot that doesn't match our saved list
+          if (savedList.current !== null) {
+            const incomingIds = data.list.map(u => u.pfId).sort().join(",");
+            const savedIds = savedList.current.map(u => u.pfId).sort().join(",");
+            if (incomingIds !== savedIds) return; // stale snapshot, ignore
+          }
           setUsers(data.list);
           setFbLoaded(true);
-          // Auto-stamp _seeded if missing so future loads always use Firebase
-          if (!data._seeded) {
+          // Auto-stamp _seeded once if missing
+          if (!data._seeded && !isSaving.current) {
+            isSaving.current = true;
             try { await db.collection("config").doc("users").set({ list: data.list, _seeded: true }); } catch(e) {}
+            setTimeout(() => { isSaving.current = false; }, 3000);
           }
         }
       } else {
@@ -2628,12 +2636,13 @@ function UserManagement({ currentUser, cars, saveCars }) {
 
   const saveUsers = async (list) => {
     isSaving.current = true;
+    savedList.current = list; // remember what we saved
     setUsers(list);
     try {
       const db = window.__db;
       if (db) await db.collection("config").doc("users").set({ list, _seeded: true });
     } catch(e) {}
-    setTimeout(() => { isSaving.current = false; }, 3000);
+    setTimeout(() => { isSaving.current = false; }, 5000);
   };
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
@@ -2796,22 +2805,4 @@ function UserManagement({ currentUser, cars, saveCars }) {
               const u = users.find(x => x.pfId === confirmDelete);
               return u ? <div style={{ textAlign: "center", marginBottom: 20, color: G.muted, fontSize: 13 }}>
                 Remove <b style={{ color: G.text }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
-              </div> : null;
-            })()}
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button style={css.btn(G.danger)} onClick={() => handleDelete(confirmDelete)}>🗑️ Yes, Delete</button>
-              <button style={css.btn(G.muted, true)} onClick={() => setConfirmDelete(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(React.createElement(App));
-  </script>
-</body>
-</html>
+    
