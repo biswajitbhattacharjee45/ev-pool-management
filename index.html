@@ -2564,7 +2564,21 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers })
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [editUser, setEditUser] = useState(null);
 
-  const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
+  const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 4000); };
+
+  // Force-write current list to Firebase server — use after all edits done
+  const forceSaveToServer = async () => {
+    showMsg("⏳ Saving to server...");
+    try {
+      const db = window.__db;
+      if (db) {
+        await db.collection("config").doc("users").set({ list: users, _seeded: true });
+        showMsg("✅ Saved! Current list is now permanent on all devices.");
+      }
+    } catch(e) {
+      showMsg("❌ Save failed. Check internet connection.");
+    }
+  };
 
   const handleAdd = () => {
     if (!form.name.trim() || !form.pfId.trim() || !form.department.trim()) { showMsg("❌ All fields are required."); return; }
@@ -2662,7 +2676,10 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers })
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
           <div style={css.sectionTitle}>👥 Authorised Users ({filtered.length})</div>
-          <input style={{ ...css.input, maxWidth: 280 }} placeholder="Search name, PF ID or department…" value={search} onChange={e => setSearch(e.target.value)} />
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <button onClick={forceSaveToServer} style={{ ...css.btn(G.success), padding: "8px 16px", fontSize: 12 }}>💾 Force Save to Server</button>
+            <input style={{ ...css.input, maxWidth: 280 }} placeholder="Search name, PF ID or department…" value={search} onChange={e => setSearch(e.target.value)} />
+          </div>
         </div>
         <div className="scroll-table"><table style={css.table}>
           <thead><tr>{["#","Name","PF ID","Department","Role","Actions"].map(h => <th key={h} style={css.th}>{h}</th>)}</tr></thead>
