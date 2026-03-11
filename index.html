@@ -594,14 +594,14 @@ function App() {
   const saveCars = async (data) => {
     isSavingCars.current = true;
     setCars(data);
-    try { const db = window.__db; if (db) await db.collection("config").doc("cars").set({ list: data }); } catch(e) {}
-    setTimeout(() => { isSavingCars.current = false; }, 2000);
+    try { const db = window.__db; if (db) await db.collection("config").doc("cars").set({ list: data, _seeded: true }); } catch(e) {}
+    setTimeout(() => { isSavingCars.current = false; }, 3000);
   };
   const [trips, setTrips] = useState([]);
   const [maintenance, setMaintenance] = useState([]);
   const [fuelLogs, setFuelLogs] = useState([]);
   const [liveLocations, setLiveLocations] = useState({});
-  const [currentUser, setCurrentUser] = useState(null); // { name, pfId, isAdmin }
+  const [currentUser, setCurrentUser] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
   // Load from storage
@@ -614,11 +614,36 @@ function App() {
     const db = window.__db;
     if (!db) return;
 
-    // Load car/driver overrides from Firebase
+    // Cars: seed once on first run, then always use Firebase
     try {
-      db.collection("config").doc("cars").onSnapshot(snap => {
+      db.collection("config").doc("cars").onSnapshot(async snap => {
         if (isSavingCars.current) return;
-        if (snap.exists) { const d = snap.data(); if (d.list && d.list.length > 0) setCars(d.list); }
+        if (snap.exists) {
+          const d = snap.data();
+          if (Array.isArray(d.list)) setCars(d.list);
+        } else {
+          // First ever run — seed Firebase with hardcoded cars
+          await db.collection("config").doc("cars").set({ list: INITIAL_CARS, _seeded: true });
+        }
+      });
+    } catch(e) {}
+
+    // Users: seed once on first run, then always use Firebase
+    try {
+      db.collection("config").doc("users").onSnapshot(async snap => {
+        if (snap.exists) {
+          const d = snap.data();
+          // Only update if it has been seeded — never fall back to hardcoded
+          if (Array.isArray(d.list) && d._seeded) {
+            // users are managed in UserManagement component
+          } else if (!d._seeded) {
+            // Seed Firebase with hardcoded users (first run only)
+            await db.collection("config").doc("users").set({ list: AUTHORISED_USERS, _seeded: true });
+          }
+        } else {
+          // No doc at all — seed
+          await db.collection("config").doc("users").set({ list: AUTHORISED_USERS, _seeded: true });
+        }
       });
     } catch(e) {}
 
@@ -783,7 +808,7 @@ function LoginScreen({ onLogin }) {
       db.collection("config").doc("users").onSnapshot(snap => {
         if (snap.exists) {
           const data = snap.data();
-          if (Array.isArray(data.list)) {
+          if (Array.isArray(data.list) && data._seeded) {
             setFirebaseUsers(data.list);
             setFbUsersLoaded(true);
           }
@@ -794,7 +819,7 @@ function LoginScreen({ onLogin }) {
     } catch(e) {}
   }, []);
 
-  // Always use Firebase list once loaded (respects deletions); fallback to hardcoded only before Firebase responds
+  // Always use Firebase list once seeded (respects deletions/edits); fallback to hardcoded only before Firebase responds
   const getAllUsers = () => {
     if (fbUsersLoaded) return firebaseUsers;
     return AUTHORISED_USERS;
@@ -2576,13 +2601,12 @@ function UserManagement({ currentUser, cars, saveCars }) {
       if (isSaving.current) return;
       if (snap.exists) {
         const data = snap.data();
-        // Always use Firebase list once loaded — even if smaller than hardcoded
-        if (Array.isArray(data.list)) {
+        // Only load from Firebase if it has been seeded (has admin-managed data)
+        if (Array.isArray(data.list) && data._seeded) {
           setUsers(data.list);
           setFbLoaded(true);
         }
       } else {
-        // No Firebase doc yet — keep hardcoded but mark as loaded
         setFbLoaded(true);
       }
     });
@@ -2594,7 +2618,7 @@ function UserManagement({ currentUser, cars, saveCars }) {
     setUsers(list);
     try {
       const db = window.__db;
-      if (db) await db.collection("config").doc("users").set({ list });
+      if (db) await db.collection("config").doc("users").set({ list, _seeded: true });
     } catch(e) {}
     setTimeout(() => { isSaving.current = false; }, 3000);
   };
