@@ -587,9 +587,12 @@ const css = {
 function App() {
   const [tab, setTab] = useState("dashboard");
   const [cars, setCars] = useState(INITIAL_CARS);
+  const isSavingCars = React.useRef(false);
   const saveCars = async (data) => {
+    isSavingCars.current = true;
     setCars(data);
     try { const db = window.__db; if (db) await db.collection("config").doc("cars").set({ list: data }); } catch(e) {}
+    setTimeout(() => { isSavingCars.current = false; }, 2000);
   };
   const [trips, setTrips] = useState([]);
   const [maintenance, setMaintenance] = useState([]);
@@ -611,6 +614,7 @@ function App() {
     // Load car/driver overrides from Firebase
     try {
       db.collection("config").doc("cars").onSnapshot(snap => {
+        if (isSavingCars.current) return;
         if (snap.exists) { const d = snap.data(); if (d.list && d.list.length > 0) setCars(d.list); }
       });
     } catch(e) {}
@@ -915,7 +919,7 @@ function LoginScreen({ onLogin }) {
 
         <div style={{ textAlign: "center", marginTop: 20, fontSize: 11, color: "#334155" }}>Office Pool Car System · {new Date().getFullYear()}</div>
         <div style={{ textAlign: "center", marginTop: 10, padding: "10px 16px", borderTop: "1px solid #1e293b" }}>
-          <div style={{ fontSize: 11, color: "#475569" }}>Designed & Developed by</div>
+          <div style={{ fontSize: 11, color: "#475569" }}>Designed & Created by</div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginTop: 3 }}>Biswajit Bhattacharjee</div>
           <div style={{ fontSize: 11, color: "#475569" }}>CM, Liaison · SBI LHO Guwahati</div>
         </div>
@@ -2546,11 +2550,13 @@ function UserManagement({ currentUser, cars, saveCars }) {
   const [msg, setMsg] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [editUser, setEditUser] = useState(null);
+  const isSaving = React.useRef(false);
 
   useEffect(() => {
     const db = window.__db;
     if (!db) return;
     const unsub = db.collection("config").doc("users").onSnapshot(snap => {
+      if (isSaving.current) return; // ignore snapshot triggered by our own save
       if (snap.exists) {
         const data = snap.data();
         if (data.list && data.list.length > 0) setUsers(data.list);
@@ -2560,8 +2566,10 @@ function UserManagement({ currentUser, cars, saveCars }) {
   }, []);
 
   const saveUsers = async (list) => {
+    isSaving.current = true;
     setUsers(list);
     try { const db = window.__db; if (db) await db.collection("config").doc("users").set({ list }); } catch(e) {}
+    setTimeout(() => { isSaving.current = false; }, 2000);
   };
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 3000); };
