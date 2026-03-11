@@ -2549,17 +2549,18 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers })
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 4000); };
 
-  // Force-write current list to Firebase server — use after all edits done
+  // Force-write AUTHORISED_USERS hardcoded list to Firebase — overwrites old data
   const forceSaveToServer = async () => {
-    showMsg("⏳ Saving to server...");
+    showMsg("⏳ Saving new user list to server...");
     try {
       const db = window.__db;
       if (db) {
-        await db.collection("config").doc("users").set({ list: users, _seeded: true });
-        showMsg("✅ Saved! Current list is now permanent on all devices.");
+        await db.collection("config").doc("users").set({ list: AUTHORISED_USERS, _seeded: true });
+        saveUsers(AUTHORISED_USERS); // update UI too
+        showMsg("✅ Done! New user list (" + AUTHORISED_USERS.length + " users) saved permanently on all devices.");
       }
     } catch(e) {
-      showMsg("❌ Save failed. Check internet connection.");
+      showMsg("❌ Save failed: " + e.message);
     }
   };
 
