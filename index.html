@@ -34,7 +34,11 @@
       messagingSenderId: "420704956913",
       appId: "1:420704956913:web:30935786b294645680d450"
     });
-    window.__db = firebase.firestore();
+    // Disable Firebase local cache — always read fresh from server
+    const db = firebase.firestore();
+    db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
+    firebase.firestore().clearPersistence().catch(() => {});
+    window.__db = db;
   </script>
   <script type="text/babel" data-presets="react">
     const { useState, useEffect } = React;
