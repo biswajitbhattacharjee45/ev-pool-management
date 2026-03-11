@@ -35,7 +35,10 @@
       appId: "1:420704956913:web:30935786b294645680d450"
     });
     const db = firebase.firestore();
-    firebase.firestore().clearPersistence().catch(() => {});
+    // Disable offline persistence entirely — always use server data
+    // This works on ALL devices including mobile
+    db.settings({ experimentalForceLongPolling: true });
+    db.disableNetwork().then(() => db.enableNetwork()).catch(() => {});
     window.__db = db;
   </script>
   <script type="text/babel" data-presets="react">
