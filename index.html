@@ -734,7 +734,7 @@ function App() {
 
       {/* ── BODY ── */}
       <div style={css.body}>
-        {tab === "dashboard"   && <Dashboard {...props} />}
+        {tab === "dashboard"   && <Dashboard {...props} setTab={setTab} />}
         {tab === "book"        && <BookTrip {...props} setTab={setTab} />}
         {tab === "trips"       && <TripLog {...props} currentUser={currentUser} />}
         {tab === "tracking"    && <LiveTracking {...props} />}
@@ -919,7 +919,7 @@ function LoginScreen({ onLogin }) {
 
         <div style={{ textAlign: "center", marginTop: 20, fontSize: 11, color: "#334155" }}>Office Pool Car System · {new Date().getFullYear()}</div>
         <div style={{ textAlign: "center", marginTop: 10, padding: "10px 16px", borderTop: "1px solid #1e293b" }}>
-          <div style={{ fontSize: 11, color: "#475569" }}>Designed & Created by</div>
+          <div style={{ fontSize: 11, color: "#475569" }}>Designed and Developed by</div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginTop: 3 }}>Biswajit Bhattacharjee</div>
           <div style={{ fontSize: 11, color: "#475569" }}>CM, Liaison · SBI LHO Guwahati</div>
         </div>
@@ -1124,7 +1124,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
-function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBusy, activeTripForCar, currentUser }) {
+function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBusy, activeTripForCar, currentUser, setTab }) {
   const [view, setView] = useState("pf"); // "pf" | "driver"
   const [search, setSearch] = useState("");
   const [expandedDates, setExpandedDates] = useState({ [today()]: true }); // today expanded by default
@@ -1169,15 +1169,22 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
       {/* ── Stat cards ── */}
       <div style={css.grid4}>
         {[
-          { label: "EVs Available",      val: cars.length - activeTrips.length, color: G.success,  icon: "✅" },
-          { label: "Active Trips",        val: activeTrips.length,               color: "#0891b2",  icon: "🚗" },
-          { label: "Pending Approvals",   val: pendingTrips.length,              color: G.warning,  icon: "⏳" },
-          { label: "Today's Trips",       val: todayTrips.length,                color: G.info,     icon: "📋" },
+          { label: "EVs Available",    val: cars.length - activeTrips.length, color: G.success,  icon: "✅", tab: "dashboard", hint: "View vehicle status ↓" },
+          { label: "Active Trips",     val: activeTrips.length,               color: "#0891b2",  icon: "🚗", tab: "trips",     hint: "View Trip Log →" },
+          { label: "Pending Approvals",val: pendingTrips.length,              color: G.warning,  icon: "⏳", tab: "approvals", hint: "Go to Approvals →" },
+          { label: "Today's Trips",    val: todayTrips.length,                color: G.info,     icon: "📋", tab: "trips",     hint: "View Trip Log →" },
         ].map(s => (
-          <div key={s.label} style={{ ...css.card, borderTop: `3px solid ${s.color}` }}>
+          <div key={s.label}
+            onClick={() => s.tab && setTab && setTab(s.tab)}
+            style={{ ...css.card, borderTop: `3px solid ${s.color}`, cursor: s.tab ? "pointer" : "default", transition: "all 0.15s", position: "relative" }}
+            onMouseEnter={e => { if(s.tab) e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 6px 20px ${s.color}30`; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
             <div style={{ fontSize: 22, marginBottom: 6 }}>{s.icon}</div>
             <div style={{ ...css.statNum, color: s.color }}>{s.val}</div>
             <div style={css.statLabel}>{s.label}</div>
+            {currentUser?.isAdmin && s.tab && (
+              <div style={{ fontSize: 10, color: s.color, marginTop: 6, fontWeight: 600, opacity: 0.8 }}>{s.hint}</div>
+            )}
           </div>
         ))}
       </div>
