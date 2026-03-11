@@ -614,13 +614,19 @@ function App() {
     const db = window.__db;
     if (!db) return;
 
-    // Cars: seed once on first run, then always use Firebase
+    // Cars: always use Firebase if exists, seed on first run
     try {
       db.collection("config").doc("cars").onSnapshot(async snap => {
         if (isSavingCars.current) return;
         if (snap.exists) {
           const d = snap.data();
-          if (Array.isArray(d.list)) setCars(d.list);
+          if (Array.isArray(d.list)) {
+            setCars(d.list);
+            // Auto-stamp _seeded if missing
+            if (!d._seeded) {
+              try { await db.collection("config").doc("cars").set({ list: d.list, _seeded: true }); } catch(e) {}
+            }
+          }
         } else {
           // First ever run — seed Firebase with hardcoded cars
           await db.collection("config").doc("cars").set({ list: INITIAL_CARS, _seeded: true });
@@ -805,12 +811,16 @@ function LoginScreen({ onLogin }) {
     const db = window.__db;
     if (!db) return;
     try {
-      db.collection("config").doc("users").onSnapshot(snap => {
+      db.collection("config").doc("users").onSnapshot(async snap => {
         if (snap.exists) {
           const data = snap.data();
-          if (Array.isArray(data.list) && data._seeded) {
+          if (Array.isArray(data.list)) {
             setFirebaseUsers(data.list);
             setFbUsersLoaded(true);
+            // Auto-stamp _seeded if missing
+            if (!data._seeded) {
+              try { await db.collection("config").doc("users").set({ list: data.list, _seeded: true }); } catch(e) {}
+            }
           }
         } else {
           setFbUsersLoaded(true);
@@ -819,7 +829,7 @@ function LoginScreen({ onLogin }) {
     } catch(e) {}
   }, []);
 
-  // Always use Firebase list once seeded (respects deletions/edits); fallback to hardcoded only before Firebase responds
+  // Always use Firebase list once loaded (respects deletions/edits); fallback to hardcoded only before Firebase responds
   const getAllUsers = () => {
     if (fbUsersLoaded) return firebaseUsers;
     return AUTHORISED_USERS;
@@ -2597,14 +2607,17 @@ function UserManagement({ currentUser, cars, saveCars }) {
   useEffect(() => {
     const db = window.__db;
     if (!db) return;
-    const unsub = db.collection("config").doc("users").onSnapshot(snap => {
+    const unsub = db.collection("config").doc("users").onSnapshot(async snap => {
       if (isSaving.current) return;
       if (snap.exists) {
         const data = snap.data();
-        // Only load from Firebase if it has been seeded (has admin-managed data)
-        if (Array.isArray(data.list) && data._seeded) {
+        if (Array.isArray(data.list)) {
           setUsers(data.list);
           setFbLoaded(true);
+          // Auto-stamp _seeded if missing so future loads always use Firebase
+          if (!data._seeded) {
+            try { await db.collection("config").doc("users").set({ list: data.list, _seeded: true }); } catch(e) {}
+          }
         }
       } else {
         setFbLoaded(true);
