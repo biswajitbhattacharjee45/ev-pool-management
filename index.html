@@ -717,10 +717,12 @@ function App() {
     { id: "dashboard", label: "Dashboard", icon: "📊" },
     { id: "book",      label: "Book Trip",  icon: "📤" },
     { id: "trips",     label: "Trip Log",   icon: "📋" },
-    ...(currentUser.isAdmin ? [
+    ...(currentUser.isAdmin || currentUser.isAssistant ? [
       { id: "tracking",    label: "Tracking",  icon: "🗺" },
       { id: "fuel",        label: "Charging",  icon: "⚡" },
       { id: "maintenance", label: "Maint.",    icon: "🔧" },
+    ] : []),
+    ...(currentUser.isAdmin ? [
       { id: "approvals",   label: pendingCount > 0 ? `Approve(${pendingCount})` : "Approvals", icon: "✅" },
       { id: "users",       label: "Users",     icon: "👥" },
     ] : []),
@@ -772,9 +774,9 @@ function App() {
         {tab === "dashboard"   && <Dashboard {...props} setTab={setTab} />}
         {tab === "book"        && <BookTrip {...props} setTab={setTab} />}
         {tab === "trips"       && <TripLog {...props} currentUser={currentUser} />}
-        {tab === "tracking"    && <LiveTracking {...props} />}
-        {tab === "fuel"        && <FuelLog {...props} />}
-        {tab === "maintenance" && <Maintenance {...props} />}
+        {tab === "tracking"    && (currentUser.isAdmin || currentUser.isAssistant) && <LiveTracking {...props} />}
+        {tab === "fuel"        && (currentUser.isAdmin || currentUser.isAssistant) && <FuelLog {...props} />}
+        {tab === "maintenance" && (currentUser.isAdmin || currentUser.isAssistant) && <Maintenance {...props} />}
         {tab === "approvals"   && currentUser.isAdmin && <Approvals {...props} />}
         {tab === "users"       && currentUser.isAdmin && <UserManagement {...props} cars={cars} saveCars={saveCars} />}
       </div>
@@ -901,7 +903,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
     if (!checkPassword(pfId.trim(), password)) { setError("❌ Incorrect password. Please try again."); return; }
     setLoading(true);
     setTimeout(() => {
-      onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), role: "staff" });
+      onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), isAssistant: !!(user.isAssistant), role: "staff" });
       setLoading(false);
     }, 600);
   };
@@ -2757,6 +2759,9 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             <div style={{ padding: 12, background: "#fef9c3", borderRadius: 8, border: "1px solid #fde68a", color: "#92400e" }}>
               <b>Editing:</b> Click ✏️ to update a user's name or department. PF ID cannot be changed.
             </div>
+            <div style={{ padding: 12, background: "#f5f3ff", borderRadius: 8, border: "1px solid #ddd6fe", color: "#5b21b6" }}>
+              <b>Assistant Role:</b> Click 🤝 to promote a user to Assistant — they get access to Tracking, Charging and Maintenance tabs (but not Approvals or Users).
+            </div>
             <div style={{ padding: 12, background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca", color: "#991b1b" }}>
               <b>Deleting:</b> Click 🗑️ — a confirmation will appear. Admin accounts cannot be deleted.
             </div>
@@ -2805,11 +2810,20 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
                   </td>
                   <td style={{ ...css.td, fontFamily: "monospace" }}>{u.pfId}</td>
                   <td style={{ ...css.td, fontSize: 12, color: G.muted }}>{u.department}</td>
-                  <td style={css.td}>{isAdmin ? <span style={css.badge(G.info)}>🔑 Admin</span> : <span style={css.badge(G.muted)}>👤 Staff</span>}</td>
+                  <td style={css.td}>{isAdmin ? <span style={css.badge(G.info)}>🔑 Admin</span> : u.isAssistant ? <span style={css.badge(G.warning)}>🤝 Assistant</span> : <span style={css.badge(G.muted)}>👤 Staff</span>}</td>
                   <td style={css.td}>
                     <div style={{ display: "flex", gap: 6 }}>
                       <button onClick={() => setEditUser({...u})} style={{ ...css.btnSm(G.info), padding: "4px 10px" }}>✏️</button>
                       <button onClick={() => setResetPwUser(u)} style={{ ...css.btnSm(G.warning), padding: "4px 10px" }} title="Reset Password">🔑</button>
+                      {!isAdmin && (
+                        <button onClick={async () => {
+                          const updated = users.map(x => x.pfId === u.pfId ? { ...x, isAssistant: !u.isAssistant } : x);
+                          saveUsers(updated);
+                          showMsg(u.isAssistant ? `✅ ${u.name} is now Staff` : `✅ ${u.name} is now Assistant`);
+                        }} style={{ ...css.btnSm(u.isAssistant ? G.muted : "#7c3aed"), padding: "4px 10px" }} title={u.isAssistant ? "Demote to Staff" : "Promote to Assistant"}>
+                          {u.isAssistant ? "👤" : "🤝"}
+                        </button>
+                      )}
                       {!isAdmin && <button onClick={() => setConfirmDelete(u.pfId)} style={{ ...css.btnSm(G.danger), padding: "4px 10px" }}>🗑️</button>}
                     </div>
                   </td>
