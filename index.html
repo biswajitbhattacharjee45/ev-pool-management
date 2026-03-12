@@ -601,6 +601,31 @@ function App() {
   const [liveLocations, setLiveLocations] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
   const [loaded, setLoaded] = useState(false);
+  const [passwords, setPasswords] = useState({});
+  const [showChangePw, setShowChangePw] = useState(false);
+
+  // Simple hash for password storage (not cryptographic, but adequate for this app)
+  const hashPw = (pw) => btoa(encodeURIComponent(pw + "_evpool_salt"));
+
+  const savePassword = async (pfId, plainPw) => {
+    const hashed = hashPw(plainPw);
+    const updated = { ...passwords, [pfId]: hashed };
+    setPasswords(updated);
+    try {
+      const db = window.__db;
+      if (db) await db.collection("config").doc("passwords").set(updated);
+    } catch(e) {}
+    return hashed;
+  };
+
+  const checkPassword = (pfId, plainPw) => {
+    const stored = passwords[pfId];
+    if (!stored) {
+      // No password set yet — default is PF ID itself
+      return plainPw === pfId;
+    }
+    return stored === hashPw(plainPw);
+  };
 
   // Load from storage
   useEffect(() => {
@@ -613,6 +638,11 @@ function App() {
     // Always use hardcoded AUTHORISED_USERS as the master truth
     setAllUsers([...AUTHORISED_USERS]);
     setUsersLoaded(true);
+
+    // Passwords: load once from server
+    db.collection("config").doc("passwords").get({ source: 'server' }).then(snap => {
+      if (snap.exists) setPasswords(snap.data() || {});
+    }).catch(e => {});
 
     // Cars: load once from server
     db.collection("config").doc("cars").get({ source: 'server' }).then(snap => {
@@ -673,13 +703,13 @@ function App() {
 
   if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
 
-  if (!currentUser) return <LoginScreen onLogin={handleLogin} allUsers={allUsers} />;
+  if (!currentUser) return <LoginScreen onLogin={handleLogin} allUsers={allUsers} checkPassword={checkPassword} />;
 
   // Driver portal — separate minimal interface
   if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} />;
 
 
-  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers };
+  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword };
 
   const pendingCount = trips.filter(t => t.approvalStatus === "pending").length;
 
@@ -732,6 +762,7 @@ function App() {
             <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}</div>
             <div style={{ fontSize: 10, color: "#94a3b8" }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
           </div>
+          <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑 Password</button>
           <button onClick={handleLogout} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Logout</button>
         </div>
       </header>
@@ -760,14 +791,92 @@ function App() {
           </button>
         ))}
       </nav>
+
+      {/* ── CHANGE PASSWORD MODAL ── */}
+      {showChangePw && (
+        <ChangePasswordModal
+          currentUser={currentUser}
+          checkPassword={checkPassword}
+          savePassword={savePassword}
+          onClose={() => setShowChangePw(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── CHANGE PASSWORD MODAL ────────────────────────────────────
+function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose }) {
+  const [oldPw, setOldPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState("error");
+  const [saving, setSaving] = useState(false);
+
+  const handleChange = async () => {
+    setMsg("");
+    if (!oldPw) { setMsg("Please enter your current password."); setMsgType("error"); return; }
+    if (!checkPassword(currentUser.pfId, oldPw)) { setMsg("❌ Current password is incorrect."); setMsgType("error"); return; }
+    if (newPw.length < 6) { setMsg("❌ New password must be at least 6 characters."); setMsgType("error"); return; }
+    if (newPw !== confirmPw) { setMsg("❌ New passwords do not match."); setMsgType("error"); return; }
+    setSaving(true);
+    await savePassword(currentUser.pfId, newPw);
+    setSaving(false);
+    setMsg("✅ Password changed successfully!");
+    setMsgType("success");
+    setTimeout(() => onClose(), 1500);
+  };
+
+  return (
+    <div style={css.modal} onClick={onClose}>
+      <div style={{ ...css.modalBox, maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 28, textAlign: "center", marginBottom: 6 }}>🔑</div>
+        <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 4 }}>Change Password</div>
+        <div style={{ fontSize: 12, color: G.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name} · PF: {currentUser.pfId}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={css.label}>Current Password</label>
+            <div style={{ position: "relative" }}>
+              <input style={{ ...css.input, paddingRight: 40 }} type={showOld ? "text" : "password"} value={oldPw} onChange={e => setOldPw(e.target.value)} placeholder="Enter current password" autoFocus />
+              <button onClick={() => setShowOld(v => !v)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 15 }}>{showOld ? "🙈" : "👁️"}</button>
+            </div>
+            <div style={{ fontSize: 10, color: G.muted, marginTop: 3 }}>Default is your PF ID if you haven't changed it.</div>
+          </div>
+          <div>
+            <label style={css.label}>New Password</label>
+            <div style={{ position: "relative" }}>
+              <input style={{ ...css.input, paddingRight: 40 }} type={showNew ? "text" : "password"} value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="Min 6 characters" />
+              <button onClick={() => setShowNew(v => !v)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 15 }}>{showNew ? "🙈" : "👁️"}</button>
+            </div>
+          </div>
+          <div>
+            <label style={css.label}>Confirm New Password</label>
+            <input style={{ ...css.input, border: confirmPw && newPw !== confirmPw ? `1.5px solid ${G.danger}` : undefined }} type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="Re-enter new password" onKeyDown={e => e.key === "Enter" && handleChange()} />
+          </div>
+          {msg && (
+            <div style={{ padding: "10px 14px", background: msgType === "success" ? "#f0fdf4" : "#fef2f2", border: `1px solid ${msgType === "success" ? "#bbf7d0" : "#fecaca"}`, borderRadius: 8, fontSize: 13, color: msgType === "success" ? G.success : G.danger }}>
+              {msg}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 10 }}>
+            <button style={css.btn(G.info)} onClick={handleChange} disabled={saving}>{saving ? "Saving..." : "💾 Change Password"}</button>
+            <button style={css.btn(G.muted, true)} onClick={onClose}>Cancel</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 // ── LOGIN SCREEN ──────────────────────────────────────────────
-function LoginScreen({ onLogin, allUsers }) {
+function LoginScreen({ onLogin, allUsers, checkPassword }) {
   const [portal, setPortal] = useState(null);
   const [pfId, setPfId] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [driverPhone, setDriverPhone] = useState("");
   const [driverName, setDriverName] = useState("");
   const [error, setError] = useState("");
@@ -788,6 +897,8 @@ function LoginScreen({ onLogin, allUsers }) {
     setError("");
     const user = getAllUsers().find(u => u.pfId === pfId.trim());
     if (!user) { setError("❌ PF ID not found. You are not authorised to access this system."); return; }
+    if (!password) { setError("❌ Please enter your password."); return; }
+    if (!checkPassword(pfId.trim(), password)) { setError("❌ Incorrect password. Please try again."); return; }
     setLoading(true);
     setTimeout(() => {
       onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), role: "staff" });
@@ -844,17 +955,17 @@ function LoginScreen({ onLogin, allUsers }) {
         {portal === "staff" && (
           <div style={{ background: "#1e293b", borderRadius: 14, padding: 32, boxShadow: "0 20px 60px rgba(0,0,0,0.4)", border: "1px solid #334155" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <button onClick={() => { setPortal(null); setError(""); setPfId(""); }} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 18 }}>←</button>
+              <button onClick={() => { setPortal(null); setError(""); setPfId(""); setPassword(""); }} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 18 }}>←</button>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>👤 Staff Login</div>
-                <div style={{ fontSize: 11, color: "#64748b" }}>Enter your Employee PF ID</div>
+                <div style={{ fontSize: 11, color: "#64748b" }}>Enter your Employee PF ID and Password</div>
               </div>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>PF ID Number</label>
               <input style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: `1.5px solid ${error ? "#ef4444" : matched ? "#22c55e" : "#334155"}`, background: "#0f172a", color: "#fff", fontSize: 16, outline: "none", letterSpacing: "0.1em", boxSizing: "border-box" }}
                 value={pfId} onChange={e => { setPfId(e.target.value); setError(""); }}
-                placeholder="e.g. 3600181" maxLength={10} onKeyDown={e => e.key === "Enter" && handleStaffLogin()} autoFocus />
+                placeholder="e.g. 3600181" maxLength={10} autoFocus />
             </div>
             {matched && (
               <div style={{ padding: "10px 14px", background: "#052e16", border: "1px solid #16a34a", borderRadius: 8, marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
@@ -865,9 +976,22 @@ function LoginScreen({ onLogin, allUsers }) {
                 </div>
               </div>
             )}
+            {matched && (
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Password</label>
+                <div style={{ position: "relative" }}>
+                  <input style={{ width: "100%", padding: "12px 44px 12px 14px", borderRadius: 8, border: `1.5px solid ${error ? "#ef4444" : "#334155"}`, background: "#0f172a", color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box" }}
+                    type={showPw ? "text" : "password"}
+                    value={password} onChange={e => { setPassword(e.target.value); setError(""); }}
+                    placeholder="Enter password" onKeyDown={e => e.key === "Enter" && handleStaffLogin()} autoFocus />
+                  <button onClick={() => setShowPw(v => !v)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 16 }}>{showPw ? "🙈" : "👁️"}</button>
+                </div>
+                <div style={{ fontSize: 10, color: "#475569", marginTop: 5 }}>Default password is your PF ID. Change it after login.</div>
+              </div>
+            )}
             {error && <div style={{ padding: "10px 14px", background: "#450a0a", border: "1px solid #ef4444", borderRadius: 8, marginBottom: 16, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
-            <button onClick={handleStaffLogin} disabled={loading || !pfId}
-              style={{ width: "100%", padding: "13px", borderRadius: 8, border: "none", background: pfId ? "#3b82f6" : "#1e3a5f", color: pfId ? "#fff" : "#475569", fontWeight: 700, fontSize: 14, cursor: pfId ? "pointer" : "not-allowed" }}>
+            <button onClick={handleStaffLogin} disabled={loading || !pfId || !password}
+              style={{ width: "100%", padding: "13px", borderRadius: 8, border: "none", background: (pfId && password) ? "#3b82f6" : "#1e3a5f", color: (pfId && password) ? "#fff" : "#475569", fontWeight: 700, fontSize: 14, cursor: (pfId && password) ? "pointer" : "not-allowed" }}>
               {loading ? "Verifying..." : "Access System →"}
             </button>
           </div>
@@ -2524,7 +2648,7 @@ function DriverEditCard({ car, onSave }) {
 }
 
 // ── USER MANAGEMENT ──────────────────────────────────────────
-function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers }) {
+function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword }) {
   const users = allUsers;
   const saveUsers = saveAllUsers;
   const [search, setSearch] = useState("");
@@ -2532,6 +2656,8 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers })
   const [msg, setMsg] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [editUser, setEditUser] = useState(null);
+  const [resetPwUser, setResetPwUser] = useState(null);
+  const [resetPwMsg, setResetPwMsg] = useState("");
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 4000); };
 
@@ -2683,6 +2809,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers })
                   <td style={css.td}>
                     <div style={{ display: "flex", gap: 6 }}>
                       <button onClick={() => setEditUser({...u})} style={{ ...css.btnSm(G.info), padding: "4px 10px" }}>✏️</button>
+                      <button onClick={() => setResetPwUser(u)} style={{ ...css.btnSm(G.warning), padding: "4px 10px" }} title="Reset Password">🔑</button>
                       {!isAdmin && <button onClick={() => setConfirmDelete(u.pfId)} style={{ ...css.btnSm(G.danger), padding: "4px 10px" }}>🗑️</button>}
                     </div>
                   </td>
@@ -2728,6 +2855,34 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers })
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button style={css.btn(G.danger)} onClick={() => handleDelete(confirmDelete)}>🗑️ Yes, Delete</button>
               <button style={css.btn(G.muted, true)} onClick={() => setConfirmDelete(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {resetPwUser && (
+        <div style={css.modal} onClick={() => { setResetPwUser(null); setResetPwMsg(""); }}>
+          <div style={{ ...css.modalBox, maxWidth: 400 }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 32, textAlign: "center", marginBottom: 6 }}>🔑</div>
+            <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 4 }}>Reset Password</div>
+            <div style={{ textAlign: "center", fontSize: 13, color: G.muted, marginBottom: 20 }}>
+              Reset password for <b style={{ color: G.text }}>{resetPwUser.name}</b><br/>PF ID: <span style={{ fontFamily: "monospace" }}>{resetPwUser.pfId}</span>
+            </div>
+            <div style={{ padding: "12px 16px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, marginBottom: 20, fontSize: 12, color: "#92400e" }}>
+              ⚠️ This will reset the user's password to their <b>PF ID</b> ({resetPwUser.pfId}). They can change it after logging in.
+            </div>
+            {resetPwMsg && (
+              <div style={{ padding: "10px 14px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, marginBottom: 16, fontSize: 13, color: G.success }}>
+                {resetPwMsg}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button style={css.btn(G.warning)} onClick={async () => {
+                await savePassword(resetPwUser.pfId, resetPwUser.pfId);
+                setResetPwMsg("✅ Password reset to PF ID successfully!");
+                setTimeout(() => { setResetPwUser(null); setResetPwMsg(""); }, 1500);
+              }}>🔑 Yes, Reset</button>
+              <button style={css.btn(G.muted, true)} onClick={() => { setResetPwUser(null); setResetPwMsg(""); }}>Cancel</button>
             </div>
           </div>
         </div>
