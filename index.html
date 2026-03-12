@@ -635,9 +635,36 @@ function App() {
     const db = window.__db;
     if (!db) return;
 
-    // Always use hardcoded AUTHORISED_USERS as the master truth
-    setAllUsers([...AUTHORISED_USERS]);
-    setUsersLoaded(true);
+    // Load users from Firebase (preserves isAssistant and other flags), fallback to hardcoded
+    db.collection("config").doc("users").get({ source: 'server' }).then(snap => {
+      if (snap.exists) {
+        const d = snap.data();
+        if (Array.isArray(d.list) && d.list.length > 0) {
+          setAllUsers(d.list);
+          // Refresh current session in case role changed (e.g. isAssistant was toggled)
+          try {
+            const sess = localStorage.getItem("ev_session");
+            if (sess) {
+              const parsed = JSON.parse(sess);
+              const fresh = d.list.find(u => u.pfId === parsed.pfId);
+              if (fresh) {
+                const updated = { ...parsed, isAssistant: !!(fresh.isAssistant), isAdmin: ADMIN_PF_IDS.includes(fresh.pfId) };
+                setCurrentUser(updated);
+                localStorage.setItem("ev_session", JSON.stringify(updated));
+              }
+            }
+          } catch(e) {}
+        } else {
+          setAllUsers([...AUTHORISED_USERS]);
+        }
+      } else {
+        setAllUsers([...AUTHORISED_USERS]);
+      }
+      setUsersLoaded(true);
+    }).catch(e => {
+      setAllUsers([...AUTHORISED_USERS]);
+      setUsersLoaded(true);
+    });
 
     // Passwords: load once from server
     db.collection("config").doc("passwords").get({ source: 'server' }).then(snap => {
