@@ -682,16 +682,22 @@ function App() {
 
     const unsubs = [];
     try {
-      unsubs.push(db.collection("trips").onSnapshot(snap => {
+      // { includeMetadataChanges: false } — only fire on server-confirmed changes, not cache
+      const snapOpts = { includeMetadataChanges: false };
+      unsubs.push(db.collection("trips").onSnapshot(snapOpts, snap => {
+        if (snap.metadata.fromCache) return; // ignore stale cache snapshots
         setTrips(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
-      unsubs.push(db.collection("maintenance").onSnapshot(snap => {
+      unsubs.push(db.collection("maintenance").onSnapshot(snapOpts, snap => {
+        if (snap.metadata.fromCache) return;
         setMaintenance(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
-      unsubs.push(db.collection("fuel").onSnapshot(snap => {
+      unsubs.push(db.collection("fuel").onSnapshot(snapOpts, snap => {
+        if (snap.metadata.fromCache) return;
         setFuelLogs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
-      unsubs.push(db.collection("config").doc("live").onSnapshot(snap => {
+      unsubs.push(db.collection("config").doc("live").onSnapshot(snapOpts, snap => {
+        if (snap.metadata.fromCache) return;
         if (snap.exists) setLiveLocations(snap.data());
       }));
     } catch(e) { console.error("Firebase listener error:", e); }
@@ -702,9 +708,15 @@ function App() {
   const _fsWrite = async (colName, data) => {
     const db = window.__db; if (!db) return;
     try {
-      const snap = await db.collection(colName).get();
-      await Promise.all(snap.docs.map(d => d.ref.delete()));
+      // Step 1: Write/update all current records (safe — no deletes yet)
       await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
+      // Step 2: Delete only records that are no longer in the data array
+      const snap = await db.collection(colName).get({ source: 'server' });
+      const currentIds = new Set(data.map(t => String(t.id)));
+      const toDelete = snap.docs.filter(d => !currentIds.has(d.id));
+      if (toDelete.length > 0) {
+        await Promise.all(toDelete.map(d => d.ref.delete()));
+      }
     } catch(e) { console.error("_fsWrite error:", e); }
   };
   const saveTrips = async (data) => { setTrips(data); _fsWrite("trips", data); };
