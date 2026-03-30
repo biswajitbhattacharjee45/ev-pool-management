@@ -3,639 +3,950 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Claude Usage Tracker</title>
+  <title>Claude Usage</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0f0f13;
-      --card: #1a1a24;
-      --border: #2a2a3a;
+      --bg: #0c0c10;
+      --surface: #13131a;
+      --card: #1a1a25;
+      --border: #252535;
+      --border2: #2e2e42;
       --claude: #cc785c;
-      --claude-light: #e8956d;
-      --text: #e8e8f0;
-      --muted: #6b6b80;
+      --claude2: #e8956d;
+      --text: #eeeef5;
+      --muted: #5a5a72;
+      --muted2: #7a7a95;
       --green: #4ade80;
-      --yellow: #facc15;
+      --yellow: #fbbf24;
       --red: #f87171;
+      --blue: #60a5fa;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 48px;
       min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 24px 16px 40px;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .logo {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, var(--claude), var(--claude-light));
-      border-radius: 12px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      margin-bottom: 12px;
-    }
-
-    h1 {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px 24px;
+    /* ── HEADER ── */
+    .header {
       width: 100%;
-      max-width: 380px;
-      margin-bottom: 16px;
-    }
-
-    /* ── Ring ── */
-    .ring-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 28px;
-    }
-
-    .ring-svg {
-      transform: rotate(-90deg);
-    }
-
-    .ring-track {
-      fill: none;
-      stroke: var(--border);
-      stroke-width: 10;
-    }
-
-    .ring-fill {
-      fill: none;
-      stroke-width: 10;
-      stroke-linecap: round;
-      transition: stroke-dashoffset 0.5s ease, stroke 0.3s;
-    }
-
-    .ring-center {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ring-outer {
-      position: relative;
+      max-width: 420px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 160px;
-      height: 160px;
-    }
-
-    .pct-value {
-      font-size: 36px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1;
-    }
-
-    .pct-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    /* ── Stats row ── */
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
+      justify-content: space-between;
       margin-bottom: 24px;
     }
 
-    .stat {
-      background: var(--bg);
-      border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .used-color  { color: var(--claude-light); }
-    .left-color  { color: var(--green); }
-    .reset-color { color: var(--yellow); }
-
-    /* ── Counter controls ── */
-    .counter-row {
+    .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
-    .count-btn {
-      flex: 1;
-      height: 50px;
-      border: none;
-      border-radius: 12px;
-      font-size: 22px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
-      user-select: none;
-    }
-
-    .count-btn:active { transform: scale(0.95); opacity: 0.8; }
-
-    .btn-minus { background: #2a1a1a; color: var(--red); }
-    .btn-plus  { background: #1a2a1a; color: var(--green); }
-
-    .count-display {
-      flex: 1.4;
-      height: 50px;
-      background: var(--bg);
-      border-radius: 12px;
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--claude), var(--claude2));
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 18px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: 0.5px;
+      flex-shrink: 0;
     }
 
-    /* ── Reset timer ── */
-    .reset-card {
-      background: #1a1800;
-      border: 1px solid #3a3400;
-      border-radius: 20px;
-      padding: 20px 24px;
-      width: 100%;
-      max-width: 380px;
-      margin-bottom: 16px;
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--muted2);
+    }
+
+    .refresh-btn {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--border2);
+      background: var(--card);
+      border-radius: 10px;
+      color: var(--muted2);
+      font-size: 16px;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
     }
 
-    .reset-info h3 {
+    .refresh-btn:active { opacity: 0.6; transform: scale(0.93); }
+    .refresh-btn.spinning { animation: spin 0.8s linear infinite; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── API KEY SCREEN ── */
+    #keyScreen {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      padding-top: 32px;
+    }
+
+    .key-card {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+    }
+
+    .key-card h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .key-card p {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .key-card p a {
+      color: var(--claude2);
+      text-decoration: none;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .key-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--text);
       font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
+      padding: 14px 48px 14px 16px;
+      outline: none;
+      letter-spacing: 0.3px;
+      font-family: monospace;
+      transition: border-color 0.2s;
     }
 
-    .reset-info p {
+    .key-input:focus { border-color: var(--claude); }
+    .key-input::placeholder { color: var(--muted); font-family: sans-serif; letter-spacing: 0; }
+
+    .toggle-vis {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted2);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--claude), var(--claude2));
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .save-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+    .key-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── MAIN DASHBOARD ── */
+    #dashboard {
+      width: 100%;
+      max-width: 420px;
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* last updated chip */
+    .last-updated {
+      text-align: center;
       font-size: 12px;
       color: var(--muted);
     }
 
-    .reset-timer {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--yellow);
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
+    .live-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 5px;
+      animation: pulse 2s ease-in-out infinite;
+      vertical-align: middle;
     }
 
-    /* ── Settings ── */
-    .settings-card {
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── USAGE RING CARD ── */
+    .ring-card {
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px 24px;
-      width: 100%;
-      max-width: 380px;
-      margin-bottom: 16px;
+      border: 1px solid var(--border2);
+      border-radius: 22px;
+      padding: 28px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .settings-card h3 {
+    .ring-outer {
+      position: relative;
+      width: 172px;
+      height: 172px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .ring-svg { transform: rotate(-90deg); position: absolute; top: 0; left: 0; }
+
+    .ring-track { fill: none; stroke: var(--border2); stroke-width: 11; }
+
+    .ring-arc {
+      fill: none;
+      stroke-width: 11;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.7s cubic-bezier(.4,0,.2,1), stroke 0.4s;
+    }
+
+    .ring-center {
+      text-align: center;
+      z-index: 1;
+    }
+
+    .ring-pct {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .ring-label {
+      font-size: 12px;
+      color: var(--muted2);
+      margin-top: 5px;
+    }
+
+    /* tab switcher for ring */
+    .ring-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    .ring-tab {
+      padding: 7px 16px;
+      border-radius: 99px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted2);
+      transition: all 0.2s;
+    }
+
+    .ring-tab.active {
+      background: var(--border2);
+      color: var(--text);
+      border-color: var(--border2);
+    }
+
+    /* ── METRICS GRID ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 16px 14px;
+    }
+
+    .metric-label {
+      font-size: 11px;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 16px;
+      letter-spacing: 0.7px;
+      margin-bottom: 6px;
     }
 
-    .setting-row {
+    .metric-value {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--muted2);
+    }
+
+    .bar {
+      height: 4px;
+      background: var(--border2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.7s cubic-bezier(.4,0,.2,1), background 0.4s;
+    }
+
+    /* ── RESET COUNTDOWN ── */
+    .reset-card {
+      background: #141208;
+      border: 1px solid #2e2a10;
+      border-radius: 16px;
+      padding: 16px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
     }
 
-    .setting-row:last-child { margin-bottom: 0; }
-
-    .setting-label {
-      font-size: 14px;
-    }
-
-    .setting-input {
-      width: 80px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 600;
-      text-align: center;
-      padding: 7px 8px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .setting-input:focus { border-color: var(--claude); }
-
-    /* ── Action buttons ── */
-    .actions {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 380px;
-    }
-
-    .action-btn {
-      flex: 1;
-      padding: 13px;
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
-    }
-
-    .action-btn:active { transform: scale(0.97); opacity: 0.85; }
-
-    .btn-reset-day {
-      background: #2a1a1a;
-      color: var(--red);
-    }
-
-    .btn-hit-limit {
-      background: linear-gradient(135deg, var(--claude), var(--claude-light));
-      color: #fff;
-    }
-
-    /* ── Status bar ── */
-    .status-bar {
-      width: 100%;
-      max-width: 380px;
-      background: var(--border);
-      border-radius: 99px;
-      height: 6px;
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-
-    .status-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.5s ease, background 0.3s;
-    }
-
-    /* ── History ── */
-    .history-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px 24px;
-      width: 100%;
-      max-width: 380px;
-    }
-
-    .history-card h3 {
+    .reset-left h4 {
       font-size: 13px;
       font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 14px;
+      color: var(--yellow);
+      margin-bottom: 3px;
     }
 
-    .history-item {
+    .reset-left p {
+      font-size: 11px;
+      color: var(--muted2);
+    }
+
+    .reset-countdown {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--yellow);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+    }
+
+    /* ── MODEL INFO ── */
+    .model-card {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
     }
 
-    .history-item:last-child { border-bottom: none; }
+    .model-label { font-size: 12px; color: var(--muted2); margin-bottom: 3px; }
+    .model-name  { font-size: 15px; font-weight: 600; }
 
-    .history-time { color: var(--muted); font-size: 12px; }
-    .history-count { font-weight: 600; color: var(--claude-light); }
+    .tier-badge {
+      padding: 5px 12px;
+      background: linear-gradient(135deg, #1e2a1e, #1a3020);
+      border: 1px solid #2a4a30;
+      border-radius: 99px;
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 600;
+    }
 
-    .no-history { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0; }
+    /* ── AUTO REFRESH ── */
+    .auto-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 14px 18px;
+    }
 
-    /* ── Note ── */
-    .note {
+    .auto-label { font-size: 14px; }
+    .auto-sub   { font-size: 12px; color: var(--muted2); margin-top: 2px; }
+
+    .toggle-wrap {
+      position: relative;
+      width: 44px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 99px;
+      background: var(--border2);
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--muted2);
+      transition: transform 0.25s, background 0.25s;
+    }
+
+    .toggle-wrap input:checked + .toggle-track { background: var(--claude); }
+    .toggle-wrap input:checked + .toggle-track::after { transform: translateX(18px); background: #fff; }
+
+    /* ── CHANGE KEY ── */
+    .change-key-btn {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--muted2);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .change-key-btn:active { opacity: 0.7; }
+
+    /* ── ERROR ── */
+    .error-banner {
+      background: #1e0f0f;
+      border: 1px solid #4a1a1a;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--red);
+      line-height: 1.5;
+      display: none;
+    }
+
+    /* ── LOADING SKELETON ── */
+    .skeleton {
+      background: var(--border);
+      border-radius: 6px;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+
+    /* ── EMPTY STATE (no data yet) ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 0;
+      gap: 8px;
+      color: var(--muted2);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .empty-state .icon { font-size: 32px; margin-bottom: 4px; }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
       font-size: 11px;
       color: var(--muted);
       text-align: center;
-      max-width: 320px;
-      margin-top: 20px;
-      line-height: 1.6;
+      line-height: 1.7;
+      margin-top: 4px;
+      max-width: 340px;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">✦</div>
-  <h1>Claude Usage Tracker</h1>
-  <p class="subtitle">Pro plan · 5-hour rolling window</p>
-</header>
+<!-- HEADER -->
+<div class="header">
+  <div class="brand">
+    <div class="brand-icon">✦</div>
+    <div class="brand-text">
+      <h1>Claude Usage</h1>
+      <p>Live rate-limit tracker</p>
+    </div>
+  </div>
+  <button class="refresh-btn" id="refreshBtn" title="Refresh" onclick="fetchUsage()">↻</button>
+</div>
 
-<div class="card">
-  <!-- Ring -->
-  <div class="ring-wrap">
+<!-- ── API KEY SETUP SCREEN ── -->
+<div id="keyScreen">
+  <div class="key-card">
+    <h2>Connect your API key</h2>
+    <p>
+      Enter your Anthropic API key to see real-time usage data.
+      Get your key from <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>.
+    </p>
+    <div class="input-wrap">
+      <input class="key-input" id="keyInput" type="password"
+        placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false" />
+      <button class="toggle-vis" id="toggleVis" onclick="toggleKeyVis()">👁</button>
+    </div>
+    <button class="save-btn" onclick="saveKey()">Connect &amp; Check Usage</button>
+    <p class="key-note">
+      Your key is saved only in your browser's localStorage.<br/>
+      It is never sent to any third-party server.
+    </p>
+  </div>
+</div>
+
+<!-- ── MAIN DASHBOARD ── -->
+<div id="dashboard">
+
+  <div class="last-updated" id="lastUpdated">
+    <span class="live-dot"></span>Tap ↻ to refresh
+  </div>
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- Ring card -->
+  <div class="ring-card" id="ringCard">
     <div class="ring-outer">
-      <svg class="ring-svg" width="160" height="160" viewBox="0 0 160 160">
-        <circle class="ring-track" cx="80" cy="80" r="68" />
-        <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="68"
-          stroke-dasharray="427.26"
-          stroke-dashoffset="427.26" />
+      <svg class="ring-svg" width="172" height="172" viewBox="0 0 172 172">
+        <circle class="ring-track" cx="86" cy="86" r="74" />
+        <circle class="ring-arc"   cx="86" cy="86" r="74" id="ringArc"
+          stroke-dasharray="464.96" stroke-dashoffset="464.96" stroke="var(--claude2)" />
       </svg>
       <div class="ring-center">
-        <div class="pct-value" id="pctValue">0%</div>
-        <div class="pct-label">used</div>
+        <div class="ring-pct"  id="ringPct">—</div>
+        <div class="ring-label" id="ringLbl">requests used</div>
       </div>
     </div>
-  </div>
-
-  <!-- Status bar -->
-  <div class="status-bar">
-    <div class="status-fill" id="statusFill" style="width:0%;background:var(--green)"></div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-value used-color" id="usedCount">0</div>
-      <div class="stat-label">Used</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value left-color" id="leftCount">45</div>
-      <div class="stat-label">Left</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value reset-color" id="resetIn">—</div>
-      <div class="stat-label">Reset in</div>
+    <div class="ring-tabs">
+      <button class="ring-tab active" id="tabReq" onclick="switchTab('req')">Requests</button>
+      <button class="ring-tab"        id="tabTok" onclick="switchTab('tok')">Tokens</button>
+      <button class="ring-tab"        id="tabIn"  onclick="switchTab('in')">Input</button>
     </div>
   </div>
 
-  <!-- Counter -->
-  <div class="counter-row">
-    <button class="count-btn btn-minus" id="btnMinus">−</button>
-    <div class="count-display" id="countDisplay">0 msgs</div>
-    <button class="count-btn btn-plus" id="btnPlus">+1 msg</button>
+  <!-- 2×2 metrics -->
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">Requests used</div>
+      <div class="metric-value" id="mReqUsed" style="color:var(--claude2)">—</div>
+      <div class="metric-sub"   id="mReqLimit">of — limit</div>
+      <div class="bar"><div class="bar-fill" id="bReq" style="width:0%;background:var(--claude2)"></div></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Requests left</div>
+      <div class="metric-value" id="mReqLeft" style="color:var(--green)">—</div>
+      <div class="metric-sub"   id="mReqReset">resets —</div>
+      <div class="bar"><div class="bar-fill" id="bReqLeft" style="width:0%;background:var(--green)"></div></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Tokens used</div>
+      <div class="metric-value" id="mTokUsed" style="color:var(--blue)">—</div>
+      <div class="metric-sub"   id="mTokLimit">of — limit</div>
+      <div class="bar"><div class="bar-fill" id="bTok" style="width:0%;background:var(--blue)"></div></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Tokens left</div>
+      <div class="metric-value" id="mTokLeft" style="color:var(--green)">—</div>
+      <div class="metric-sub"   id="mTokReset">resets —</div>
+      <div class="bar"><div class="bar-fill" id="bTokLeft" style="width:0%;background:var(--green)"></div></div>
+    </div>
   </div>
-</div>
 
-<!-- Reset timer (full countdown) -->
-<div class="reset-card" id="resetCard" style="display:none">
-  <div class="reset-info">
-    <h3>Window resets in</h3>
-    <p id="resetAtText">Started at —</p>
+  <!-- Reset countdown -->
+  <div class="reset-card" id="resetCard">
+    <div class="reset-left">
+      <h4>Next request reset</h4>
+      <p id="resetAtLabel">—</p>
+    </div>
+    <div class="reset-countdown" id="resetCountdown">—</div>
   </div>
-  <div class="reset-timer" id="resetTimerBig">0:00:00</div>
-</div>
 
-<!-- Settings -->
-<div class="settings-card">
-  <h3>Settings</h3>
-  <div class="setting-row">
-    <span class="setting-label">Message limit per window</span>
-    <input class="setting-input" id="limitInput" type="number" min="1" max="500" value="45" />
+  <!-- Model -->
+  <div class="model-card">
+    <div>
+      <div class="model-label">Checked with</div>
+      <div class="model-name">claude-haiku-4-5</div>
+    </div>
+    <div class="tier-badge" id="tierBadge">API</div>
   </div>
-  <div class="setting-row">
-    <span class="setting-label">Window duration (hours)</span>
-    <input class="setting-input" id="windowInput" type="number" min="1" max="24" value="5" />
+
+  <!-- Auto refresh toggle -->
+  <div class="auto-row">
+    <div>
+      <div class="auto-label">Auto refresh</div>
+      <div class="auto-sub">Every 60 seconds</div>
+    </div>
+    <label class="toggle-wrap">
+      <input type="checkbox" id="autoToggle" onchange="toggleAuto()" />
+      <span class="toggle-track"></span>
+    </label>
   </div>
-</div>
 
-<!-- Actions -->
-<div class="actions">
-  <button class="action-btn btn-reset-day" id="btnResetDay">Reset Window</button>
-  <button class="action-btn btn-hit-limit" id="btnHitLimit">I Hit the Limit</button>
-</div>
+  <button class="change-key-btn" onclick="changeKey()">⚙ Change API key</button>
 
-<!-- History -->
-<div class="history-card">
-  <h3>Session Log</h3>
-  <div id="historyList"><p class="no-history">No sessions yet</p></div>
+  <p class="footer-note">
+    Data is fetched directly from the Anthropic API using your key.<br/>
+    Each check uses ~1 token (~$0.000001). Limits shown are per-minute windows.
+  </p>
 </div>
-
-<p class="note">
-  Tap <strong>+1 msg</strong> each time you send a message to Claude.<br/>
-  Press <strong>"I Hit the Limit"</strong> when Claude says you've run out — it starts the 5-hour countdown.
-</p>
 
 <script>
-  const STORAGE_KEY = 'claude_usage_v1';
-  const CIRCUMFERENCE = 2 * Math.PI * 68; // 427.26
+  // ── CONSTANTS ──
+  const CIRC = 2 * Math.PI * 74; // 464.96
+  const KEY_STORE = 'claude_api_key';
+  const DATA_STORE = 'claude_usage_data';
 
-  // ── State ──
-  let state = load();
+  // ── STATE ──
+  let apiKey = localStorage.getItem(KEY_STORE) || '';
+  let lastData = null;
+  let autoTimer = null;
+  let countdownTimer = null;
+  let currentTab = 'req';
 
-  function defaultState() {
-    return {
-      count: 0,
-      limit: 45,
-      windowHours: 5,
-      windowStart: null,   // ISO string — when limit was hit / window started
-      history: []          // [{time, count}]
-    };
+  // ── INIT ──
+  if (apiKey) {
+    showDashboard();
+    const cached = localStorage.getItem(DATA_STORE);
+    if (cached) {
+      try { renderData(JSON.parse(cached)); } catch {}
+    }
+    fetchUsage();
   }
 
-  function load() {
+  // ── KEY SETUP ──
+  function saveKey() {
+    const val = document.getElementById('keyInput').value.trim();
+    if (!val.startsWith('sk-ant-')) {
+      alert('Invalid key. It should start with sk-ant-');
+      return;
+    }
+    apiKey = val;
+    localStorage.setItem(KEY_STORE, apiKey);
+    showDashboard();
+    fetchUsage();
+  }
+
+  function changeKey() {
+    apiKey = '';
+    localStorage.removeItem(KEY_STORE);
+    localStorage.removeItem(DATA_STORE);
+    document.getElementById('keyInput').value = '';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('keyScreen').style.display = 'flex';
+  }
+
+  function toggleKeyVis() {
+    const inp = document.getElementById('keyInput');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function showDashboard() {
+    document.getElementById('keyScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'flex';
+  }
+
+  // ── FETCH ──
+  async function fetchUsage() {
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('spinning');
+    hideError();
+
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return { ...defaultState(), ...JSON.parse(raw) };
-    } catch {}
-    return defaultState();
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'hi' }]
+        })
+      });
+
+      if (res.status === 401) { showError('Invalid API key. Please check and reconnect.'); return; }
+      if (res.status === 403) { showError('Access denied. Check your API key permissions.'); return; }
+
+      // Parse rate-limit headers
+      const h = {};
+      res.headers.forEach((v, k) => { h[k.toLowerCase()] = v; });
+
+      let body = null;
+      try { body = await res.json(); } catch {}
+
+      const data = {
+        fetchedAt: new Date().toISOString(),
+        // Requests
+        reqLimit:     parseH(h['anthropic-ratelimit-requests-limit']),
+        reqRemaining: parseH(h['anthropic-ratelimit-requests-remaining']),
+        reqReset:     h['anthropic-ratelimit-requests-reset'] || null,
+        // Tokens
+        tokLimit:     parseH(h['anthropic-ratelimit-tokens-limit']),
+        tokRemaining: parseH(h['anthropic-ratelimit-tokens-remaining']),
+        tokReset:     h['anthropic-ratelimit-tokens-reset'] || null,
+        // Input tokens
+        inLimit:      parseH(h['anthropic-ratelimit-input-tokens-limit']),
+        inRemaining:  parseH(h['anthropic-ratelimit-input-tokens-remaining']),
+        inReset:      h['anthropic-ratelimit-input-tokens-reset'] || null,
+        // Output tokens
+        outLimit:     parseH(h['anthropic-ratelimit-output-tokens-limit']),
+        outRemaining: parseH(h['anthropic-ratelimit-output-tokens-remaining']),
+        // Usage from body
+        inputTokens:  body?.usage?.input_tokens ?? null,
+        outputTokens: body?.usage?.output_tokens ?? null,
+        model:        body?.model || 'claude-haiku-4-5',
+        error:        (res.status >= 400 && res.status !== 429) ? (body?.error?.message || `HTTP ${res.status}`) : null
+      };
+
+      // If 429, headers still have good data — don't treat as error
+      if (res.status === 429 && !data.reqLimit) {
+        showError(`Rate limited. ${body?.error?.message || 'Too many requests.'}`);
+      } else if (data.error && res.status < 429) {
+        showError(data.error);
+      } else {
+        lastData = data;
+        localStorage.setItem(DATA_STORE, JSON.stringify(data));
+        renderData(data);
+      }
+
+    } catch (e) {
+      showError('Network error — check your connection and try again.');
+      console.error(e);
+    } finally {
+      btn.classList.remove('spinning');
+    }
   }
 
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  function parseH(v) {
+    if (v == null || v === '') return null;
+    const n = parseInt(v, 10);
+    return isNaN(n) ? null : n;
   }
 
-  // ── Elements ──
-  const ringFill    = document.getElementById('ringFill');
-  const pctValue    = document.getElementById('pctValue');
-  const statusFill  = document.getElementById('statusFill');
-  const usedCount   = document.getElementById('usedCount');
-  const leftCount   = document.getElementById('leftCount');
-  const resetIn     = document.getElementById('resetIn');
-  const countDisplay = document.getElementById('countDisplay');
-  const resetCard   = document.getElementById('resetCard');
-  const resetAtText = document.getElementById('resetAtText');
-  const resetTimerBig = document.getElementById('resetTimerBig');
-  const limitInput  = document.getElementById('limitInput');
-  const windowInput = document.getElementById('windowInput');
-  const historyList = document.getElementById('historyList');
+  // ── RENDER ──
+  function renderData(d) {
+    // Last updated
+    const now = new Date(d.fetchedAt);
+    document.getElementById('lastUpdated').innerHTML =
+      `<span class="live-dot"></span>Updated ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 
-  // ── Render ──
-  function render() {
-    const pct = Math.min(100, Math.round((state.count / state.limit) * 100));
-    const left = Math.max(0, state.limit - state.count);
+    // Compute used counts
+    const reqUsed  = d.reqLimit != null && d.reqRemaining != null ? d.reqLimit - d.reqRemaining : null;
+    const tokUsed  = d.tokLimit != null && d.tokRemaining != null ? d.tokLimit - d.tokRemaining : null;
+    const inUsed   = d.inLimit  != null && d.inRemaining  != null ? d.inLimit  - d.inRemaining  : null;
+
+    // Metrics
+    setMetric('mReqUsed',  fmt(reqUsed));
+    setMetric('mReqLimit', `of ${fmt(d.reqLimit)} limit`);
+    setMetric('mReqLeft',  fmt(d.reqRemaining));
+    setMetric('mReqReset', d.reqReset ? `resets ${shortTime(d.reqReset)}` : 'resets —');
+
+    setMetric('mTokUsed',  fmtK(tokUsed));
+    setMetric('mTokLimit', `of ${fmtK(d.tokLimit)} limit`);
+    setMetric('mTokLeft',  fmtK(d.tokRemaining));
+    setMetric('mTokReset', d.tokReset ? `resets ${shortTime(d.tokReset)}` : 'resets —');
+
+    // Progress bars
+    setBar('bReq',     pct(reqUsed, d.reqLimit));
+    setBar('bReqLeft', pct(d.reqRemaining, d.reqLimit));
+    setBar('bTok',     pct(tokUsed,  d.tokLimit));
+    setBar('bTokLeft', pct(d.tokRemaining, d.tokLimit));
 
     // Ring
-    const offset = CIRCUMFERENCE * (1 - pct / 100);
-    ringFill.style.strokeDashoffset = offset;
-    ringFill.style.stroke = pct >= 100 ? 'var(--red)' : pct >= 75 ? 'var(--yellow)' : 'var(--claude-light)';
+    updateRing(d, reqUsed, tokUsed, inUsed);
 
-    // Text
-    pctValue.textContent = pct + '%';
-    pctValue.style.color = pct >= 100 ? 'var(--red)' : pct >= 75 ? 'var(--yellow)' : 'var(--text)';
-    statusFill.style.width = pct + '%';
-    statusFill.style.background = pct >= 100 ? 'var(--red)' : pct >= 75 ? 'var(--yellow)' : 'var(--green)';
+    // Reset countdown
+    startCountdown(d.reqReset, d.reqLimit, d.reqRemaining);
 
-    usedCount.textContent = state.count;
-    leftCount.textContent = left;
-    countDisplay.textContent = state.count + ' msg' + (state.count !== 1 ? 's' : '');
-
-    // Settings inputs
-    limitInput.value  = state.limit;
-    windowInput.value = state.windowHours;
-
-    // History
-    renderHistory();
+    // Model tier
+    if (d.reqLimit) {
+      const tier = d.reqLimit >= 4000 ? 'Scale' : d.reqLimit >= 1000 ? 'Build' : 'Free';
+      document.getElementById('tierBadge').textContent = tier;
+    }
   }
 
-  function renderHistory() {
-    if (!state.history.length) {
-      historyList.innerHTML = '<p class="no-history">No sessions yet</p>';
-      return;
+  function updateRing(d, reqUsed, tokUsed, inUsed) {
+    let used, limit, label;
+    if (currentTab === 'req') {
+      used = reqUsed; limit = d.reqLimit; label = 'requests used';
+    } else if (currentTab === 'tok') {
+      used = tokUsed; limit = d.tokLimit; label = 'tokens used';
+    } else {
+      used = inUsed; limit = d.inLimit; label = 'input tokens used';
     }
-    historyList.innerHTML = [...state.history].reverse().slice(0, 8).map(h => {
-      const d = new Date(h.time);
-      const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const dateStr = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      return `<div class="history-item">
-        <span>${dateStr} ${timeStr} — window reset</span>
-        <span class="history-count">${h.count} msgs used</span>
-      </div>`;
-    }).join('');
+
+    const p = pct(used, limit);
+    const offset = CIRC * (1 - p / 100);
+    const arc = document.getElementById('ringArc');
+    arc.style.strokeDashoffset = offset;
+    arc.style.stroke = p >= 90 ? 'var(--red)' : p >= 70 ? 'var(--yellow)' : 'var(--claude2)';
+
+    document.getElementById('ringPct').textContent = p != null ? p + '%' : '—';
+    document.getElementById('ringPct').style.color = p >= 90 ? 'var(--red)' : p >= 70 ? 'var(--yellow)' : 'var(--text)';
+    document.getElementById('ringLbl').textContent = label;
   }
 
-  // ── Timer ──
-  function updateTimer() {
-    if (!state.windowStart) {
-      resetCard.style.display = 'none';
-      resetIn.textContent = '—';
-      return;
-    }
+  function switchTab(tab) {
+    currentTab = tab;
+    ['req','tok','in'].forEach(t => {
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+    });
+    if (lastData) updateRing(lastData,
+      lastData.reqLimit != null && lastData.reqRemaining != null ? lastData.reqLimit - lastData.reqRemaining : null,
+      lastData.tokLimit != null && lastData.tokRemaining != null ? lastData.tokLimit - lastData.tokRemaining : null,
+      lastData.inLimit  != null && lastData.inRemaining  != null ? lastData.inLimit  - lastData.inRemaining  : null
+    );
+  }
 
-    const start   = new Date(state.windowStart).getTime();
-    const endTime = start + state.windowHours * 3600 * 1000;
-    const now     = Date.now();
-    const diff    = endTime - now;
-
-    if (diff <= 0) {
-      // Window expired — auto reset
-      state.history.push({ time: state.windowStart, count: state.count });
-      state.count = 0;
-      state.windowStart = null;
-      save();
-      render();
-      resetCard.style.display = 'none';
-      resetIn.textContent = '—';
+  // ── COUNTDOWN ──
+  function startCountdown(resetISO, limit, remaining) {
+    if (countdownTimer) clearInterval(countdownTimer);
+    if (!resetISO) {
+      document.getElementById('resetCountdown').textContent = '—';
+      document.getElementById('resetAtLabel').textContent = '—';
       return;
     }
 
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    const fmt = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const resetMs = new Date(resetISO).getTime();
+    document.getElementById('resetAtLabel').textContent =
+      'Resets at ' + new Date(resetISO).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-    resetCard.style.display = 'flex';
-    resetTimerBig.textContent = fmt;
-    resetIn.textContent = fmt;
-
-    const startedAt = new Date(state.windowStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    resetAtText.textContent = `Limit hit at ${startedAt}`;
-  }
-
-  // ── Handlers ──
-  document.getElementById('btnPlus').addEventListener('click', () => {
-    state.count++;
-    save();
-    render();
-  });
-
-  document.getElementById('btnMinus').addEventListener('click', () => {
-    if (state.count > 0) { state.count--; save(); render(); }
-  });
-
-  document.getElementById('btnHitLimit').addEventListener('click', () => {
-    if (!state.windowStart) {
-      state.windowStart = new Date().toISOString();
-      save();
-    }
-    updateTimer();
-  });
-
-  document.getElementById('btnResetDay').addEventListener('click', () => {
-    if (state.count > 0 || state.windowStart) {
-      if (state.count > 0) {
-        state.history.push({ time: state.windowStart || new Date().toISOString(), count: state.count });
+    function tick() {
+      const diff = resetMs - Date.now();
+      if (diff <= 0) {
+        document.getElementById('resetCountdown').textContent = 'now';
+        clearInterval(countdownTimer);
+        return;
       }
-      state.count = 0;
-      state.windowStart = null;
-      save();
-      render();
-      updateTimer();
+      const m = Math.floor(diff / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      document.getElementById('resetCountdown').textContent =
+        m > 0 ? `${m}m ${String(s).padStart(2,'0')}s` : `${s}s`;
     }
-  });
 
-  limitInput.addEventListener('change', () => {
-    const v = parseInt(limitInput.value);
-    if (v > 0) { state.limit = v; save(); render(); }
-  });
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  }
 
-  windowInput.addEventListener('change', () => {
-    const v = parseInt(windowInput.value);
-    if (v > 0) { state.windowHours = v; save(); render(); }
-  });
+  // ── AUTO REFRESH ──
+  function toggleAuto() {
+    const on = document.getElementById('autoToggle').checked;
+    if (autoTimer) clearInterval(autoTimer);
+    if (on) autoTimer = setInterval(fetchUsage, 60000);
+  }
 
-  // ── Init ──
-  render();
-  updateTimer();
-  setInterval(updateTimer, 1000);
+  // ── HELPERS ──
+  function pct(used, limit) {
+    if (used == null || limit == null || limit === 0) return null;
+    return Math.min(100, Math.round((used / limit) * 100));
+  }
+
+  function fmt(n) {
+    if (n == null) return '—';
+    return n.toLocaleString();
+  }
+
+  function fmtK(n) {
+    if (n == null) return '—';
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+    if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+    return n.toLocaleString();
+  }
+
+  function shortTime(iso) {
+    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function setMetric(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  function setBar(id, p) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const pv = p ?? 0;
+    el.style.width = pv + '%';
+    el.style.background = pv >= 90 ? 'var(--red)' : pv >= 70 ? 'var(--yellow)' : el.style.background;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorBanner');
+    el.textContent = '⚠ ' + msg;
+    el.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('errorBanner').style.display = 'none';
+  }
+
+  // Allow enter key on key input
+  document.getElementById('keyInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveKey();
+  });
 </script>
 </body>
 </html>
