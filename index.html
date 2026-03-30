@@ -2813,6 +2813,12 @@ function DriverEditCard({ car, onSave }) {
 function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword }) {
   const users = allUsers;
   const saveUsers = saveAllUsers;
+
+  // Always hold the latest users in a ref so forceSaveToServer never reads
+  // a stale closure value (e.g. when clicked quickly after an edit, before
+  // React has re-rendered with the updated allUsers prop).
+  const latestUsersRef = React.useRef(allUsers);
+  latestUsersRef.current = allUsers;
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ name: "", pfId: "", department: "" });
   const [msg, setMsg] = useState("");
@@ -2823,14 +2829,17 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 4000); };
 
-  // Force-write current live user list to Firebase — saves all additions, edits, role changes
+  // Force-write current live user list to Firebase — saves all additions, edits, role changes.
+  // Uses latestUsersRef (not the closure variable) so it always writes the most
+  // up-to-date list even if called before React has completed a re-render.
   const forceSaveToServer = async () => {
+    const currentList = latestUsersRef.current;
     showMsg("⏳ Saving current user list to server...");
     try {
       const db = window.__db;
       if (db) {
-        await db.collection("config").doc("users").set({ list: users, _seeded: true });
-        showMsg("✅ Done! Current user list (" + users.length + " users) saved permanently on all devices.");
+        await db.collection("config").doc("users").set({ list: currentList, _seeded: true });
+        showMsg("✅ Done! Current user list (" + currentList.length + " users) saved permanently on all devices.");
       }
     } catch(e) {
       showMsg("❌ Save failed: " + e.message);
@@ -2852,11 +2861,12 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
     showMsg("✅ User removed.");
   };
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     if (!editUser.name.trim() || !editUser.department.trim()) { showMsg("❌ Name and department are required."); return; }
-    saveUsers(users.map(u => u.pfId === editUser.pfId ? { ...u, name: editUser.name.trim().toUpperCase(), department: editUser.department.trim() } : u));
+    const updated = users.map(u => u.pfId === editUser.pfId ? { ...u, name: editUser.name.trim().toUpperCase(), department: editUser.department.trim() } : u);
     setEditUser(null);
-    showMsg("✅ User updated.");
+    await saveUsers(updated);
+    showMsg("✅ User updated and saved.");
   };
 
   const filtered = users.filter(u =>
