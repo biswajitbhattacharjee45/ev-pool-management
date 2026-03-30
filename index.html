@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Pool EV" />
-  <title>⚡ Pool EV Management</title>
+  <title>⚡ Pool EV Management v2.0</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -708,15 +708,11 @@ function App() {
   const _fsWrite = async (colName, data) => {
     const db = window.__db; if (!db) return;
     try {
-      // Step 1: Write/update all current records (safe — no deletes yet)
+      // Upsert all records by ID — never auto-delete.
+      // Deletion based on in-memory state caused data loss when the app loaded
+      // with partial data (slow network / new device) and a save was triggered
+      // before all Firestore records had arrived via onSnapshot.
       await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
-      // Step 2: Delete only records that are no longer in the data array
-      const snap = await db.collection(colName).get({ source: 'server' });
-      const currentIds = new Set(data.map(t => String(t.id)));
-      const toDelete = snap.docs.filter(d => !currentIds.has(d.id));
-      if (toDelete.length > 0) {
-        await Promise.all(toDelete.map(d => d.ref.delete()));
-      }
     } catch(e) { console.error("_fsWrite error:", e); }
   };
   const saveTrips = async (data) => { setTrips(data); _fsWrite("trips", data); };
@@ -789,7 +785,7 @@ function App() {
       {/* ── HEADER ── */}
       <header style={css.header}>
         <div>
-          <div style={css.headerTitle}>⚡ Pool EV Management</div>
+          <div style={css.headerTitle}>⚡ Pool EV Management <span style={{ fontSize: 10, fontWeight: 600, background: "#3b82f6", color: "#fff", borderRadius: 4, padding: "1px 6px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.0</span></div>
           <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}</div>
         </div>
         {/* Desktop nav */}
@@ -1023,7 +1019,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
             <div style={S.iconRingOuter}></div>
             <div style={S.iconRing}>⚡</div>
           </div>
-          <div style={S.appName}>Pool EV Management</div>
+          <div style={S.appName}>Pool EV Management <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(59,130,246,0.2)", color: "#60a5fa", borderRadius: 4, padding: "2px 7px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.0</span></div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.18)', backdropFilter: 'blur(8px)' }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums', textShadow: '0 0 12px rgba(147,197,253,0.5)' }}>
@@ -1158,7 +1154,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           )}
         </div>
 
-        <div style={S.footer}>Pool EV Management · {new Date().getFullYear()}</div>
+        <div style={S.footer}>Pool EV Management v2.0 · {new Date().getFullYear()}</div>
         <div style={{ textAlign: "center", marginTop: 16, padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.9))", border: "1.5px solid rgba(59,130,246,0.5)", backdropFilter: "blur(12px)", boxShadow: "0 0 28px rgba(59,130,246,0.18), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
           <div style={{ fontSize: 9, color: "#64748b", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 6 }}>✦ Designed &amp; Developed by ✦</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd", letterSpacing: "0.03em", textShadow: "0 0 16px rgba(147,197,253,0.8), 0 0 32px rgba(59,130,246,0.5), 0 0 60px rgba(59,130,246,0.25)" }}>Biswajit Bhattacharjee</div>
