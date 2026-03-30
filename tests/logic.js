@@ -108,6 +108,92 @@ const applyRejection = (trip, rejecterPfId, rejecterName, reason) => ({
   rejectionReason: reason,
 });
 
+// ── DRIVER LOGIN ───────────────────────────────────────────────
+
+const DRIVERS = [
+  { id: "CAR1", name: "Alam",    phone: "7637946383", vehicle: "Vehicle 1", plate: "AS 01 FF 9417", color: "#2563eb" },
+  { id: "CAR2", name: "Tinku",   phone: "8638183371", vehicle: "Vehicle 2", plate: "AS 01 FF 9427", color: "#16a34a" },
+  { id: "CAR3", name: "Pinku",   phone: "7578062778", vehicle: "Vehicle 3", plate: "AS 01 FF 9437", color: "#0891b2" },
+  { id: "CAR4", name: "Safiqul", phone: "7896993883", vehicle: "Vehicle 4", plate: "AS 01 FF 9447", color: "#9333ea" },
+];
+
+/**
+ * Validates driver login credentials. Returns the matched driver or null.
+ * Mirrors handleDriverLogin() in LoginScreen:
+ *   - strips non-digits from phone, takes last 10 digits
+ *   - matches by phone AND name (case-insensitive)
+ */
+const validateDriverLogin = (rawPhone, rawName, drivers = DRIVERS) => {
+  const phone = rawPhone.replace(/\D/g, "").slice(-10);
+  return drivers.find(
+    (d) => d.phone === phone && d.name.toLowerCase() === rawName.trim().toLowerCase()
+  ) || null;
+};
+
+// ── TRIP RETURN ────────────────────────────────────────────────
+
+/**
+ * Finds the auto-selected trip to return: the user's first approved active trip.
+ * Mirrors the fallback tripId lookup in handleReturn().
+ */
+const findReturnableTrip = (userPfId, trips) =>
+  trips.find(
+    (t) =>
+      !t.returnTime &&
+      t.approvalStatus === "approved" &&
+      (t.bookedByPfId === userPfId || t.officerPfId === userPfId)
+  ) || null;
+
+/**
+ * Validates a trip return request. Returns null if valid, or an error string.
+ * Mirrors the validation block in handleReturn().
+ */
+const validateReturn = ({ tripId, returnTime, userPfId, trips }) => {
+  const resolvedId =
+    tripId || (findReturnableTrip(userPfId, trips)?.id);
+  if (!resolvedId || !returnTime) return "Please select trip and enter return time.";
+  return null;
+};
+
+/**
+ * Applies a trip return to the trips array.
+ * Mirrors the map + state update in handleReturn().
+ */
+const applyReturn = (trips, tripId, returnDate, returnTime, endKm, remarks) => {
+  const returnDateTime = returnDate + " " + returnTime;
+  return trips.map((t) =>
+    t.id === tripId ? { ...t, returnTime: returnDateTime, endKm, remarks } : t
+  );
+};
+
+// ── ROLE-BASED NAVIGATION ──────────────────────────────────────
+
+/**
+ * Builds the navigation item list for a given user and pending trip count.
+ * Mirrors the NAV_ITEMS derivation in App component.
+ */
+const buildNavItems = (currentUser, pendingCount = 0) => {
+  const items = [
+    { id: "dashboard", label: "Dashboard" },
+    { id: "book",      label: "Book Trip" },
+    { id: "trips",     label: "Trip Log" },
+  ];
+  if (currentUser.isAdmin || currentUser.isAssistant) {
+    items.push(
+      { id: "tracking",    label: "Tracking" },
+      { id: "fuel",        label: "Charging" },
+      { id: "maintenance", label: "Maint." }
+    );
+  }
+  if (currentUser.isAdmin) {
+    items.push(
+      { id: "approvals", label: pendingCount > 0 ? `Approve(${pendingCount})` : "Approvals" },
+      { id: "users",     label: "Users" }
+    );
+  }
+  return items;
+};
+
 // ── AGGREGATIONS ───────────────────────────────────────────────
 
 /**
@@ -151,6 +237,12 @@ module.exports = {
   ADMIN_1,
   ADMIN_2,
   ADMIN_PF_IDS,
+  DRIVERS,
+  validateDriverLogin,
+  findReturnableTrip,
+  validateReturn,
+  applyReturn,
+  buildNavItems,
   today,
   now,
   fmtDate,
