@@ -1,0 +1,16 @@
+{
+  "name": "ev-pool-management-tests",
+  "version": "1.0.0",
+  "description": "Unit tests for EV Pool Management business logic",
+  "scripts": {
+    "test": "jest --verbose",
+    "test:coverage": "jest --verbose --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/*.test.js"]
+  }
+}
