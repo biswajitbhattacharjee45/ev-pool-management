@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claude Usage Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13;
+      --card: #1a1a24;
+      --border: #2a2a3a;
+      --claude: #cc785c;
+      --claude-light: #e8956d;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #f87171;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--claude), var(--claude-light));
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Ring ── */
+    .ring-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .ring-svg {
+      transform: rotate(-90deg);
+    }
+
+    .ring-track {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 10;
+    }
+
+    .ring-fill {
+      fill: none;
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease, stroke 0.3s;
+    }
+
+    .ring-center {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-outer {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 160px;
+      height: 160px;
+    }
+
+    .pct-value {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .pct-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Stats row ── */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .used-color  { color: var(--claude-light); }
+    .left-color  { color: var(--green); }
+    .reset-color { color: var(--yellow); }
+
+    /* ── Counter controls ── */
+    .counter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .count-btn {
+      flex: 1;
+      height: 50px;
+      border: none;
+      border-radius: 12px;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      user-select: none;
+    }
+
+    .count-btn:active { transform: scale(0.95); opacity: 0.8; }
+
+    .btn-minus { background: #2a1a1a; color: var(--red); }
+    .btn-plus  { background: #1a2a1a; color: var(--green); }
+
+    .count-display {
+      flex: 1.4;
+      height: 50px;
+      background: var(--bg);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Reset timer ── */
+    .reset-card {
+      background: #1a1800;
+      border: 1px solid #3a3400;
+      border-radius: 20px;
+      padding: 20px 24px;
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .reset-info h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .reset-info p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .reset-timer {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--yellow);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Settings ── */
+    .settings-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 16px;
+    }
+
+    .settings-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .setting-row:last-child { margin-bottom: 0; }
+
+    .setting-label {
+      font-size: 14px;
+    }
+
+    .setting-input {
+      width: 80px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      padding: 7px 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .setting-input:focus { border-color: var(--claude); }
+
+    /* ── Action buttons ── */
+    .actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .action-btn:active { transform: scale(0.97); opacity: 0.85; }
+
+    .btn-reset-day {
+      background: #2a1a1a;
+      color: var(--red);
+    }
+
+    .btn-hit-limit {
+      background: linear-gradient(135deg, var(--claude), var(--claude-light));
+      color: #fff;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      width: 100%;
+      max-width: 380px;
+      background: var(--border);
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .status-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.5s ease, background 0.3s;
+    }
+
+    /* ── History ── */
+    .history-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .history-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 14px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .history-item:last-child { border-bottom: none; }
+
+    .history-time { color: var(--muted); font-size: 12px; }
+    .history-count { font-weight: 600; color: var(--claude-light); }
+
+    .no-history { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0; }
+
+    /* ── Note ── */
+    .note {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      max-width: 320px;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">✦</div>
+  <h1>Claude Usage Tracker</h1>
+  <p class="subtitle">Pro plan · 5-hour rolling window</p>
+</header>
+
+<div class="card">
+  <!-- Ring -->
+  <div class="ring-wrap">
+    <div class="ring-outer">
+      <svg class="ring-svg" width="160" height="160" viewBox="0 0 160 160">
+        <circle class="ring-track" cx="80" cy="80" r="68" />
+        <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="68"
+          stroke-dasharray="427.26"
+          stroke-dashoffset="427.26" />
+      </svg>
+      <div class="ring-center">
+        <div class="pct-value" id="pctValue">0%</div>
+        <div class="pct-label">used</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <div class="status-fill" id="statusFill" style="width:0%;background:var(--green)"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value used-color" id="usedCount">0</div>
+      <div class="stat-label">Used</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value left-color" id="leftCount">45</div>
+      <div class="stat-label">Left</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value reset-color" id="resetIn">—</div>
+      <div class="stat-label">Reset in</div>
+    </div>
+  </div>
+
+  <!-- Counter -->
+  <div class="counter-row">
+    <button class="count-btn btn-minus" id="btnMinus">−</button>
+    <div class="count-display" id="countDisplay">0 msgs</div>
+    <button class="count-btn btn-plus" id="btnPlus">+1 msg</button>
+  </div>
+</div>
+
+<!-- Reset timer (full countdown) -->
+<div class="reset-card" id="resetCard" style="display:none">
+  <div class="reset-info">
+    <h3>Window resets in</h3>
+    <p id="resetAtText">Started at —</p>
+  </div>
+  <div class="reset-timer" id="resetTimerBig">0:00:00</div>
+</div>
+
+<!-- Settings -->
+<div class="settings-card">
+  <h3>Settings</h3>
+  <div class="setting-row">
+    <span class="setting-label">Message limit per window</span>
+    <input class="setting-input" id="limitInput" type="number" min="1" max="500" value="45" />
+  </div>
+  <div class="setting-row">
+    <span class="setting-label">Window duration (hours)</span>
+    <input class="setting-input" id="windowInput" type="number" min="1" max="24" value="5" />
+  </div>
+</div>
+
+<!-- Actions -->
+<div class="actions">
+  <button class="action-btn btn-reset-day" id="btnResetDay">Reset Window</button>
+  <button class="action-btn btn-hit-limit" id="btnHitLimit">I Hit the Limit</button>
+</div>
+
+<!-- History -->
+<div class="history-card">
+  <h3>Session Log</h3>
+  <div id="historyList"><p class="no-history">No sessions yet</p></div>
+</div>
+
+<p class="note">
+  Tap <strong>+1 msg</strong> each time you send a message to Claude.<br/>
+  Press <strong>"I Hit the Limit"</strong> when Claude says you've run out — it starts the 5-hour countdown.
+</p>
+
+<script>
+  const STORAGE_KEY = 'claude_usage_v1';
+  const CIRCUMFERENCE = 2 * Math.PI * 68; // 427.26
+
+  // ── State ──
+  let state = load();
+
+  function defaultState() {
+    return {
+      count: 0,
+      limit: 45,
+      windowHours: 5,
+      windowStart: null,   // ISO string — when limit was hit / window started
+      history: []          // [{time, count}]
+    };
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return { ...defaultState(), ...JSON.parse(raw) };
+    } catch {}
+    return defaultState();
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // ── Elements ──
+  const ringFill    = document.getElementById('ringFill');
+  const pctValue    = document.getElementById('pctValue');
+  const statusFill  = document.getElementById('statusFill');
+  const usedCount   = document.getElementById('usedCount');
+  const leftCount   = document.getElementById('leftCount');
+  const resetIn     = document.getElementById('resetIn');
+  const countDisplay = document.getElementById('countDisplay');
+  const resetCard   = document.getElementById('resetCard');
+  const resetAtText = document.getElementById('resetAtText');
+  const resetTimerBig = document.getElementById('resetTimerBig');
+  const limitInput  = document.getElementById('limitInput');
+  const windowInput = document.getElementById('windowInput');
+  const historyList = document.getElementById('historyList');
+
+  // ── Render ──
+  function render() {
+    const pct = Math.min(100, Math.round((state.count / state.limit) * 100));
+    const left = Math.max(0, state.limit - state.count);
+
+    // Ring
+    const offset = CIRCUMFERENCE * (1 - pct / 100);
+    ringFill.style.strokeDashoffset = offset;
+    ringFill.style.stroke = pct >= 100 ? 'var(--red)' : pct >= 75 ? 'var(--yellow)' : 'var(--claude-light)';
+
+    // Text
+    pctValue.textContent = pct + '%';
+    pctValue.style.color = pct >= 100 ? 'var(--red)' : pct >= 75 ? 'var(--yellow)' : 'var(--text)';
+    statusFill.style.width = pct + '%';
+    statusFill.style.background = pct >= 100 ? 'var(--red)' : pct >= 75 ? 'var(--yellow)' : 'var(--green)';
+
+    usedCount.textContent = state.count;
+    leftCount.textContent = left;
+    countDisplay.textContent = state.count + ' msg' + (state.count !== 1 ? 's' : '');
+
+    // Settings inputs
+    limitInput.value  = state.limit;
+    windowInput.value = state.windowHours;
+
+    // History
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (!state.history.length) {
+      historyList.innerHTML = '<p class="no-history">No sessions yet</p>';
+      return;
+    }
+    historyList.innerHTML = [...state.history].reverse().slice(0, 8).map(h => {
+      const d = new Date(h.time);
+      const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dateStr = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      return `<div class="history-item">
+        <span>${dateStr} ${timeStr} — window reset</span>
+        <span class="history-count">${h.count} msgs used</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Timer ──
+  function updateTimer() {
+    if (!state.windowStart) {
+      resetCard.style.display = 'none';
+      resetIn.textContent = '—';
+      return;
+    }
+
+    const start   = new Date(state.windowStart).getTime();
+    const endTime = start + state.windowHours * 3600 * 1000;
+    const now     = Date.now();
+    const diff    = endTime - now;
+
+    if (diff <= 0) {
+      // Window expired — auto reset
+      state.history.push({ time: state.windowStart, count: state.count });
+      state.count = 0;
+      state.windowStart = null;
+      save();
+      render();
+      resetCard.style.display = 'none';
+      resetIn.textContent = '—';
+      return;
+    }
+
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const fmt = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+    resetCard.style.display = 'flex';
+    resetTimerBig.textContent = fmt;
+    resetIn.textContent = fmt;
+
+    const startedAt = new Date(state.windowStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    resetAtText.textContent = `Limit hit at ${startedAt}`;
+  }
+
+  // ── Handlers ──
+  document.getElementById('btnPlus').addEventListener('click', () => {
+    state.count++;
+    save();
+    render();
+  });
+
+  document.getElementById('btnMinus').addEventListener('click', () => {
+    if (state.count > 0) { state.count--; save(); render(); }
+  });
+
+  document.getElementById('btnHitLimit').addEventListener('click', () => {
+    if (!state.windowStart) {
+      state.windowStart = new Date().toISOString();
+      save();
+    }
+    updateTimer();
+  });
+
+  document.getElementById('btnResetDay').addEventListener('click', () => {
+    if (state.count > 0 || state.windowStart) {
+      if (state.count > 0) {
+        state.history.push({ time: state.windowStart || new Date().toISOString(), count: state.count });
+      }
+      state.count = 0;
+      state.windowStart = null;
+      save();
+      render();
+      updateTimer();
+    }
+  });
+
+  limitInput.addEventListener('change', () => {
+    const v = parseInt(limitInput.value);
+    if (v > 0) { state.limit = v; save(); render(); }
+  });
+
+  windowInput.addEventListener('change', () => {
+    const v = parseInt(windowInput.value);
+    if (v > 0) { state.windowHours = v; save(); render(); }
+  });
+
+  // ── Init ──
+  render();
+  updateTimer();
+  setInterval(updateTimer, 1000);
+</script>
+</body>
+</html>
