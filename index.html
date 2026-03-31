@@ -2069,24 +2069,34 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
 }
 
 // ── APPROVALS ─────────────────────────────────────────────────
-function Approvals({ trips, saveTrips, currentUser }) {
+function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
   const [rejectId, setRejectId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [filter, setFilter] = useState("pending");
+  const [vehicleChangeId, setVehicleChangeId] = useState(null); // tripId being reassigned
+  const [selectedCarId, setSelectedCarId] = useState("");
 
   const pending = trips.filter(t => t.approvalStatus === "pending");
   const approved = trips.filter(t => t.approvalStatus === "approved");
   const rejected = trips.filter(t => t.approvalStatus === "rejected");
 
-  const handleApprove = (tripId) => {
+  const handleApprove = (tripId, overrideCarId) => {
     const updated = trips.map(t => {
       if (t.id !== tripId) return t;
       const newApprovedBy = [...(t.approvedBy || [])];
       if (!newApprovedBy.includes(currentUser.pfId)) newApprovedBy.push(currentUser.pfId);
       const fullyApproved = newApprovedBy.includes(ADMIN_1.pfId) || newApprovedBy.includes(ADMIN_2.pfId);
-      return { ...t, approvedBy: newApprovedBy, approvalStatus: fullyApproved ? "approved" : "pending" };
+      // Apply vehicle override if admin chose a different car
+      let carFields = {};
+      if (overrideCarId && overrideCarId !== t.carId) {
+        const car = (cars || []).find(c => c.id === overrideCarId);
+        if (car) carFields = { carId: car.id, carName: car.name, carPlate: car.plate, driver: car.driver, driverPhone: car.driverPhone };
+      }
+      return { ...t, ...carFields, approvedBy: newApprovedBy, approvalStatus: fullyApproved ? "approved" : "pending" };
     });
     saveTrips(updated);
+    setVehicleChangeId(null);
+    setSelectedCarId("");
   };
 
   const handleReject = (tripId) => {
@@ -2147,8 +2157,8 @@ function Approvals({ trips, saveTrips, currentUser }) {
             {/* Action buttons — only show for pending trips */}
             {t.approvalStatus === "pending" && !myApproved && (
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => handleApprove(t.id)}>✅ Approve</button>
-                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => setRejectId(t.id)}>❌ Reject</button>
+                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => { setVehicleChangeId(t.id); setSelectedCarId(t.carId); setRejectId(null); }}>✅ Approve</button>
+                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => { setRejectId(t.id); setVehicleChangeId(null); }}>❌ Reject</button>
               </div>
             )}
             {t.approvalStatus === "pending" && myApproved && (
@@ -2158,6 +2168,36 @@ function Approvals({ trips, saveTrips, currentUser }) {
             )}
           </div>
         </div>
+
+        {/* Vehicle change + confirm approval panel */}
+        {vehicleChangeId === t.id && (
+          <div style={{ marginTop: 14, padding: 14, background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: G.success, marginBottom: 10 }}>✅ Confirm Approval</div>
+            <div style={{ fontSize: 12, color: G.muted, marginBottom: 8 }}>You may assign a different available vehicle before approving.</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div>
+                <label style={{ ...css.label, color: G.text }}>Assign Vehicle</label>
+                <select style={css.select} value={selectedCarId} onChange={e => setSelectedCarId(e.target.value)}>
+                  {(cars || []).map(c => {
+                    const busy = isCarBusy && isCarBusy(c.id) && c.id !== t.carId;
+                    return <option key={c.id} value={c.id} disabled={busy}>{c.name} — {c.plate}{busy ? " (On Duty)" : c.id === t.carId ? " (Requested)" : " ✓ Available"}</option>;
+                  })}
+                </select>
+              </div>
+              {selectedCarId !== t.carId && (
+                <div style={{ fontSize: 12, padding: "6px 10px", background: "#fef9c3", borderRadius: 6, color: "#92400e" }}>
+                  ⚠️ Vehicle changed from <b>{t.carName}</b> to <b>{(cars || []).find(c => c.id === selectedCarId)?.name || selectedCarId}</b>
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 8 }}>
+                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => handleApprove(t.id, selectedCarId)}>
+                  ✅ Confirm &amp; Approve
+                </button>
+                <button style={{ ...css.btn(G.muted, true), fontSize: 12 }} onClick={() => { setVehicleChangeId(null); setSelectedCarId(""); }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Reject modal inline */}
         {rejectId === t.id && (
