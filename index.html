@@ -603,6 +603,7 @@ function App() {
   const [loaded, setLoaded] = useState(false);
   const [passwords, setPasswords] = useState({});
   const [showChangePw, setShowChangePw] = useState(false);
+  const [activeSessions, setActiveSessions] = useState({});
 
   // Simple hash for password storage (not cryptographic, but adequate for this app)
   const hashPw = (pw) => btoa(encodeURIComponent(pw + "_evpool_salt"));
@@ -700,6 +701,10 @@ function App() {
         if (snap.metadata.fromCache) return;
         if (snap.exists) setLiveLocations(snap.data());
       }));
+      unsubs.push(db.collection("config").doc("sessions").onSnapshot(snapOpts, snap => {
+        if (snap.metadata.fromCache) return;
+        setActiveSessions(snap.exists ? (snap.data() || {}) : {});
+      }));
     } catch(e) { console.error("Firebase listener error:", e); }
 
     return () => unsubs.forEach(u => { try { u(); } catch {} });
@@ -726,12 +731,44 @@ function App() {
   const handleLogin = async (user) => {
     setCurrentUser(user);
     try { localStorage.setItem("ev_session", JSON.stringify(user)); } catch {}
+    try {
+      const db = window.__db;
+      if (db && user.pfId) {
+        const sessionKey = user.pfId;
+        const now = new Date().toISOString();
+        await db.collection("config").doc("sessions").set({
+          [sessionKey]: { pfId: user.pfId, name: user.name, role: user.role || "staff", department: user.department || "", loginAt: now, lastSeen: now }
+        }, { merge: true });
+      }
+    } catch(e) {}
   };
   const handleLogout = async () => {
+    try {
+      const db = window.__db;
+      if (db && currentUser?.pfId) {
+        const FieldValue = firebase.firestore.FieldValue;
+        await db.collection("config").doc("sessions").update({ [currentUser.pfId]: FieldValue.delete() });
+      }
+    } catch(e) {}
     setCurrentUser(null);
     try { localStorage.removeItem("ev_session"); } catch {}
     setTab("dashboard");
   };
+
+  // Heartbeat — update lastSeen every 5 minutes so admins can distinguish
+  // active sessions from stale ones (e.g. tab closed without logging out).
+  useEffect(() => {
+    if (!currentUser?.pfId) return;
+    const ping = async () => {
+      try {
+        const db = window.__db;
+        if (db) await db.collection("config").doc("sessions").update({ [currentUser.pfId + ".lastSeen"]: new Date().toISOString() });
+      } catch(e) {}
+    };
+    ping(); // immediate ping on mount / user change
+    const interval = setInterval(ping, 5 * 60 * 1000); // every 5 minutes
+    return () => clearInterval(interval);
+  }, [currentUser?.pfId]);
 
   const activeTripForCar = (carId) => trips.find(t => t.carId === carId && !t.returnTime && t.approvalStatus === "approved");
   const isCarBusy = (carId) => !!activeTripForCar(carId);
@@ -744,7 +781,7 @@ function App() {
   if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} />;
 
 
-  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword };
+  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword, activeSessions };
 
   const pendingCount = trips.filter(t => t.approvalStatus === "pending").length;
 
@@ -2810,7 +2847,7 @@ function DriverEditCard({ car, onSave }) {
 }
 
 // ── USER MANAGEMENT ──────────────────────────────────────────
-function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword }) {
+function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword, activeSessions }) {
   const users = allUsers;
   const saveUsers = saveAllUsers;
 
@@ -2819,6 +2856,14 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
   // React has re-rendered with the updated allUsers prop).
   const latestUsersRef = React.useRef(allUsers);
   latestUsersRef.current = allUsers;
+
+  // Derive session list with status labels
+  const sessionList = Object.values(activeSessions || {}).map(s => {
+    const lastSeen = s.lastSeen ? new Date(s.lastSeen) : null;
+    const minsAgo = lastSeen ? Math.floor((Date.now() - lastSeen.getTime()) / 60000) : 999;
+    const status = minsAgo <= 10 ? "active" : minsAgo <= 30 ? "idle" : "stale";
+    return { ...s, minsAgo, status };
+  }).sort((a, b) => (a.loginAt > b.loginAt ? -1 : 1));
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ name: "", pfId: "", department: "" });
   const [msg, setMsg] = useState("");
@@ -2877,6 +2922,48 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* ── WHO'S ONLINE ── */}
+      <div style={{ background: "#0f172a", borderRadius: 12, padding: "16px 20px", border: "1px solid #1e293b" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: sessionList.length > 0 ? 14 : 0 }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e", flexShrink: 0 }}></div>
+          <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 14 }}>Who's Online</div>
+          <span style={{ background: "#1e293b", color: "#94a3b8", borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 700 }}>{sessionList.filter(s => s.status !== "stale").length} active</span>
+          <span style={{ color: "#475569", fontSize: 12, marginLeft: "auto" }}>Updates live · Active = last seen &lt;10 min · Idle = 10–30 min</span>
+        </div>
+        {sessionList.length === 0 && <div style={{ color: "#475569", fontSize: 13 }}>No active sessions right now.</div>}
+        {sessionList.length > 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 10 }}>
+            {sessionList.map(s => {
+              const dot = s.status === "active" ? "#22c55e" : s.status === "idle" ? "#f59e0b" : "#64748b";
+              const label = s.status === "active" ? "Active" : s.status === "idle" ? "Idle" : "Session expired";
+              const loginTime = s.loginAt ? new Date(s.loginAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "—";
+              const loginDate = s.loginAt ? new Date(s.loginAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) : "—";
+              return (
+                <div key={s.pfId} style={{ background: "#1e293b", borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "center", gap: 12, border: `1px solid ${dot}30` }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: s.status === "active" ? "#14532d" : s.status === "idle" ? "#451a03" : "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", color: dot, fontWeight: 800, fontSize: 14, flexShrink: 0, border: `2px solid ${dot}` }}>
+                    {s.name ? s.name.charAt(0) : "?"}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
+                    <div style={{ color: "#64748b", fontSize: 11 }}>{s.department || s.role || "Staff"}</div>
+                    <div style={{ color: "#475569", fontSize: 11 }}>Logged in {loginDate} at {loginTime}</div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: dot + "20", color: dot, borderRadius: 20, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: dot, display: "inline-block" }}></span>
+                      {label}
+                    </div>
+                    <div style={{ color: "#475569", fontSize: 10, marginTop: 3 }}>
+                      {s.status !== "stale" ? `${s.minsAgo}m ago` : "30+ min"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* ── FORCE SAVE BANNER ── */}
       <div style={{ background: "#065f46", borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
