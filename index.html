@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Pool EV" />
-  <title>⚡ Pool EV Management v2.0</title>
+  <title>⚡ Pool EV Management</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,465 +45,329 @@
 
 // ── AUTHORISED USERS DATABASE ─────────────────────────────────
 const AUTHORISED_USERS = [
-  { name: 'SANKALPA BORTHAKUR', pfId: '100057', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Kaushik Das', pfId: '100729', department: 'Funds Settlement Link Office' },
-  { name: 'PRIYANKA MEDHI', pfId: '101280', department: 'Circle Complaint Resolution Centre' },
-  { name: 'SANJEEV BORO', pfId: '101521', department: 'Circle Security Deptt' },
-  { name: 'JEENA DAIMARY', pfId: '101689', department: 'WEALTH HUB' },
-  { name: 'DYUTOM DYUMON SAHA', pfId: '102218', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'RAHUL RAUT', pfId: '102222', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'ODELIA DARISHISHA SAWIAN', pfId: '102319', department: 'Adminstration(LHO,GHY)' },
-  { name: 'BIRJU GAYARY', pfId: '102545', department: 'WEALTH HUB' },
-  { name: 'ROSHAN DUTTA', pfId: '102558', department: 'WEALTH HUB' },
-  { name: 'BIRKHANG BASUMATARY', pfId: '102561', department: 'WEALTH HUB' },
-  { name: 'ROSY SUMI', pfId: '102571', department: 'WEALTH HUB' },
-  { name: 'ANWARUL HAQUE LASKAR', pfId: '102578', department: 'WEALTH HUB' },
-  { name: 'GULSHAN AHMED', pfId: '102591', department: 'WEALTH HUB' },
-  { name: 'HIDANGMAYUM SARDHANA SHARMA', pfId: '103176', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'SWAPAN DAS', pfId: '103289', department: 'Circle Security Deptt' },
-  { name: 'OBANG AO', pfId: '1032900', department: 'Circle Security Deptt' },
-  { name: 'PUSHPA THAPA', pfId: '1032901', department: 'Circle Security Deptt' },
-  { name: 'DILIP PRADHAN', pfId: '1032902', department: 'Circle Security Deptt' },
-  { name: 'MONALISA DAS', pfId: '103622', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'ARJUN RAJ GHOSH', pfId: '103623', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'DURGA DUTT THAKUR', pfId: '103874', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Bandita Sarma', pfId: '1038762', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Sahil Jaiswal', pfId: '1038765', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'DEBKUMAR SEN', pfId: '103891', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'MONALISA SAIKIA', pfId: '103894', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'HIRAKJYOTI DEURI', pfId: '103896', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'MUNNA TERON', pfId: '103897', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'SUJIT BASFORE', pfId: '104359', department: 'Adminstration(LHO,GHY)' },
-  { name: 'DAIBOKI KUMAR', pfId: '104796', department: 'Adminstration(LHO,GHY)' },
-  { name: 'NIRAJ PATHAK', pfId: '106285', department: 'Government Business Unit' },
-  { name: 'ANANYA DEBNATH', pfId: '106616', department: 'WEALTH HUB' },
-  { name: 'IRENGBAM JIO SINGH', pfId: '106906', department: 'Circle Security Deptt' },
-  { name: 'ARBAB KALAM', pfId: '106917', department: 'Premises & Estate' },
-  { name: 'Ridul Saud', pfId: '108513', department: 'Premises & Estate' },
-  { name: 'VICKEY ANAND', pfId: '1085150', department: 'Premises & Estate' },
-  { name: 'ANUBHAW CHOUDHARY', pfId: '1085155', department: 'Premises & Estate' },
-  { name: 'PARTHA BHOWMIK', pfId: '131997', department: 'WEALTH HUB' },
-  { name: 'PINAK GUPTA', pfId: '132071', department: 'RB&O-LHO-CIRCLE-CHANNEL MGMT & CUST SERV' },
-  { name: 'Sanjay Kumar Shaw', pfId: '132087', department: 'WEALTH HUB' },
-  { name: 'MANASH PRATIM DEKA', pfId: '132091', department: 'WEALTH HUB' },
-  { name: 'Chandan Jyoti Deka', pfId: '132097', department: 'WEALTH HUB' },
-  { name: 'Rakesh Das', pfId: '1321154', department: 'WEALTH HUB' },
-  { name: 'Sruti Laxmi Choudhury', pfId: '1321155', department: 'WEALTH HUB' },
-  { name: 'PRADIP KUMAR ROY', pfId: '132135', department: 'Account Traking Centre' },
-  { name: 'Diptanu Saha', pfId: '132144', department: 'WEALTH HUB' },
-  { name: 'BISWAJIT DEBBARMA', pfId: '132167', department: 'WEALTH HUB' },
-  { name: 'PRANJAL NATH', pfId: '132208', department: 'WEALTH HUB' },
-  { name: 'LETKHONEH HAOKIP', pfId: '132226', department: 'Lead Bank & RSETI' },
-  { name: 'TAPASH SEN', pfId: '132378', department: 'Circle Complaint Resolution Centre' },
-  { name: 'SWAPAN KUMAR DEBNATH', pfId: '132386', department: 'Circle Complaint Resolution Centre' },
-  { name: 'RAJIV NANDA', pfId: '132387', department: 'Local head Office,Guwahat' },
-  { name: 'JOYDIP DEBNATH', pfId: '133096', department: 'WEALTH HUB' },
-  { name: 'Ranjan Barthakur', pfId: '133097', department: 'WEALTH HUB' },
-  { name: 'Deben Deka', pfId: '318366', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Alois Daimari', pfId: '318922', department: 'Disciplinary Proceeding D' },
-  { name: 'Deo Bahadur Bisukarma', pfId: '319593', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Ajit Kalita', pfId: '319780', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Pranab Kumar Paul', pfId: '319842', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Pankaj Goswami', pfId: '319886', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Bibhas Das', pfId: '319947', department: 'Audit Department (BOD)' },
-  { name: 'Pramod Kumar Singh', pfId: '349976', department: 'Non Performing Asset' },
-  { name: 'Niranjan Baruah', pfId: '360018', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Shyamal Kumar Hazarika', pfId: '360042', department: 'Human Resources' },
-  { name: 'Dulal Roy', pfId: '360072', department: 'Disciplinary Proceeding D' },
-  { name: 'Gurupada Halder', pfId: '360116', department: 'Outreach' },
-  { name: 'Suren Kalita', pfId: '360217', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Sujit Dey', pfId: '360239', department: 'Public Relations & Comm.S' },
-  { name: 'Monoj Kumar Paul', pfId: '360333', department: 'RISK' },
-  { name: 'Shyamanta Konwar', pfId: '360390', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Monoj Sen', pfId: '360517', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Dhanendra Nath Brahma', pfId: '360520', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Ujjwal Sarmah', pfId: '360572', department: 'Human Resources' },
-  { name: 'Biswajit Bhattacharjee', pfId: '360664', department: 'Liaison' },
-  { name: 'Susanta Chakraborty', pfId: '360665', department: 'IT Support Services' },
-  { name: 'Suren Regon', pfId: '360681', department: 'Credit & Performance Monitoring' },
-  { name: 'Singh Nimai Mayanglambam', pfId: '360688', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Nijananda Badir', pfId: '360693', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Subhrangshu Dey', pfId: '360725', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Monjoy Bohora', pfId: '360754', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Hiren Sarma', pfId: '361084', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Ashok Kumar Ghosh', pfId: '361119', department: 'Government Business Unit' },
-  { name: 'Mahendra Deka', pfId: '361161', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Pabitra Nath Kakati', pfId: '361165', department: 'PPG Department Guwahati' },
-  { name: 'Dibakar Chakraborty', pfId: '361177', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Gunendra Kumar Barman', pfId: '361178', department: 'Outreach' },
-  { name: 'Madan Gopal Goswami', pfId: '361262', department: 'Premises & Estate' },
-  { name: 'Debananda Pao', pfId: '361276', department: 'AGM INVESTIGATION LHO GUWAHATI' },
-  { name: 'Prodeep Saikia', pfId: '361313', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Satyajit Chowdhury', pfId: '361328', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Pinak Dutta', pfId: '361344', department: 'Lead Bank & RSETI' },
-  { name: 'Rupak Bhowal', pfId: '361362', department: 'Human Resources' },
-  { name: 'Ranendra Narzary', pfId: '361366', department: 'PPG Department Guwahati' },
-  { name: 'Girindra Sarma', pfId: '361413', department: 'MIS&BPM' },
-  { name: 'Sandip Bhattacharjee', pfId: '361454', department: 'Human Resources' },
-  { name: 'Santanu Bhattacharjee', pfId: '361489', department: 'RISK' },
-  { name: 'Prabin Hazuwary', pfId: '361494', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'Kumud Chandra Boro', pfId: '361540', department: 'Audit Department (BOD)' },
-  { name: 'Dipak Chandra Sarmah', pfId: '361566', department: 'IT Support Services' },
-  { name: 'Amal Chandra Sarkar', pfId: '361570', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Sujit Das', pfId: '361571', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Jogat Jibon Paul', pfId: '361642', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Bijou Uddin Ahmed', pfId: '361649', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Dhiraj Choudhury', pfId: '361714', department: 'Disciplinary Proceeding D' },
-  { name: 'Abhijit Bhattacharjee', pfId: '361739', department: 'Liaison' },
-  { name: 'Shyam Kumar Upadhaya', pfId: '361775', department: 'Disciplinary Proceeding D' },
-  { name: 'Ratul Kumar Talukdar', pfId: '361776', department: 'Human Resources' },
-  { name: 'Prabhat Rajkhowa', pfId: '361800', department: 'Banking Ombudsman' },
-  { name: 'Alok Choudhury', pfId: '361840', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Prasanta Paul', pfId: '361855', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Rajesh Biswas', pfId: '361874', department: 'Credit & Performance Monitoring' },
-  { name: 'Ashok Chakraborty', pfId: '361921', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Alak Ranjan Paul', pfId: '361943', department: 'Funds Settlement Link Office' },
-  { name: 'Mrinal Kumar Hazarika', pfId: '361953', department: 'Human Resources' },
-  { name: 'Dibyendu Dhar', pfId: '361981', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Pradip Mazumder', pfId: '361988', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Rajib Bhagawati', pfId: '362010', department: 'CGM  Secretariat' },
-  { name: 'Subodh Kumar Das', pfId: '362019', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Jatin Kumar Boruah', pfId: '362049', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Chandra Kanta Rabha', pfId: '362081', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Piali Ghosh', pfId: '362084', department: 'Retail Loan LHO Ghy' },
-  { name: 'Shamim Ahmed', pfId: '362148', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Joy Ram Pait', pfId: '362175', department: 'Lead Bank & RSETI' },
-  { name: 'H. Haukhanpau', pfId: '362200', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Bijoy Kumar Saha', pfId: '362278', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Narendra Nath Saha', pfId: '362326', department: 'Non Performing Asset' },
-  { name: 'Abhijit Das', pfId: '362439', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Uttam Das', pfId: '362471', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Diganta Kumar Rabha', pfId: '362499', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Sabita Kalita', pfId: '362505', department: 'Premises & Estate' },
-  { name: 'Pijush Bora', pfId: '362592', department: 'Audit Department (BOD)' },
-  { name: 'Hatneikim  Gangte Imsong', pfId: '362608', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Tapan Kumar Narzy', pfId: '362633', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Benjamin Baglary', pfId: '362637', department: 'Human Resources' },
-  { name: 'Bhabatosh Dutta', pfId: '362665', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Muhammad Salauddin Mansoori', pfId: '362670', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Anirban Dutta', pfId: '362680', department: 'I O R Department' },
-  { name: 'L P Lalchangkima', pfId: '362727', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Papulal Harizan', pfId: '362748', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Niren Das', pfId: '362753', department: 'Funds Settlement Link Office' },
-  { name: 'Suraj Nath', pfId: '362770', department: 'I O R Department' },
-  { name: 'Dadhi Charan Basumatary', pfId: '362879', department: 'Network Credit Management' },
-  { name: 'Sohan Sarki', pfId: '362897', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Sambhu Rajbangshi', pfId: '362940', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Chanchal Chandra Paul', pfId: '362962', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Abhijit Das', pfId: '362986', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Nandu Ram Sharma', pfId: '363052', department: 'Human Resources' },
-  { name: 'Dandeswar Ray', pfId: '363064', department: 'CGM  Secretariat' },
-  { name: 'Komanly Khongwar', pfId: '363073', department: 'Account Traking Centre' },
-  { name: 'Odimenla Jamir', pfId: '363140', department: 'CLIC' },
-  { name: 'Sanjib Sen', pfId: '363189', department: 'Account Traking Centre' },
-  { name: 'Bimal Das', pfId: '363200', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Anil Gharphalia', pfId: '363224', department: 'Disciplinary Proceeding D' },
-  { name: 'Parag Roymedhi', pfId: '363251', department: 'Premises & Estate' },
-  { name: 'Sushil Brahma', pfId: '363259', department: 'IT Support Services' },
-  { name: 'Khamkhochinthang Hnunkhum Khuptong', pfId: '363319', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'S.Chinlianthang Ngaihte', pfId: '363327', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Besii Bosco Sani', pfId: '363330', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Theo Ayu Pao Paul', pfId: '363337', department: 'PPG Department Guwahati' },
-  { name: 'Joy Chandra Chakma', pfId: '363340', department: 'Lead Bank & RSETI' },
-  { name: 'Sita Kumari Basfore', pfId: '363341', department: 'Outreach' },
-  { name: 'Uttam Kumar Saha', pfId: '363345', department: 'Premises & Estate' },
-  { name: 'Plabon Borgohain', pfId: '363353', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Sumangali Choudhury', pfId: '363486', department: 'I O R Department' },
-  { name: 'Khaikhopao Haokip', pfId: '363516', department: 'Outreach' },
-  { name: 'Maheswar Choudhury', pfId: '363528', department: 'HR G.M (NW-I)' },
-  { name: 'Chandrajyoti Dowari', pfId: '363529', department: 'SME AGRI ASSET QUALITY NW1' },
-  { name: 'Nilamoni Hazarika', pfId: '363533', department: 'SME AGRI ASSET QUALITY NW1' },
-  { name: 'Bhabananda Talukdar', pfId: '363536', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Sarat Chandra Haloi', pfId: '363538', department: 'Adminstration(LHO,GHY)' },
-  { name: 'KC Vanlal Vena', pfId: '363540', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Sarbari Debbarman', pfId: '363545', department: 'WEALTH HUB' },
-  { name: 'Manawar Lyngdoh', pfId: '363550', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Sanjib Swargiary', pfId: '363553', department: 'Lead Bank & RSETI' },
-  { name: 'Santanu Buragohain', pfId: '363556', department: 'Human Resources' },
-  { name: 'Rupam Roy', pfId: '363561', department: 'PPG Department Guwahati' },
-  { name: 'Abinash Hembrom', pfId: '363586', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'C RAMDINSANGA', pfId: '363588', department: 'Lead Bank & RSETI' },
-  { name: 'Munindra Upadhyaya', pfId: '363612', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Pradip Malakar', pfId: '363669', department: 'Outreach' },
-  { name: 'I Temjen Changkiri', pfId: '363672', department: 'Human Resources' },
-  { name: 'Dhiraj Kumar Boro', pfId: '363682', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Pitambor Taye', pfId: '363691', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Suraj Pradhan', pfId: '363742', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Moloy Kanti Paul', pfId: '363755', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Manash Bhuyan', pfId: '363764', department: 'Human Resources' },
-  { name: 'Nirmalendu Dhar', pfId: '363791', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Mantu Das', pfId: '363880', department: 'Human Resources' },
-  { name: 'David N Lhouvum', pfId: '363898', department: 'AGM AGRI' },
-  { name: 'Pirbox Ali', pfId: '363945', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Dharitri Deka', pfId: '364060', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Prajnan Chaitanya Deka', pfId: '364103', department: 'Law' },
-  { name: 'Lienkholal Gangte', pfId: '364139', department: 'Outreach' },
-  { name: 'Ankur Pradhan', pfId: '364218', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Bijoy Sarma', pfId: '364257', department: 'Merchant Acquiring Business' },
-  { name: 'Partha Pratim Saikia', pfId: '364271', department: 'Human Resources' },
-  { name: 'Kamal Debnath', pfId: '364305', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Papan Kumar Das', pfId: '364310', department: 'Liaison' },
-  { name: 'Daisy Baro', pfId: '364372', department: 'Outreach' },
-  { name: 'Sujata Bhattacharjee', pfId: '364386', department: 'Lead Bank & RSETI' },
-  { name: 'Chandamita Gogoi', pfId: '364387', department: 'Small and Medium Enterpri' },
-  { name: 'Golap Hossain', pfId: '364392', department: 'I O R Department' },
-  { name: 'Abu Toufique Miftasul Hussain', pfId: '364417', department: 'CGM  Secretariat' },
-  { name: 'Ujjal Deka', pfId: '364420', department: 'Premises & Estate' },
-  { name: 'Dibyajyoti Saikia', pfId: '364436', department: 'Funds Settlement Link Office' },
-  { name: 'Puspita Nath', pfId: '364448', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Sudipto Bhattacharjee', pfId: '364453', department: 'BOPM NW-I' },
-  { name: 'Leenabati Mutum', pfId: '364496', department: 'PPG Department Guwahati' },
-  { name: 'Monica Dkhar', pfId: '364526', department: 'AGM AGRI' },
-  { name: 'Jyoti Krishna Nath', pfId: '364549', department: 'Human Resources' },
-  { name: 'Swaraj Hatibaruah', pfId: '364564', department: 'Human Resources' },
-  { name: 'Hari Krishna Chetia', pfId: '364565', department: 'Public Relations & Comm.S' },
-  { name: 'Papori Das Chakraborty', pfId: '364618', department: 'PROJECT LOTUS' },
-  { name: 'Priyanka Phukan', pfId: '364664', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Susanta Das', pfId: '364666', department: 'Retail Loan LHO Ghy' },
-  { name: 'Ramesh Chand Meena', pfId: '371062', department: 'OPR LHO GUWAHATI' },
-  { name: 'Sujit Kumar Singh', pfId: '373372', department: 'Banking Ombudsman' },
-  { name: 'Sanjeeb Kumar Dev', pfId: '379707', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Dilip Kumar Pathak', pfId: '392438', department: 'Retail Loan LHO Ghy' },
-  { name: 'Rakesh Kumar', pfId: '392471', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Diwakar Kumar', pfId: '393550', department: 'FRAUD MONITORING CELL' },
-  { name: 'Md Naiyar Imam', pfId: '394925', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Kishore Kumar Choudhary', pfId: '420027', department: 'Non Performing Asset' },
-  { name: 'Pramod Kumar', pfId: '427111', department: 'RBO-LHO-NW 2-RSC CVE  WEALTH' },
-  { name: 'Kamal Kishor Naik', pfId: '427314', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'Anthony Leyangi', pfId: '430763', department: 'Small and Medium Enterpri' },
-  { name: 'Urmilesh Kumar Pathak', pfId: '432798', department: 'AGM AGRI' },
-  { name: 'Rakesh Banerjee', pfId: '433855', department: 'RBO-LHO-NW 1-RSC CVE  WEALTH' },
-  { name: 'Lalremtluangi C', pfId: '434067', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Vijay Kumar Sharma', pfId: '435984', department: 'Circle Security Deptt' },
-  { name: 'Anurag Arpan', pfId: '441550', department: 'Small and Medium Enterpri' },
-  { name: 'Bhupen Borah', pfId: '447945', department: 'AGM AGRI' },
-  { name: 'Chongtham Chanchan', pfId: '447969', department: 'AGM AGRI2' },
-  { name: 'Roopam Das', pfId: '449494', department: 'Agri Bussiness Unit' },
-  { name: 'Bhaba Jyoti Dutta', pfId: '449519', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Md Jehirul Islam', pfId: '449528', department: 'WEALTH HUB' },
-  { name: 'Lopamudra Biswas Kangsa Banik', pfId: '449529', department: 'WEALTH HUB' },
-  { name: 'Lakhima Phukan', pfId: '449531', department: 'WEALTH HUB' },
-  { name: 'Adaha Nepuni', pfId: '449613', department: 'AGM AGRI' },
-  { name: 'Kshetrimayum Shanta Devi', pfId: '449615', department: 'WEALTH HUB' },
-  { name: 'Raj  Kumar Jaiswal', pfId: '449634', department: 'AGM AGRI2' },
-  { name: 'Satyendra Kumar', pfId: '452295', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Hrishikesh Jha', pfId: '456719', department: 'Audit Department (BOD)' },
-  { name: 'Amit Saklani', pfId: '457805', department: 'REH AGM LHO GUWAHATI' },
-  { name: 'Rajesh Chaturvedy', pfId: '458536', department: 'Rajbhasha' },
-  { name: 'Pankaj Kumar', pfId: '459000', department: 'AC – Sys. & Proc' },
-  { name: 'Nabajyoti Borah', pfId: '459240', department: 'Government Business Unit' },
-  { name: 'Vivek Kumar Singh', pfId: '459517', department: 'Rajbhasha' },
-  { name: 'Rakesh Kumar', pfId: '501108', department: 'SME AGRI ASSET QUALITY NW2' },
-  { name: 'Nishant Kumar', pfId: '501298', department: 'Procurment' },
-  { name: 'Manish Sinha', pfId: '501421', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Ipsita Itisudha Tarai', pfId: '511818', department: 'BPR( IT)' },
-  { name: 'Hemchandra Rajkumar Jha', pfId: '523888', department: 'BPR( IT)' },
-  { name: 'Parimal Langthasa', pfId: '524383', department: 'Funds Settlement Link Office' },
-  { name: 'BHASKAR KUMAR DEY SARKAR', pfId: '528968', department: 'Funds Settlement Link Office' },
-  { name: 'J CHUMBENTHUNG HUMTSOE', pfId: '531599', department: 'Data Processing Centre' },
-  { name: 'SUDHIR KUMAR JHA', pfId: '538913', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Johnson Tawmbing', pfId: '544260', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Manoj Kumar Choudhary', pfId: '552308', department: 'I O R Department' },
-  { name: 'Sanjeeb Kumar Kalita', pfId: '552310', department: 'Funds Settlement Link Office' },
-  { name: 'Amrita Das', pfId: '552316', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Sangita Kalita', pfId: '552351', department: 'PPG Department Guwahati' },
-  { name: 'Pratyush Baruah', pfId: '552352', department: 'Agri Bussiness Unit' },
-  { name: 'Paran Jyoti Deka', pfId: '552355', department: 'Human Resources' },
-  { name: 'Purabi Sarma', pfId: '552364', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Saurav Kumar Kalita', pfId: '552388', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Priti Prasun Sen', pfId: '552389', department: 'Human Resources' },
-  { name: 'Mehdi Hassan', pfId: '552414', department: 'IT Support Services' },
-  { name: 'Pallabi Borah', pfId: '552422', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Archana Saha', pfId: '552429', department: 'Outreach' },
-  { name: 'Shameek Purkayastha', pfId: '552431', department: 'Human Resources' },
-  { name: 'Utpal Deka', pfId: '552445', department: 'Credit & Performance Monitoring' },
-  { name: 'Bikramjeet Goswami', pfId: '552453', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Vivekananda Das', pfId: '552460', department: 'CLIC' },
-  { name: 'Samir Kumar Dey', pfId: '552543', department: 'Small and Medium Enterpri' },
-  { name: 'Devraj Phookan', pfId: '552592', department: 'Human Resources' },
-  { name: 'Ankur Pratim Saikia', pfId: '552599', department: 'WEALTH HUB' },
-  { name: 'Debankita Paul', pfId: '552636', department: 'AC – Sys. & Proc' },
-  { name: 'Bismita Borchetia', pfId: '552679', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Pranjal Dey', pfId: '552689', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Rituparna Basu Roy', pfId: '552713', department: 'CGM  Secretariat' },
-  { name: 'Krishang Buragohain', pfId: '552827', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Rajeev Kumar Das', pfId: '552831', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Bishnu Kinkar', pfId: '552866', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Pranjal Saikia', pfId: '552872', department: 'CLIC' },
-  { name: 'Krishna Mallick', pfId: '552882', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Shaonli Majumder', pfId: '552904', department: 'Human Resources' },
-  { name: 'Moumita Gandha Banik', pfId: '552905', department: 'RISK' },
-  { name: 'Mridul Goiary', pfId: '552920', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Gautam Swargiary', pfId: '552923', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Jinti Moni Khakhlary', pfId: '552932', department: 'Outreach' },
-  { name: 'Daisy B. Rabha', pfId: '552972', department: 'Public Relations & Comm.S' },
-  { name: 'Pandava Chakma', pfId: '552988', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Sandeepan Roy', pfId: '553055', department: 'Retail Loan LHO Ghy' },
-  { name: 'Vijaya Laxmi Phukan', pfId: '553066', department: 'Funds Settlement Link Office' },
-  { name: 'Koushiki Gupta', pfId: '553249', department: 'BPR( IT)' },
-  { name: 'Rahul Ranjan', pfId: '554433', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Satyaranjan Das', pfId: '554655', department: 'AC – Sys. & Proc' },
-  { name: 'John Borgoyari', pfId: '555936', department: 'IT Support Services' },
-  { name: 'Bhaskar Pegu', pfId: '555949', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Spondon Chelleng', pfId: '555976', department: 'Non Performing Asset' },
-  { name: 'Diganta Bordoloi', pfId: '569861', department: 'Data Processing Centre' },
-  { name: 'Rahul Deb Thakur', pfId: '577273', department: 'Human Resources' },
-  { name: 'Biswadeep Dey', pfId: '583854', department: 'IT Support Services' },
-  { name: 'Thangkholen Khongsai', pfId: '583861', department: 'Retail Loan LHO Ghy' },
-  { name: 'Debraj Barua', pfId: '583884', department: 'LEARNING and DEVELOPMENT GUWAHATI' },
-  { name: 'Raj Kumar Bhagat', pfId: '583941', department: 'Government Business Unit' },
-  { name: 'Tapash Paul', pfId: '583969', department: 'PPG Department Guwahati' },
-  { name: 'Mrinmoy Rajbongshi', pfId: '583975', department: 'IT Support Services' },
-  { name: 'Deba Kanta Phukan', pfId: '583989', department: 'WEALTH HUB' },
-  { name: 'Mriganka Buragohain', pfId: '583995', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Kishor Kumar Das', pfId: '583997', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Surajit Das', pfId: '584025', department: 'IT Support Services' },
-  { name: 'Baikuntha Phukan', pfId: '584033', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Rupjyoti Sarma', pfId: '584038', department: 'Human Resources' },
-  { name: 'Pawan Kumar Verma', pfId: '584047', department: 'Public Relations & Comm.S' },
-  { name: 'Sadananda Kalita', pfId: '584055', department: 'Premises & Estate' },
-  { name: 'Pranab Barman', pfId: '584056', department: 'Outreach' },
-  { name: 'Yendrembam Amarprem Singh', pfId: '584176', department: 'FINANCE AND OPERATIONS' },
-  { name: 'G Tawnliansiam', pfId: '584237', department: 'BPR( IT)' },
-  { name: 'Torida Sandor Marbaniang', pfId: '584243', department: 'BPR( IT)' },
-  { name: 'Bendangla Amer', pfId: '584332', department: 'BPR( IT)' },
-  { name: 'Sashilemba Longkumer', pfId: '584370', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Ruposmita Baruah', pfId: '584379', department: 'Account Traking Centre' },
-  { name: 'Anup Kumar Atreya', pfId: '588095', department: 'FINANCE AND OPERATIONS' },
-  { name: 'ANURADHA KUMARI', pfId: '590463', department: 'Retail Loan LHO Ghy' },
-  { name: 'Gaurica Naidu', pfId: '597377', department: 'Human Resources' },
-  { name: 'Asim Anand', pfId: '599947', department: 'Small and Medium Enterpri' },
-  { name: 'Niti Vidyarthi', pfId: '600417', department: 'Human Resources' },
-  { name: 'Prakash Kr Srivastava', pfId: '600457', department: 'Small and Medium Enterpri' },
-  { name: 'Amit Kumar Jha', pfId: '600516', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'DURLABH KHAUND', pfId: '601275', department: 'Banking Ombudsman' },
-  { name: 'Jagrit Jyoti Bora', pfId: '601276', department: 'Account Traking Centre' },
-  { name: 'Hiranyamayee Phukan', pfId: '601300', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Saptarshi Roy', pfId: '601328', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Shahid Haque', pfId: '601329', department: 'PPG Department Guwahati' },
-  { name: 'Ayekpam Premjit Singh', pfId: '601361', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Pratiti Hazarika', pfId: '601387', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Sambit Kumar Pattanayak', pfId: '607957', department: 'Premises & Estate' },
-  { name: 'Irengbam Priyokumar Singh', pfId: '621382', department: 'LEARNING and DEVELOPMENT GUWAHATI' },
-  { name: 'Tuikhang Chuongchun Koren', pfId: '623829', department: 'IT Support Services' },
-  { name: 'AJOY PAUL', pfId: '625566', department: 'IT Support Services' },
-  { name: 'Ranjita Bastia Panda', pfId: '638275', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Ramtawnlien H D', pfId: '640676', department: 'FRAUD MONITORING CELL' },
-  { name: 'KHAILUNMANG Vaiphei', pfId: '640686', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'JITENDRA KUMAR', pfId: '646392', department: 'RE & Retail Loans (DGM)' },
-  { name: 'MD FIROZ ALAM', pfId: '650702', department: 'Premises & Estate' },
-  { name: 'Jolen Prabha Tiru', pfId: '665353', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Naba Chandra Singh', pfId: '665930', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Tanmoy Barman', pfId: '671573', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Avik Ghosh', pfId: '671583', department: 'Government Business Unit' },
-  { name: 'Aroj Kumar', pfId: '671585', department: 'IT Support Services' },
-  { name: 'Samar Jyoti Deka', pfId: '672319', department: 'Premises & Estate' },
-  { name: 'Rini Elizabeth Toppo', pfId: '672777', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Bikramjyoti Das', pfId: '673200', department: 'Digital Banking and TBU' },
-  { name: 'Joycee Vungngaihmawi Guite', pfId: '673237', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Daricor Pariat', pfId: '674578', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'Vipin Upadhyay', pfId: '675413', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Jitender Yadav', pfId: '677831', department: 'Credit & Performance Monitoring' },
-  { name: 'Bhabesh Bhagabati', pfId: '681742', department: 'Circle Security Deptt' },
-  { name: 'Ahindra Kumar Sinha', pfId: '681743', department: 'Circle Security Deptt' },
-  { name: 'Binita Kumari', pfId: '682472', department: 'Lead Bank & RSETI' },
-  { name: 'Tage Gyuthey', pfId: '684525', department: 'Premises & Estate' },
-  { name: 'Preetimayee Tripathy', pfId: '684700', department: 'Rajbhasha' },
-  { name: 'Bharat Baruah', pfId: '694480', department: 'CGM  Secretariat' },
-  { name: 'Plaban Mazumdar', pfId: '697966', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Manjit', pfId: '701488', department: 'CLIC' },
-  { name: 'Imdad Arif Ahmed', pfId: '701708', department: 'IT Support Services' },
-  { name: 'Shaiborlang Dkhar', pfId: '701744', department: 'Data Processing Centre' },
-  { name: 'Vikash Kumar', pfId: '705311', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'SANDEEP KUMAR', pfId: '708328', department: 'Rajbhasha' },
-  { name: 'SURYANSH BAMANIA', pfId: '711521', department: 'Rajbhasha' },
-  { name: 'Biju Gopinathan Pillai', pfId: '723122', department: 'Agri Bussiness Unit' },
-  { name: 'Brajesh Kumar R', pfId: '724020', department: 'BPR( IT)' },
-  { name: 'Salseng Sangma Marak', pfId: '725435', department: 'Human Resources' },
-  { name: 'Shibojit Soren', pfId: '733479', department: 'Premises & Estate' },
-  { name: 'Joydeep Das', pfId: '742797', department: 'FRAUD MONITORING CELL' },
-  { name: 'Gagan Baro', pfId: '742819', department: 'Human Resources' },
-  { name: 'Banty Sonowal', pfId: '742840', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Tulika Barman', pfId: '742851', department: 'Account Traking Centre' },
-  { name: 'Bandita Dihingia', pfId: '742868', department: 'IT Support Services' },
-  { name: 'Chandan Talukdar', pfId: '742909', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Gitika Nath', pfId: '742958', department: 'Account Traking Centre' },
-  { name: 'Nabanita Hazarika', pfId: '742983', department: 'Rajbhasha' },
-  { name: 'Subhasish Das', pfId: '742996', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Bhaskar Narayan Chakraborty', pfId: '743004', department: 'IT Support Services' },
-  { name: 'Sanjib Kumar Baishya', pfId: '743026', department: 'PROJECT LOTUS' },
-  { name: 'Trishna Barua', pfId: '743028', department: 'Audit Department (BOD)' },
-  { name: 'Prabhat Kumar Choudhary', pfId: '743049', department: 'Outreach' },
-  { name: 'HIRANYA KALITA', pfId: '743074', department: 'MIS&BPM' },
-  { name: 'Debankur Pathak', pfId: '743080', department: 'Human Resources' },
-  { name: 'Imran Ali', pfId: '743086', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Dhrubajyoti Pathak', pfId: '743090', department: 'GM Network -1( Guwahati)' },
-  { name: 'Sumi Das', pfId: '743097', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Rijuwana Akhtar', pfId: '743111', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Arup Sarma', pfId: '743144', department: 'I O R Department' },
-  { name: 'Rahul Singh', pfId: '743159', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Sarda Sagar', pfId: '743451', department: 'Disciplinary Proceeding D' },
-  { name: 'ABHIJIT KHATIA', pfId: '743624', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Om Prakash Gupta', pfId: '743704', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Kabita Barai', pfId: '751542', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Usharani Rajkhowa', pfId: '758325', department: 'Human Resources' },
-  { name: 'Pratima Patir', pfId: '758330', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Bhaskar Jyoti Nath', pfId: '758455', department: 'Government Business Unit' },
-  { name: 'Karuna Kanta Das', pfId: '758504', department: 'IT Support Services' },
-  { name: 'Amar Jyoti Kalita', pfId: '758543', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Anupam Haloi', pfId: '758544', department: 'GM Network -2( Guwahati)' },
-  { name: 'Rameez Raja Ahmed', pfId: '758563', department: 'Premises & Estate' },
-  { name: 'Sandip Pathak', pfId: '758588', department: 'Human Resources' },
-  { name: 'Samiparna Dutta', pfId: '758613', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Arijit Dey', pfId: '758724', department: 'MIS&BPM' },
-  { name: 'Radha Shakti Boro', pfId: '760102', department: 'Human Resources' },
-  { name: 'Minakshi Ayushman Baruah', pfId: '760108', department: 'BOPM NW-I' },
-  { name: 'Tarun Dey', pfId: '763744', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Chaitanya Kirti', pfId: '767346', department: 'Agri Bussiness Unit' },
-  { name: 'Sonam Gagrai', pfId: '767579', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Rana Pratap Bhoi', pfId: '769179', department: 'Human Resources' },
-  { name: 'Amit Kumar', pfId: '781021', department: 'Law' },
-  { name: 'Swarndeep D', pfId: '781088', department: 'Retail Loan LHO Ghy' },
-  { name: 'Bikash Roy', pfId: '781627', department: 'Human Resources' },
-  { name: 'Gourab Goswami', pfId: '781756', department: 'BOPM NW-I' },
-  { name: 'JOLY GOSWAMI', pfId: '783075', department: 'FRAUD MONITORING CELL' },
-  { name: 'BISWAJIT DAS', pfId: '784432', department: 'Audit Department (BOD)' },
-  { name: 'Darshan Jyoti Deka', pfId: '787445', department: 'Banking Ombudsman' },
-  { name: 'HIMANGSHU KALITA', pfId: '787459', department: 'Lead Bank & RSETI' },
-  { name: 'ARNAB BARKATAKI', pfId: '787496', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'URMISNATA NANDA', pfId: '787542', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'DIJABRATA BHAGABATI', pfId: '787634', department: 'PPG Department Guwahati' },
-  { name: 'SAMIRAN NATH', pfId: '787641', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Suman Das', pfId: '787739', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Ashish Kumar', pfId: '807291', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Biswajit Chandra Das', pfId: '813095', department: 'WEALTH HUB' },
-  { name: 'Jitumoni Malakar', pfId: '813519', department: 'WEALTH HUB' },
-  { name: 'Sandipa Gogoi', pfId: '832983', department: 'Digital Banking and TBU' },
-  { name: 'Monchumi Bora', pfId: '833129', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Nitish Kumar', pfId: '833307', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'SUDIP SARKAR', pfId: '845615', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Aditi Paul', pfId: '847660', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'KONDURU PRANEETH', pfId: '847922', department: 'IT Support Services' },
-  { name: 'PRANJAL BHARALI', pfId: '848514', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Bandana Rabha', pfId: '849099', department: 'Non Performing Asset' },
-  { name: 'RUPAM CHANDRA RABHA', pfId: '849190', department: 'Human Resources' },
-  { name: 'TISHA GHOSH', pfId: '851090', department: 'Premises & Estate' },
-  { name: 'GAYATRI SAIKIA', pfId: '851883', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Maitreyi Roy', pfId: '851977', department: 'Account Traking Centre' },
-  { name: 'ANMOL GHOSHAL', pfId: '852326', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'PUNAM DEVI', pfId: '852955', department: 'MIS&BPM' },
-  { name: 'CHAYANIKA CHOUDHURY', pfId: '853221', department: 'Adminstration(LHO,GHY)' },
-  { name: 'HAROLD DHAR', pfId: '855740', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'BIBEK DEY', pfId: '855825', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Meenakshi Baishya', pfId: '856114', department: 'Circle Security Deptt' },
-  { name: 'BIKRAM DAMAI', pfId: '857017', department: 'Account Traking Centre' },
-  { name: 'ARPITA MALLICK', pfId: '858063', department: 'Adminstration(LHO,GHY)' },
-  { name: 'PRITAM BASUMATARY', pfId: '859735', department: 'Account Traking Centre' },
-  { name: 'VISHAL BHALLA', pfId: '859858', department: 'Circle Security Deptt' },
-  { name: 'DIVESH ANAND', pfId: '860905', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'SATADRU DEY', pfId: '861347', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'KALYANI RAJBONGSHI', pfId: '862419', department: 'Small and Medium Enterpri' },
-  { name: 'Richard Uj Zaman', pfId: '864647', department: 'Circle Security Deptt' },
+  { name: 'PRIYANKA MEDHI', pfId: '101280', department: 'Circle Complaint Resolution Centre', designation: 'Deputy Manager' },
+  { name: 'ROSHAN DUTTA', pfId: '102558', department: 'WEALTH HUB', designation: 'WM-Cust RelatnshipEx' },
+  { name: 'NIRAJ PATHAK', pfId: '106285', department: 'Government Business Unit', designation: 'Assistant Manager' },
+  { name: 'ARBAB KALAM', pfId: '106917', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'Ridul Saud', pfId: '108513', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'VICKEY ANAND', pfId: '1085150', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'ANUBHAW CHOUDHARY', pfId: '1085155', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'JOYDIP DEBNATH', pfId: '133096', department: 'WEALTH HUB', designation: 'VICE PRESIDENT' },
+  { name: 'Alois Daimari', pfId: '318922', department: 'Disciplinary Proceeding D', designation: 'Chief Manager' },
+  { name: 'Pankaj Goswami', pfId: '319886', department: 'Adminstration(LHO,GHY)', designation: 'Asst. Gen. Manager' },
+  { name: 'Bibhas Das', pfId: '319947', department: 'Audit Department (BOD)', designation: 'Asst. Gen. Manager' },
+  { name: 'Pramod Kumar Singh', pfId: '349976', department: 'Non Performing Asset', designation: 'Asst. Gen. Manager' },
+  { name: 'Niranjan Baruah', pfId: '360018', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Shyamal Kumar Hazarika', pfId: '360042', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Dulal Roy', pfId: '360072', department: 'Disciplinary Proceeding D', designation: 'Asst. Gen. Manager' },
+  { name: 'Gurupada Halder', pfId: '360116', department: 'Outreach', designation: 'Asst. Gen. Manager' },
+  { name: 'Monoj Kumar Paul', pfId: '360333', department: 'RISK', designation: 'Chief Manager' },
+  { name: 'Monoj Sen', pfId: '360517', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Asst. Gen. Manager' },
+  { name: 'Dhanendra Nath Brahma', pfId: '360520', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'Ujjwal Sarmah', pfId: '360572', department: 'Public Relations & Comm.S', designation: 'Asst. Gen. Manager' },
+  { name: 'Biswajit Bhattacharjee', pfId: '360664', department: 'Liaison', designation: 'Chief Manager(S)' },
+  { name: 'Susanta Chakraborty', pfId: '360665', department: 'IT Support Services', designation: 'Asst. Gen. Manager' },
+  { name: 'Suren Regon', pfId: '360681', department: 'Credit & Performance Monitoring', designation: 'Manager' },
+  { name: 'Singh Nimai Mayanglambam', pfId: '360688', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Nijananda Badir', pfId: '360693', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Asst. Gen. Manager' },
+  { name: 'Subhrangshu Dey', pfId: '360725', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Monjoy Bohora', pfId: '360754', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Asst. Gen. Manager' },
+  { name: 'Ashok Kumar Ghosh', pfId: '361119', department: 'Government Business Unit', designation: 'Chief Manager' },
+  { name: 'Gunendra Kumar Barman', pfId: '361178', department: 'Outreach', designation: 'Chief Manager' },
+  { name: 'Madan Gopal Goswami', pfId: '361262', department: 'Premises & Estate', designation: 'Chief Manager' },
+  { name: 'Debananda Pao', pfId: '361276', department: 'AGM INVESTIGATION LHO GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Prodeep Saikia', pfId: '361313', department: 'Cust Experience Enhancement Deptt', designation: 'Asst. Gen. Manager' },
+  { name: 'Satyajit Chowdhury', pfId: '361328', department: 'FINANCE AND OPERATIONS', designation: 'Chief Manager' },
+  { name: 'Pinak Dutta', pfId: '361344', department: 'Lead Bank & RSETI', designation: 'Chief Manager' },
+  { name: 'Rupak Bhowal', pfId: '361362', department: 'Human Resources', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Ranendra Narzary', pfId: '361366', department: 'PPG Department Guwahati', designation: 'Asst. Gen. Manager' },
+  { name: 'Girindra Sarma', pfId: '361413', department: 'MIS&BPM', designation: 'Asst. Gen. Manager' },
+  { name: 'Sandip Bhattacharjee', pfId: '361454', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Santanu Bhattacharjee', pfId: '361489', department: 'RISK', designation: 'Manager' },
+  { name: 'Prabin Hazuwary', pfId: '361494', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Chief Manager' },
+  { name: 'Kumud Chandra Boro', pfId: '361540', department: 'Audit Department (BOD)', designation: 'Chief Manager' },
+  { name: 'Dipak Chandra Sarmah', pfId: '361566', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Amal Chandra Sarkar', pfId: '361570', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Asst. Gen. Manager' },
+  { name: 'Sujit Das', pfId: '361571', department: 'RE & Retail Loans (DGM)', designation: 'Chief Manager' },
+  { name: 'Jogat Jibon Paul', pfId: '361642', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Chief Manager' },
+  { name: 'Bijou Uddin Ahmed', pfId: '361649', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Asst. Gen. Manager' },
+  { name: 'Dhiraj Choudhury', pfId: '361714', department: 'Disciplinary Proceeding D', designation: 'Chief Manager' },
+  { name: 'Abhijit Bhattacharjee', pfId: '361739', department: 'Liaison', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Shyam Kumar Upadhaya', pfId: '361775', department: 'Disciplinary Proceeding D', designation: 'Manager' },
+  { name: 'Prabhat Rajkhowa', pfId: '361800', department: 'Banking Ombudsman', designation: 'Manager' },
+  { name: 'Alok Choudhury', pfId: '361840', department: 'DIGITAL & eCOMMERCE', designation: 'Chief Manager' },
+  { name: 'Prasanta Paul', pfId: '361855', department: 'Vigilance Dpt(Guwahati)', designation: 'Manager' },
+  { name: 'Rajesh Biswas', pfId: '361874', department: 'Credit & Performance Monitoring', designation: 'Asst. Gen. Manager' },
+  { name: 'Ashok Chakraborty', pfId: '361921', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Alak Ranjan Paul', pfId: '361943', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Mrinal Kumar Hazarika', pfId: '361953', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Dibyendu Dhar', pfId: '361981', department: 'DIGITAL & eCOMMERCE', designation: 'Asst. Gen. Manager' },
+  { name: 'Pradip Mazumder', pfId: '361988', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Rajib Bhagawati', pfId: '362010', department: 'CGM  Secretariat', designation: 'Asst. Gen. Manager' },
+  { name: 'Subodh Kumar Das', pfId: '362019', department: 'Cust Experience Enhancement Deptt', designation: 'Chief Manager' },
+  { name: 'Jatin Kumar Boruah', pfId: '362049', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Chandra Kanta Rabha', pfId: '362081', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Assistant Manager' },
+  { name: 'Piali Ghosh', pfId: '362084', department: 'Retail Loan LHO Ghy', designation: 'Chief Manager' },
+  { name: 'Shamim Ahmed', pfId: '362148', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Joy Ram Pait', pfId: '362175', department: 'Lead Bank & RSETI', designation: 'Asst. Gen. Manager' },
+  { name: 'H. Haukhanpau', pfId: '362200', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Bijoy Kumar Saha', pfId: '362278', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Narendra Nath Saha', pfId: '362326', department: 'Non Performing Asset', designation: 'Chief Manager' },
+  { name: 'Abhijit Das', pfId: '362439', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'Uttam Das', pfId: '362471', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Chief Manager' },
+  { name: 'Diganta Kumar Rabha', pfId: '362499', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'Pijush Bora', pfId: '362592', department: 'Audit Department (BOD)', designation: 'Manager' },
+  { name: 'Hatneikim  Gangte Imsong', pfId: '362608', department: 'Circle Complaint Resolution Centre', designation: 'Chief Manager' },
+  { name: 'Tapan Kumar Narzy', pfId: '362633', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Deputy Manager' },
+  { name: 'Benjamin Baglary', pfId: '362637', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Bhabatosh Dutta', pfId: '362665', department: 'RE & Retail Loans (DGM)', designation: 'Chief Manager' },
+  { name: 'Muhammad Salauddin Mansoori', pfId: '362670', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Anirban Dutta', pfId: '362680', department: 'I O R Department', designation: 'Manager' },
+  { name: 'Suraj Nath', pfId: '362770', department: 'I O R Department', designation: 'Manager' },
+  { name: 'Dadhi Charan Basumatary', pfId: '362879', department: 'Network Credit Management', designation: 'Deputy Manager' },
+  { name: 'Sohan Sarki', pfId: '362897', department: 'Adminstration(LHO,GHY)', designation: 'Deputy Manager' },
+  { name: 'Chanchal Chandra Paul', pfId: '362962', department: 'RE & Retail Loans (DGM)', designation: 'Manager' },
+  { name: 'Abhijit Das', pfId: '362986', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Nandu Ram Sharma', pfId: '363052', department: 'Human Resources', designation: 'Asst. Gen. Manager' },
+  { name: 'Komanly Khongwar', pfId: '363073', department: 'Account Traking Centre', designation: 'Chief Manager' },
+  { name: 'Odimenla Jamir', pfId: '363140', department: 'CLIC', designation: 'Chief Manager' },
+  { name: 'Sanjib Sen', pfId: '363189', department: 'Account Traking Centre', designation: 'Manager' },
+  { name: 'Bimal Das', pfId: '363200', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Anil Gharphalia', pfId: '363224', department: 'Disciplinary Proceeding D', designation: 'Chief Manager' },
+  { name: 'Parag Roymedhi', pfId: '363251', department: 'Premises & Estate', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Sushil Brahma', pfId: '363259', department: 'IT Support Services', designation: 'Chief Manager' },
+  { name: 'Khamkhochinthang Hnunkhum Khuptong', pfId: '363319', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Asst. Gen. Manager' },
+  { name: 'S.Chinlianthang Ngaihte', pfId: '363327', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Besii Bosco Sani', pfId: '363330', department: 'Circle Complaint Resolution Centre', designation: 'Asst. Gen. Manager' },
+  { name: 'Theo Ayu Pao Paul', pfId: '363337', department: 'PPG Department Guwahati', designation: 'Chief Manager' },
+  { name: 'Joy Chandra Chakma', pfId: '363340', department: 'Lead Bank & RSETI', designation: 'Asst. Gen. Manager' },
+  { name: 'Uttam Kumar Saha', pfId: '363345', department: 'Premises & Estate', designation: 'Deputy Manager' },
+  { name: 'Plabon Borgohain', pfId: '363353', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Sumangali Choudhury', pfId: '363486', department: 'I O R Department', designation: 'Asst. Gen. Manager' },
+  { name: 'Khaikhopao Haokip', pfId: '363516', department: 'Outreach', designation: 'Asst. Gen. Manager' },
+  { name: 'Chandrajyoti Dowari', pfId: '363529', department: 'SME AGRI ASSET QUALITY NW1', designation: 'Manager' },
+  { name: 'Nilamoni Hazarika', pfId: '363533', department: 'SME AGRI ASSET QUALITY NW1', designation: 'Chief Manager' },
+  { name: 'KC Vanlal Vena', pfId: '363540', department: 'DIGITAL & eCOMMERCE', designation: 'Chief Manager' },
+  { name: 'Sarbari Debbarman', pfId: '363545', department: 'WEALTH HUB', designation: 'Manager' },
+  { name: 'Manawar Lyngdoh', pfId: '363550', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Sanjib Swargiary', pfId: '363553', department: 'Lead Bank & RSETI', designation: 'Manager' },
+  { name: 'Santanu Buragohain', pfId: '363556', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Rupam Roy', pfId: '363561', department: 'PPG Department Guwahati', designation: 'Deputy Manager' },
+  { name: 'Abinash Hembrom', pfId: '363586', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Asst. Gen. Manager' },
+  { name: 'C RAMDINSANGA', pfId: '363588', department: 'Lead Bank & RSETI', designation: 'Chief Manager' },
+  { name: 'Munindra Upadhyaya', pfId: '363612', department: 'FINANCE AND OPERATIONS', designation: 'Asst. Gen. Manager' },
+  { name: 'Pradip Malakar', pfId: '363669', department: 'Outreach', designation: 'Manager' },
+  { name: 'I Temjen Changkiri', pfId: '363672', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Dhiraj Kumar Boro', pfId: '363682', department: 'Circle Complaint Resolution Centre', designation: 'Manager' },
+  { name: 'Pitambor Taye', pfId: '363691', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Suraj Pradhan', pfId: '363742', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Deputy Manager' },
+  { name: 'Moloy Kanti Paul', pfId: '363755', department: 'FINANCE AND OPERATIONS', designation: 'Chief Manager' },
+  { name: 'Manash Bhuyan', pfId: '363764', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Nirmalendu Dhar', pfId: '363791', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'David N Lhouvum', pfId: '363898', department: 'AGM AGRI', designation: 'Asst. Gen. Manager' },
+  { name: 'Dharitri Deka', pfId: '364060', department: 'Adminstration(LHO,GHY)', designation: 'Chief Manager (BMO IV)' },
+  { name: 'Prajnan Chaitanya Deka', pfId: '364103', department: 'Law', designation: 'Chief Manager(S)' },
+  { name: 'Lienkholal Gangte', pfId: '364139', department: 'Outreach', designation: 'Asst. Gen. Manager' },
+  { name: 'Ankur Pradhan', pfId: '364218', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Manager' },
+  { name: 'Bijoy Sarma', pfId: '364257', department: 'Merchant Acquiring Business', designation: 'Manager' },
+  { name: 'Partha Pratim Saikia', pfId: '364271', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Kamal Debnath', pfId: '364305', department: 'Adminstration(LHO,GHY)', designation: 'Manager' },
+  { name: 'Daisy Baro', pfId: '364372', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'Sujata Bhattacharjee', pfId: '364386', department: 'Lead Bank & RSETI', designation: 'Deputy Manager' },
+  { name: 'Chandamita Gogoi', pfId: '364387', department: 'Small and Medium Enterpri', designation: 'Manager' },
+  { name: 'Golap Hossain', pfId: '364392', department: 'I O R Department', designation: 'Deputy Manager' },
+  { name: 'Abu Toufique Miftasul Hussain', pfId: '364417', department: 'CGM  Secretariat', designation: 'Chief Manager' },
+  { name: 'Dibyajyoti Saikia', pfId: '364436', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Puspita Nath', pfId: '364448', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Chief Manager' },
+  { name: 'Sudipto Bhattacharjee', pfId: '364453', department: 'BOPM NW-I', designation: 'Chief Manager' },
+  { name: 'Leenabati Mutum', pfId: '364496', department: 'PPG Department Guwahati', designation: 'Deputy Manager' },
+  { name: 'Monica Dkhar', pfId: '364526', department: 'AGM AGRI', designation: 'Manager' },
+  { name: 'Jyoti Krishna Nath', pfId: '364549', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Swaraj Hatibaruah', pfId: '364564', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Papori Das Chakraborty', pfId: '364618', department: 'PROJECT LOTUS', designation: 'Manager' },
+  { name: 'Priyanka Phukan', pfId: '364664', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Susanta Das', pfId: '364666', department: 'Retail Loan LHO Ghy', designation: 'Asst. Gen. Manager' },
+  { name: 'Ramesh Chand Meena', pfId: '371062', department: 'OPR LHO GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Sujit Kumar Singh', pfId: '373372', department: 'Banking Ombudsman', designation: 'Asst. Gen. Manager' },
+  { name: 'Sanjeeb Kumar Dev', pfId: '379707', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Asst. Gen. Manager' },
+  { name: 'Dilip Kumar Pathak', pfId: '392438', department: 'Retail Loan LHO Ghy', designation: 'Chief Manager' },
+  { name: 'Rakesh Kumar', pfId: '392471', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Diwakar Kumar', pfId: '393550', department: 'FRAUD MONITORING CELL', designation: 'Chief Manager' },
+  { name: 'Md Naiyar Imam', pfId: '394925', department: 'Vigilance Dpt(Guwahati)', designation: 'Asst. Gen. Manager' },
+  { name: 'Kishore Kumar Choudhary', pfId: '420027', department: 'Non Performing Asset', designation: 'Chief Manager' },
+  { name: 'Pramod Kumar', pfId: '427111', department: 'RBO-LHO-NW 2-RSC CVE  WEALTH', designation: 'Asst. Gen. Manager' },
+  { name: 'Kamal Kishor Naik', pfId: '427314', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Asst. Gen. Manager' },
+  { name: 'Anthony Leyangi', pfId: '430763', department: 'Small and Medium Enterpri', designation: 'Chief Manager' },
+  { name: 'Urmilesh Kumar Pathak', pfId: '432798', department: 'AGM AGRI', designation: 'Chief Manager' },
+  { name: 'Rakesh Banerjee', pfId: '433855', department: 'RBO-LHO-NW 1-RSC CVE  WEALTH', designation: 'Asst. Gen. Manager' },
+  { name: 'Lalremtluangi C', pfId: '434067', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Vijay Kumar Sharma', pfId: '435984', department: 'Circle Security Deptt', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Anurag Arpan', pfId: '441550', department: 'Small and Medium Enterpri', designation: 'Asst. Gen. Manager' },
+  { name: 'Bhupen Borah', pfId: '447945', department: 'AGM AGRI', designation: 'Deputy Manager(S)' },
+  { name: 'Chongtham Chanchan', pfId: '447969', department: 'AGM AGRI2', designation: 'Chief Manager(S)' },
+  { name: 'Roopam Das', pfId: '449494', department: 'Agri Bussiness Unit', designation: 'Chief Manager(S)' },
+  { name: 'Bhaba Jyoti Dutta', pfId: '449519', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Manager(S)' },
+  { name: 'Md Jehirul Islam', pfId: '449528', department: 'WEALTH HUB', designation: 'Assistant Manager(S)' },
+  { name: 'Lopamudra Biswas Kangsa Banik', pfId: '449529', department: 'WEALTH HUB', designation: 'Deputy Manager(S)' },
+  { name: 'Lakhima Phukan', pfId: '449531', department: 'WEALTH HUB', designation: 'Manager(S)' },
+  { name: 'Adaha Nepuni', pfId: '449613', department: 'AGM AGRI', designation: 'Manager(S)' },
+  { name: 'Kshetrimayum Shanta Devi', pfId: '449615', department: 'WEALTH HUB', designation: 'Manager(S)' },
+  { name: 'Raj  Kumar Jaiswal', pfId: '449634', department: 'AGM AGRI2', designation: 'Manager(S)' },
+  { name: 'Satyendra Kumar', pfId: '452295', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Asst. Gen. Manager' },
+  { name: 'Hrishikesh Jha', pfId: '456719', department: 'Audit Department (BOD)', designation: 'Chief Manager' },
+  { name: 'Amit Saklani', pfId: '457805', department: 'REH AGM LHO GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Rajesh Chaturvedy', pfId: '458536', department: 'Rajbhasha', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Pankaj Kumar', pfId: '459000', department: 'AC – Sys. & Proc', designation: 'Asst. Gen. Manager' },
+  { name: 'Nabajyoti Borah', pfId: '459240', department: 'Government Business Unit', designation: 'Asst. Gen. Manager' },
+  { name: 'Vivek Kumar Singh', pfId: '459517', department: 'Rajbhasha', designation: 'Chief Manager(S)' },
+  { name: 'Rakesh Kumar', pfId: '501108', department: 'SME AGRI ASSET QUALITY NW2', designation: 'Chief Manager' },
+  { name: 'Nishant Kumar', pfId: '501298', department: 'Procurment', designation: 'Manager' },
+  { name: 'Manish Sinha', pfId: '501421', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Chief Manager' },
+  { name: 'Hemchandra Rajkumar Jha', pfId: '523888', department: 'BPR( IT)', designation: 'Chief Manager' },
+  { name: 'Parimal Langthasa', pfId: '524383', department: 'Funds Settlement Link Office', designation: 'Asst. Gen. Manager' },
+  { name: 'BHASKAR KUMAR DEY SARKAR', pfId: '528968', department: 'Funds Settlement Link Office', designation: 'Chief Manager(S)' },
+  { name: 'J CHUMBENTHUNG HUMTSOE', pfId: '531599', department: 'Data Processing Centre', designation: 'Chief Manager(S)' },
+  { name: 'SUDHIR KUMAR JHA', pfId: '538913', department: 'RE & Retail Loans (DGM)', designation: 'Asst. Gen. Manager' },
+  { name: 'Johnson Tawmbing', pfId: '544260', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Manoj Kumar Choudhary', pfId: '552308', department: 'I O R Department', designation: 'Deputy Manager' },
+  { name: 'Sanjeeb Kumar Kalita', pfId: '552310', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Amrita Das', pfId: '552316', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Paran Jyoti Deka', pfId: '552355', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Purabi Sarma', pfId: '552364', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Assistant Manager' },
+  { name: 'Priti Prasun Sen', pfId: '552389', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Mehdi Hassan', pfId: '552414', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Pallabi Borah', pfId: '552422', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Shameek Purkayastha', pfId: '552431', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Vivekananda Das', pfId: '552460', department: 'CLIC', designation: 'Deputy Manager' },
+  { name: 'Samir Kumar Dey', pfId: '552543', department: 'Small and Medium Enterpri', designation: 'Deputy Manager' },
+  { name: 'Devraj Phookan', pfId: '552592', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Ankur Pratim Saikia', pfId: '552599', department: 'WEALTH HUB', designation: 'Manager' },
+  { name: 'Rajeev Kumar Das', pfId: '552831', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Deputy Manager' },
+  { name: 'Bishnu Kinkar', pfId: '552866', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Deputy Manager' },
+  { name: 'Pranjal Saikia', pfId: '552872', department: 'CLIC', designation: 'Deputy Manager' },
+  { name: 'Krishna Mallick', pfId: '552882', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Deputy Manager' },
+  { name: 'Moumita Gandha Banik', pfId: '552905', department: 'RISK', designation: 'Deputy Manager' },
+  { name: 'Mridul Goiary', pfId: '552920', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Gautam Swargiary', pfId: '552923', department: 'Adminstration(LHO,GHY)', designation: 'Deputy Manager' },
+  { name: 'Jinti Moni Khakhlary', pfId: '552932', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'Pandava Chakma', pfId: '552988', department: 'Cust Experience Enhancement Deptt', designation: 'Deputy Manager' },
+  { name: 'Sandeepan Roy', pfId: '553055', department: 'Retail Loan LHO Ghy', designation: 'Deputy Manager' },
+  { name: 'Vijaya Laxmi Phukan', pfId: '553066', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Koushiki Gupta', pfId: '553249', department: 'BPR( IT)', designation: 'Deputy Manager' },
+  { name: 'Rahul Ranjan', pfId: '554433', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Satyaranjan Das', pfId: '554655', department: 'AC – Sys. & Proc', designation: 'Chief Manager' },
+  { name: 'John Borgoyari', pfId: '555936', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Bhaskar Pegu', pfId: '555949', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Spondon Chelleng', pfId: '555976', department: 'Non Performing Asset', designation: 'Manager' },
+  { name: 'Diganta Bordoloi', pfId: '569861', department: 'Data Processing Centre', designation: 'Deputy Manager(S)' },
+  { name: 'Rahul Deb Thakur', pfId: '577273', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Biswadeep Dey', pfId: '583854', department: 'IT Support Services', designation: 'Manager' },
+  { name: 'Thangkholen Khongsai', pfId: '583861', department: 'Retail Loan LHO Ghy', designation: 'Chief Manager' },
+  { name: 'Debraj Barua', pfId: '583884', department: 'LEARNING and DEVELOPMENT GUWAHATI', designation: 'Deputy Manager' },
+  { name: 'Raj Kumar Bhagat', pfId: '583941', department: 'Government Business Unit', designation: 'Deputy Manager' },
+  { name: 'Tapash Paul', pfId: '583969', department: 'PPG Department Guwahati', designation: 'Deputy Manager' },
+  { name: 'Mrinmoy Rajbongshi', pfId: '583975', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Deba Kanta Phukan', pfId: '583989', department: 'WEALTH HUB', designation: 'Manager' },
+  { name: 'Kishor Kumar Das', pfId: '583997', department: 'Adminstration(LHO,GHY)', designation: 'Deputy Manager' },
+  { name: 'Surajit Das', pfId: '584025', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Baikuntha Phukan', pfId: '584033', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Chief Manager' },
+  { name: 'Rupjyoti Sarma', pfId: '584038', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Pawan Kumar Verma', pfId: '584047', department: 'Public Relations & Comm.S', designation: 'Manager' },
+  { name: 'Pranab Barman', pfId: '584056', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'Yendrembam Amarprem Singh', pfId: '584176', department: 'FINANCE AND OPERATIONS', designation: 'Chief Manager' },
+  { name: 'G Tawnliansiam', pfId: '584237', department: 'BPR( IT)', designation: 'Deputy Manager' },
+  { name: 'Torida Sandor Marbaniang', pfId: '584243', department: 'BPR( IT)', designation: 'Chief Manager' },
+  { name: 'Bendangla Amer', pfId: '584332', department: 'BPR( IT)', designation: 'Chief Manager' },
+  { name: 'Sashilemba Longkumer', pfId: '584370', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Ruposmita Baruah', pfId: '584379', department: 'Account Traking Centre', designation: 'Manager' },
+  { name: 'Anup Kumar Atreya', pfId: '588095', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Asim Anand', pfId: '599947', department: 'Small and Medium Enterpri', designation: 'Chief Manager' },
+  { name: 'Niti Vidyarthi', pfId: '600417', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Prakash Kr Srivastava', pfId: '600457', department: 'Small and Medium Enterpri', designation: 'Chief Manager' },
+  { name: 'Amit Kumar Jha', pfId: '600516', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'DURLABH KHAUND', pfId: '601275', department: 'Banking Ombudsman', designation: 'Manager' },
+  { name: 'Manas Jyoti Deka', pfId: '601279', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Saptarshi Roy', pfId: '601328', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Deputy Manager' },
+  { name: 'Shahid Haque', pfId: '601329', department: 'PPG Department Guwahati', designation: 'Manager' },
+  { name: 'Ayekpam Premjit Singh', pfId: '601361', department: 'DIGITAL & eCOMMERCE', designation: 'Chief Manager' },
+  { name: 'Pratiti Hazarika', pfId: '601387', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Sambit Kumar Pattanayak', pfId: '607957', department: 'Premises & Estate', designation: 'Asst. Gen. Manager' },
+  { name: 'Irengbam Priyokumar Singh', pfId: '621382', department: 'LEARNING and DEVELOPMENT GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Tuikhang Chuongchun Koren', pfId: '623829', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'AJOY PAUL', pfId: '625566', department: 'IT Support Services', designation: 'Deputy Manager(S)' },
+  { name: 'Ranjita Bastia Panda', pfId: '638275', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Asst. Gen. Manager' },
+  { name: 'Ramtawnlien H D', pfId: '640676', department: 'FRAUD MONITORING CELL', designation: 'Asst. Gen. Manager' },
+  { name: 'KHAILUNMANG Vaiphei', pfId: '640686', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'JITENDRA KUMAR', pfId: '646392', department: 'RE & Retail Loans (DGM)', designation: 'Manager' },
+  { name: 'MD FIROZ ALAM', pfId: '650702', department: 'Premises & Estate', designation: 'Chief Manager(S)' },
+  { name: 'Jolen Prabha Tiru', pfId: '665353', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Tanmoy Barman', pfId: '671573', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Manager(S)' },
+  { name: 'Avik Ghosh', pfId: '671583', department: 'Government Business Unit', designation: 'Manager(S)' },
+  { name: 'Aroj Kumar', pfId: '671585', department: 'IT Support Services', designation: 'Manager(S)' },
+  { name: 'Samar Jyoti Deka', pfId: '672319', department: 'Premises & Estate', designation: 'Deputy Manager(S)' },
+  { name: 'Rini Elizabeth Toppo', pfId: '672777', department: 'Circle Complaint Resolution Centre', designation: 'Manager' },
+  { name: 'Bikramjyoti Das', pfId: '673200', department: 'Digital Banking and TBU', designation: 'Manager' },
+  { name: 'Joycee Vungngaihmawi Guite', pfId: '673237', department: 'Cust Experience Enhancement Deptt', designation: 'Manager' },
+  { name: 'Daricor Pariat', pfId: '674578', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Manager' },
+  { name: 'Vipin Upadhyay', pfId: '675413', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Chief Manager' },
+  { name: 'Jitender Yadav', pfId: '677831', department: 'Credit & Performance Monitoring', designation: 'Chief Manager' },
+  { name: 'Binita Kumari', pfId: '682472', department: 'Lead Bank & RSETI', designation: 'Deputy Manager' },
+  { name: 'Tage Gyuthey', pfId: '684525', department: 'Premises & Estate', designation: 'Deputy Manager(S)' },
+  { name: 'Preetimayee Tripathy', pfId: '684700', department: 'Rajbhasha', designation: 'Manager(S)' },
+  { name: 'Plaban Mazumdar', pfId: '697966', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Manager' },
+  { name: 'Nitesh Sen', pfId: '697977', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Manjit', pfId: '701488', department: 'CLIC', designation: 'Deputy Manager' },
+  { name: 'Imdad Arif Ahmed', pfId: '701708', department: 'IT Support Services', designation: 'Deputy Manager(S)' },
+  { name: 'Shaiborlang Dkhar', pfId: '701744', department: 'Data Processing Centre', designation: 'Deputy Manager(S)' },
+  { name: 'Vikash Kumar', pfId: '705311', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Manager' },
+  { name: 'SANDEEP KUMAR', pfId: '708328', department: 'Rajbhasha', designation: 'Manager(S)' },
+  { name: 'SURYANSH BAMANIA', pfId: '711521', department: 'Rajbhasha', designation: 'Manager(S)' },
+  { name: 'Biju Gopinathan Pillai', pfId: '723122', department: 'Agri Bussiness Unit', designation: 'Chief Manager' },
+  { name: 'Brajesh Kumar R', pfId: '724020', department: 'BPR( IT)', designation: 'Asst. Gen. Manager' },
+  { name: 'Salseng Sangma Marak', pfId: '725435', department: 'Human Resources', designation: 'Chief Manager(S)' },
+  { name: 'Shibojit Soren', pfId: '733479', department: 'Premises & Estate', designation: 'Deputy Manager' },
+  { name: 'Joydeep Das', pfId: '742797', department: 'FRAUD MONITORING CELL', designation: 'Manager' },
+  { name: 'Gagan Baro', pfId: '742819', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Banty Sonowal', pfId: '742840', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Assistant Manager' },
+  { name: 'Chandan Talukdar', pfId: '742909', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Deputy Manager' },
+  { name: 'Subhasish Das', pfId: '742996', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Manager' },
+  { name: 'Bhaskar Narayan Chakraborty', pfId: '743004', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Sanjib Kumar Baishya', pfId: '743026', department: 'PROJECT LOTUS', designation: 'Deputy Manager' },
+  { name: 'Prabhat Kumar Choudhary', pfId: '743049', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'HIRANYA KALITA', pfId: '743074', department: 'MIS&BPM', designation: 'Manager' },
+  { name: 'Debankur Pathak', pfId: '743080', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Imran Ali', pfId: '743086', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Dhrubajyoti Pathak', pfId: '743090', department: 'GM Network -1( Guwahati)', designation: 'Deputy Manager' },
+  { name: 'Rahul Singh', pfId: '743159', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'ABHIJIT KHATIA', pfId: '743624', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Om Prakash Gupta', pfId: '743704', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Deputy Manager' },
+  { name: 'Kabita Barai', pfId: '751542', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Usharani Rajkhowa', pfId: '758325', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Pratima Patir', pfId: '758330', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Bhaskar Jyoti Nath', pfId: '758455', department: 'Government Business Unit', designation: 'Manager' },
+  { name: 'Karuna Kanta Das', pfId: '758504', department: 'IT Support Services', designation: 'Manager' },
+  { name: 'Amar Jyoti Kalita', pfId: '758543', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Manager' },
+  { name: 'Anupam Haloi', pfId: '758544', department: 'GM Network -2( Guwahati)', designation: 'Deputy Manager' },
+  { name: 'Rameez Raja Ahmed', pfId: '758563', department: 'Premises & Estate', designation: 'Deputy Manager' },
+  { name: 'Arijit Dey', pfId: '758724', department: 'MIS&BPM', designation: 'Assistant Manager' },
+  { name: 'Radha Shakti Boro', pfId: '760102', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Minakshi Ayushman Baruah', pfId: '760108', department: 'BOPM NW-I', designation: 'Deputy Manager' },
+  { name: 'Chaitanya Kirti', pfId: '767346', department: 'Agri Bussiness Unit', designation: 'Deputy Manager' },
+  { name: 'Rana Pratap Bhoi', pfId: '769179', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Amit Kumar', pfId: '781021', department: 'Law', designation: 'Manager(S)' },
+  { name: 'Swarndeep D', pfId: '781088', department: 'Retail Loan LHO Ghy', designation: 'Deputy Manager' },
+  { name: 'Bikash Roy', pfId: '781627', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Gourab Goswami', pfId: '781756', department: 'BOPM NW-I', designation: 'Manager' },
+  { name: 'JOLY GOSWAMI', pfId: '783075', department: 'FRAUD MONITORING CELL', designation: 'Deputy Manager' },
+  { name: 'BISWAJIT DAS', pfId: '784432', department: 'Audit Department (BOD)', designation: 'Manager' },
+  { name: 'Nitish Kumar', pfId: '833307', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Deputy Manager' },
+  { name: 'Aditi Paul', pfId: '847660', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'KONDURU PRANEETH', pfId: '847922', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'PRANJAL BHARALI', pfId: '848514', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Deputy Manager' },
+  { name: 'Bandana Rabha', pfId: '849099', department: 'Non Performing Asset', designation: 'Deputy Manager' },
+  { name: 'RUPAM CHANDRA RABHA', pfId: '849190', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'VISHAL BHALLA', pfId: '859858', department: 'Circle Security Deptt', designation: 'Manager(S)' },
+  { name: 'PAPAN KUMAR DAS', pfId: '364310', department: 'Liaison Deptt', designation: 'Senior Associate' },
 ];
 
 // Admin PF IDs — Biswajit Bhattacharjee & Abhijit Bhattacharjee
@@ -708,11 +572,15 @@ function App() {
   const _fsWrite = async (colName, data) => {
     const db = window.__db; if (!db) return;
     try {
-      // Upsert all records by ID — never auto-delete.
-      // Deletion based on in-memory state caused data loss when the app loaded
-      // with partial data (slow network / new device) and a save was triggered
-      // before all Firestore records had arrived via onSnapshot.
+      // Step 1: Write/update all current records (safe — no deletes yet)
       await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
+      // Step 2: Delete only records that are no longer in the data array
+      const snap = await db.collection(colName).get({ source: 'server' });
+      const currentIds = new Set(data.map(t => String(t.id)));
+      const toDelete = snap.docs.filter(d => !currentIds.has(d.id));
+      if (toDelete.length > 0) {
+        await Promise.all(toDelete.map(d => d.ref.delete()));
+      }
     } catch(e) { console.error("_fsWrite error:", e); }
   };
   const saveTrips = async (data) => { setTrips(data); _fsWrite("trips", data); };
@@ -785,8 +653,8 @@ function App() {
       {/* ── HEADER ── */}
       <header style={css.header}>
         <div>
-          <div style={css.headerTitle}>⚡ Pool EV Management <span style={{ fontSize: 10, fontWeight: 600, background: "#3b82f6", color: "#fff", borderRadius: 4, padding: "1px 6px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.0</span></div>
-          <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}</div>
+          <div style={css.headerTitle}>⚡ Pool EV Management</div>
+          <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
         </div>
         {/* Desktop nav */}
         <nav className="desktop-nav" style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
@@ -796,7 +664,7 @@ function App() {
         </nav>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
           <div style={{ textAlign: "right" }} className="hide-mobile">
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
             <div style={{ fontSize: 10, color: "#94a3b8" }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
           </div>
           <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑 Password</button>
@@ -812,7 +680,7 @@ function App() {
         {tab === "tracking"    && (currentUser.isAdmin || currentUser.isAssistant) && <LiveTracking {...props} />}
         {tab === "fuel"        && (currentUser.isAdmin || currentUser.isAssistant) && <FuelLog {...props} />}
         {tab === "maintenance" && (currentUser.isAdmin || currentUser.isAssistant) && <Maintenance {...props} />}
-        {tab === "approvals"   && currentUser.isAdmin && <Approvals {...props} />}
+        {tab === "approvals"   && currentUser.isAdmin && <Approvals {...props} cars={cars} isCarBusy={isCarBusy} />}
         {tab === "users"       && currentUser.isAdmin && <UserManagement {...props} cars={cars} saveCars={saveCars} />}
       </div>
 
@@ -872,7 +740,7 @@ function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose
       <div style={{ ...css.modalBox, maxWidth: 420 }} onClick={e => e.stopPropagation()}>
         <div style={{ fontSize: 28, textAlign: "center", marginBottom: 6 }}>🔑</div>
         <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 4 }}>Change Password</div>
-        <div style={{ fontSize: 12, color: G.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name} · PF: {currentUser.pfId}</div>
+        <div style={{ fontSize: 12, color: G.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''} · PF: {currentUser.pfId}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
             <label style={css.label}>Current Password</label>
@@ -942,7 +810,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
     if (!checkPassword(pfId.trim(), password)) { setError("❌ Incorrect password. Please try again."); return; }
     setLoading(true);
     setTimeout(() => {
-      onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), isAssistant: !!(user.isAssistant), role: "staff" });
+      onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", designation: user.designation || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), isAssistant: !!(user.isAssistant), role: "staff" });
       setLoading(false);
     }, 600);
   };
@@ -1019,7 +887,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
             <div style={S.iconRingOuter}></div>
             <div style={S.iconRing}>⚡</div>
           </div>
-          <div style={S.appName}>Pool EV Management <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(59,130,246,0.2)", color: "#60a5fa", borderRadius: 4, padding: "2px 7px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.0</span></div>
+          <div style={S.appName}>Pool EV Management</div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.18)', backdropFilter: 'blur(8px)' }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums', textShadow: '0 0 12px rgba(147,197,253,0.5)' }}>
@@ -1079,7 +947,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
                 <div style={S.matchCard}>
                   <div style={S.matchAvatar}>{matched.name.charAt(0)}</div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#4ade80" }}>{matched.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#4ade80" }}>{matched.name}{matched.designation ? `, ${matched.designation}` : ''}</div>
                     <div style={{ fontSize: 10, color: "#16a34a" }}>✓ {matched.department || "Authorised user"}</div>
                   </div>
                   <div style={{ marginLeft: "auto", fontSize: 16 }}>✅</div>
@@ -1154,7 +1022,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           )}
         </div>
 
-        <div style={S.footer}>Pool EV Management v2.0 · {new Date().getFullYear()}</div>
+        <div style={S.footer}>Pool EV Management · {new Date().getFullYear()}</div>
         <div style={{ textAlign: "center", marginTop: 16, padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.9))", border: "1.5px solid rgba(59,130,246,0.5)", backdropFilter: "blur(12px)", boxShadow: "0 0 28px rgba(59,130,246,0.18), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
           <div style={{ fontSize: 9, color: "#64748b", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 6 }}>✦ Designed &amp; Developed by ✦</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd", letterSpacing: "0.03em", textShadow: "0 0 16px rgba(147,197,253,0.8), 0 0 32px rgba(59,130,246,0.5), 0 0 60px rgba(59,130,246,0.25)" }}>Biswajit Bhattacharjee</div>
@@ -1688,7 +1556,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
       const found = allUsers.find(u => u.pfId === trimmed);
       if (found) {
         setMatchedUser(found);
-        setForm(f => ({ ...f, officerName: found.name, department: found.department || "", officerPfId: found.pfId }));
+        setForm(f => ({ ...f, officerName: found.name, department: found.department || "", designation: found.designation || "", officerPfId: found.pfId }));
       } else {
         setMatchedUser(null);
         setForm(f => ({ ...f, officerName: "", department: "", officerPfId: "" }));
@@ -1803,7 +1671,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                   {matchedUser.name.charAt(0)}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: "#166534" }}>{matchedUser.name}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: "#166534" }}>{matchedUser.name}{matchedUser.designation ? `, ${matchedUser.designation}` : ''}</div>
                   <div style={{ fontSize: 12, color: "#16a34a" }}>🏢 {matchedUser.department || "—"}</div>
                 </div>
                 <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 600 }}>✓ Verified</div>
@@ -2032,10 +1900,12 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
 }
 
 // ── APPROVALS ─────────────────────────────────────────────────
-function Approvals({ trips, saveTrips, currentUser }) {
+function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
   const [rejectId, setRejectId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [filter, setFilter] = useState("pending");
+  const [changeVehicleId, setChangeVehicleId] = useState(null);
+  const [selectedNewCar, setSelectedNewCar] = useState("");
 
   const pending = trips.filter(t => t.approvalStatus === "pending");
   const approved = trips.filter(t => t.approvalStatus === "approved");
@@ -2062,6 +1932,20 @@ function Approvals({ trips, saveTrips, currentUser }) {
     setRejectReason("");
   };
 
+  const handleChangeVehicle = (tripId) => {
+    if (!selectedNewCar) return;
+    const car = cars.find(c => c.id === selectedNewCar);
+    if (!car) return;
+    const updated = trips.map(t => t.id !== tripId ? t : {
+      ...t, carId: car.id, carName: car.name, carPlate: car.plate,
+      driver: car.driver, driverPhone: car.driverPhone,
+      vehicleChangedBy: currentUser.name, vehicleChangedAt: new Date().toISOString()
+    });
+    saveTrips(updated);
+    setChangeVehicleId(null);
+    setSelectedNewCar("");
+  };
+
   const displayTrips = filter === "pending" ? pending : filter === "approved" ? approved : rejected;
 
   const ApprovalCard = ({ t }) => {
@@ -2080,7 +1964,10 @@ function Approvals({ trips, saveTrips, currentUser }) {
               {t.approvalStatus === "rejected" && <span style={css.badge(G.danger)}>❌ Rejected</span>}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", fontSize: 13 }}>
-              <div><span style={{ color: G.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span><span style={{ color: G.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</span>
+                {t.vehicleChangedBy && <span style={{ fontSize: 10, color: G.info, fontStyle: "italic" }}>Changed by {t.vehicleChangedBy}</span>}
+              </div>
               <div><span style={{ color: G.muted }}>Driver:</span> {t.driver}</div>
               <div><span style={{ color: G.muted }}>Department:</span> {t.department}</div>
               <div><span style={{ color: G.muted }}>Date:</span> {fmtDate(t.date)} at {t.departureTime}</div>
@@ -2119,8 +2006,48 @@ function Approvals({ trips, saveTrips, currentUser }) {
                 ✅ You have approved this request
               </div>
             )}
+            {/* Change Vehicle button — always visible for admin on pending trips */}
+            {t.approvalStatus === "pending" && (
+              <button
+                style={{ ...css.btn(G.info, true), fontSize: 12, marginTop: 4 }}
+                onClick={() => { setChangeVehicleId(changeVehicleId === t.id ? null : t.id); setSelectedNewCar(""); }}
+              >🔄 Change Vehicle</button>
+            )}
           </div>
         </div>
+
+        {/* Change Vehicle panel */}
+        {changeVehicleId === t.id && (
+          <div style={{ marginTop: 14, padding: 14, background: "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: G.info, marginBottom: 10 }}>🔄 Change Assigned Vehicle</div>
+            <div style={{ fontSize: 12, color: G.muted, marginBottom: 10 }}>
+              Currently: <b>{t.carName}</b> ({t.carPlate}) · Driver: {t.driver}
+            </div>
+            <select
+              style={{ ...css.input, marginBottom: 10 }}
+              value={selectedNewCar}
+              onChange={e => setSelectedNewCar(e.target.value)}
+            >
+              <option value="">— Select a vehicle —</option>
+              {cars.map(c => {
+                const busy = isCarBusy(c.id) && c.id !== t.carId;
+                return (
+                  <option key={c.id} value={c.id} disabled={busy}>
+                    {c.name} — {c.plate} | Driver: {c.driver} {busy ? "(On Duty)" : c.id === t.carId ? "(Current)" : "(Available)"}
+                  </option>
+                );
+              })}
+            </select>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                style={{ ...css.btn(G.info), fontSize: 12 }}
+                disabled={!selectedNewCar || selectedNewCar === t.carId}
+                onClick={() => handleChangeVehicle(t.id)}
+              >✅ Confirm Change</button>
+              <button style={{ ...css.btn(G.muted, true), fontSize: 12 }} onClick={() => { setChangeVehicleId(null); setSelectedNewCar(""); }}>Cancel</button>
+            </div>
+          </div>
+        )}
 
         {/* Reject modal inline */}
         {rejectId === t.id && (
@@ -2813,12 +2740,6 @@ function DriverEditCard({ car, onSave }) {
 function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword }) {
   const users = allUsers;
   const saveUsers = saveAllUsers;
-
-  // Always hold the latest users in a ref so forceSaveToServer never reads
-  // a stale closure value (e.g. when clicked quickly after an edit, before
-  // React has re-rendered with the updated allUsers prop).
-  const latestUsersRef = React.useRef(allUsers);
-  latestUsersRef.current = allUsers;
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ name: "", pfId: "", department: "" });
   const [msg, setMsg] = useState("");
@@ -2829,17 +2750,14 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 4000); };
 
-  // Force-write current live user list to Firebase — saves all additions, edits, role changes.
-  // Uses latestUsersRef (not the closure variable) so it always writes the most
-  // up-to-date list even if called before React has completed a re-render.
+  // Force-write current live user list to Firebase — saves all additions, edits, role changes
   const forceSaveToServer = async () => {
-    const currentList = latestUsersRef.current;
     showMsg("⏳ Saving current user list to server...");
     try {
       const db = window.__db;
       if (db) {
-        await db.collection("config").doc("users").set({ list: currentList, _seeded: true });
-        showMsg("✅ Done! Current user list (" + currentList.length + " users) saved permanently on all devices.");
+        await db.collection("config").doc("users").set({ list: users, _seeded: true });
+        showMsg("✅ Done! Current user list (" + users.length + " users) saved permanently on all devices.");
       }
     } catch(e) {
       showMsg("❌ Save failed: " + e.message);
@@ -2861,12 +2779,11 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
     showMsg("✅ User removed.");
   };
 
-  const handleEdit = async () => {
+  const handleEdit = () => {
     if (!editUser.name.trim() || !editUser.department.trim()) { showMsg("❌ Name and department are required."); return; }
-    const updated = users.map(u => u.pfId === editUser.pfId ? { ...u, name: editUser.name.trim().toUpperCase(), department: editUser.department.trim() } : u);
+    saveUsers(users.map(u => u.pfId === editUser.pfId ? { ...u, name: editUser.name.trim().toUpperCase(), department: editUser.department.trim() } : u));
     setEditUser(null);
-    await saveUsers(updated);
-    showMsg("✅ User updated and saved.");
+    showMsg("✅ User updated.");
   };
 
   const filtered = users.filter(u =>
@@ -2974,7 +2891,10 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
                   <td style={css.td}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ width: 28, height: 28, borderRadius: "50%", background: isAdmin ? G.info : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 11, flexShrink: 0 }}>{u.name.charAt(0)}</div>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>{u.name}</div>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 13 }}>{u.name}</div>
+                        {u.designation && <div style={{ fontSize: 10, color: G.muted }}>{u.designation}</div>}
+                      </div>
                     </div>
                   </td>
                   <td style={{ ...css.td, fontFamily: "monospace" }}>{u.pfId}</td>
