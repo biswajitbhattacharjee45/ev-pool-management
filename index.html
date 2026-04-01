@@ -2764,6 +2764,27 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
     }
   };
 
+  // Sync fresh AUTHORISED_USERS from code to Firebase, preserving isAssistant flags
+  const [syncConfirm, setSyncConfirm] = useState(false);
+  const syncNewUserList = async () => {
+    showMsg("⏳ Syncing new user list to Firebase...");
+    try {
+      const db = window.__db;
+      if (!db) { showMsg("❌ No database connection."); return; }
+      // Preserve isAssistant flags from current list
+      const newList = AUTHORISED_USERS.map(u => {
+        const existing = users.find(e => e.pfId === u.pfId);
+        return { ...u, isAssistant: !!(existing?.isAssistant) };
+      });
+      await db.collection("config").doc("users").set({ list: newList, _seeded: true });
+      saveAllUsers(newList);
+      showMsg("✅ Done! New list of " + newList.length + " users synced to Firebase. Old list replaced.");
+      setSyncConfirm(false);
+    } catch(e) {
+      showMsg("❌ Sync failed: " + e.message);
+    }
+  };
+
   const handleAdd = () => {
     if (!form.name.trim() || !form.pfId.trim() || !form.department.trim()) { showMsg("❌ All fields are required."); return; }
     if (users.find(u => u.pfId === form.pfId.trim())) { showMsg("❌ PF ID already exists."); return; }
@@ -2804,6 +2825,24 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
         <button onClick={forceSaveToServer} style={{ background: "#10b981", border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
           💾 Force Save to Server
         </button>
+      </div>
+
+      {/* Sync new user list from code */}
+      <div style={{ background: "#1e3a5f", borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, border: "1.5px solid rgba(59,130,246,0.4)" }}>
+        <div>
+          <div style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>🔄 Sync New User Database from Code</div>
+          <div style={{ color: "#93c5fd", fontSize: 12, marginTop: 2 }}>Replaces Firebase with the latest {AUTHORISED_USERS.length}-user list. Assistant roles are preserved.</div>
+        </div>
+        {!syncConfirm
+          ? <button onClick={() => setSyncConfirm(true)} style={{ background: "#3b82f6", border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+              🔄 Sync Now
+            </button>
+          : <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <span style={{ color: "#fcd34d", fontSize: 12, fontWeight: 600 }}>⚠️ This will replace all {users.length} current users. Sure?</span>
+              <button onClick={syncNewUserList} style={{ background: "#ef4444", border: "none", borderRadius: 8, padding: "8px 16px", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Yes, Replace</button>
+              <button onClick={() => setSyncConfirm(false)} style={{ background: "transparent", border: "1px solid #475569", borderRadius: 8, padding: "8px 16px", color: "#94a3b8", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>Cancel</button>
+            </div>
+        }
       </div>
 
       <div style={css.grid4}>
