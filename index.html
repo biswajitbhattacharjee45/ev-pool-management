@@ -769,7 +769,8 @@ function App() {
   }, [currentUser?.pfId]);
 
   const activeTripForCar = (carId) => trips.find(t => t.carId === carId && !t.returnTime && t.approvalStatus === "approved");
-  const isCarBusy = (carId) => !!activeTripForCar(carId);
+  const pendingTripForCar = (carId) => trips.find(t => t.carId === carId && !t.returnTime && t.approvalStatus === "pending");
+  const isCarBusy = (carId) => !!(activeTripForCar(carId) || pendingTripForCar(carId));
 
   if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
 
@@ -779,7 +780,7 @@ function App() {
   if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} />;
 
 
-  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword, activeSessions };
+  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, pendingTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword, activeSessions };
 
   const pendingCount = trips.filter(t => t.approvalStatus === "pending").length;
 
@@ -1699,7 +1700,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
 }
 
 // ── BOOK TRIP ─────────────────────────────────────────────────
-function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab, currentUser, allUsers }) {
+function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pendingTripForCar, setTab, currentUser, allUsers }) {
 
   const freshUser = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
   const initName = freshUser?.name || currentUser?.name || "";
@@ -1752,7 +1753,8 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
     if (!form.carId || !form.destination || !form.date || !form.departureTime) {
       setMsg("❌ Please fill all required fields."); return;
     }
-    if (isCarBusy(form.carId)) { setMsg("❌ This vehicle is currently on duty."); return; }
+    if (activeTripForCar(form.carId)) { setMsg("❌ This vehicle is currently on duty."); return; }
+    if (pendingTripForCar(form.carId)) { setMsg("❌ This vehicle has already been booked by someone else and is awaiting approval."); return; }
     if (userHasActiveTrip && userActiveTrip) {
       setMsg("❌ You already have an active/pending trip (" + userActiveTrip.carName + " → " + userActiveTrip.destination + "). Please cancel or return that vehicle before booking another.");
       return;
@@ -1866,7 +1868,12 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               <label style={css.label}>Select Vehicle *</label>
               <select style={css.select} value={form.carId} onChange={e => set("carId", e.target.value)}>
                 <option value="">-- Choose Vehicle --</option>
-                {cars.map(c => <option key={c.id} value={c.id} disabled={isCarBusy(c.id)}>{c.name} — {c.plate} | Driver: {c.driver} {isCarBusy(c.id) ? "(On Duty)" : "(Available)"}</option>)}
+                {cars.map(c => {
+                  const onDuty = !!activeTripForCar(c.id);
+                  const booked = !onDuty && !!pendingTripForCar(c.id);
+                  const label = onDuty ? "(On Duty)" : booked ? "(Booked — Pending Approval)" : "(Available)";
+                  return <option key={c.id} value={c.id} disabled={onDuty || booked}>{c.name} — {c.plate} | Driver: {c.driver} {label}</option>;
+                })}
               </select>
             </div>
 
@@ -2084,7 +2091,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
 }
 
 // ── APPROVALS ─────────────────────────────────────────────────
-function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
+function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, activeTripForCar, pendingTripForCar }) {
   const [filter, setFilter] = useState("pending");
 
   const pending = trips.filter(t => t.approvalStatus === "pending");
@@ -2189,8 +2196,11 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
                 <label style={{ ...css.label, color: G.text }}>Assign Vehicle</label>
                 <select style={css.select} value={cardCarId} onChange={e => setCardCarId(e.target.value)}>
                   {(cars || []).map(c => {
-                    const busy = isCarBusy && isCarBusy(c.id) && c.id !== t.carId;
-                    return <option key={c.id} value={c.id} disabled={busy}>{c.name} — {c.plate}{busy ? " (On Duty)" : c.id === t.carId ? " (Requested)" : " ✓ Available"}</option>;
+                    const onDuty = !!(activeTripForCar && activeTripForCar(c.id));
+                    const hasPending = !onDuty && !!(pendingTripForCar && pendingTripForCar(c.id)) && c.id !== t.carId;
+                    const disabled = onDuty;
+                    const label = onDuty ? " (On Duty)" : hasPending ? " (Pending Booking)" : c.id === t.carId ? " (Requested)" : " ✓ Available";
+                    return <option key={c.id} value={c.id} disabled={disabled}>{c.name} — {c.plate}{label}</option>;
                   })}
                 </select>
               </div>
