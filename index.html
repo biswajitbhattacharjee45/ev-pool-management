@@ -683,12 +683,12 @@ function App() {
 
     const unsubs = [];
     try {
-      // { includeMetadataChanges: false } — only fire on server-confirmed changes, not cache
-      const snapOpts = { includeMetadataChanges: false };
-      unsubs.push(db.collection("trips").onSnapshot(snapOpts, snap => {
-        if (snap.metadata.fromCache) return; // ignore stale cache snapshots
+      // trips: accept both cache and server snapshots so pending bookings
+      // from other users are reflected immediately without waiting for server round-trip
+      unsubs.push(db.collection("trips").onSnapshot(snap => {
         setTrips(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
+      const snapOpts = { includeMetadataChanges: false };
       unsubs.push(db.collection("maintenance").onSnapshot(snapOpts, snap => {
         if (snap.metadata.fromCache) return;
         setMaintenance(snap.docs.map(d => ({ id: d.id, ...d.data() })));
