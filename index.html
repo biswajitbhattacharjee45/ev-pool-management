@@ -712,15 +712,13 @@ function App() {
 
   const _fsWrite = async (colName, data) => {
     const db = window.__db; if (!db) return;
-    try {
-      // Upsert all records by ID — never auto-delete.
-      // Deletion based on in-memory state caused data loss when the app loaded
-      // with partial data (slow network / new device) and a save was triggered
-      // before all Firestore records had arrived via onSnapshot.
-      await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
-    } catch(e) { console.error("_fsWrite error:", e); }
+    // Upsert all records by ID — never auto-delete.
+    // Deletion based on in-memory state caused data loss when the app loaded
+    // with partial data (slow network / new device) and a save was triggered
+    // before all Firestore records had arrived via onSnapshot.
+    await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
   };
-  const saveTrips = async (data) => { setTrips(data); _fsWrite("trips", data); };
+  const saveTrips = async (data) => { setTrips(data); await _fsWrite("trips", data); };
   const saveMaint = async (data) => { setMaintenance(data); _fsWrite("maintenance", data); };
   const saveFuel  = async (data) => { setFuelLogs(data); _fsWrite("fuel", data); };
   const saveLive  = async (data) => {
@@ -1711,7 +1709,8 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
   const [pfInput, setPfInput] = useState(initPfId);
   const [matchedUser, setMatchedUser] = useState(initPfId ? { name: initName, pfId: initPfId, department: initDept } : null);
   const [form, setForm] = useState({ carId: "", officerName: initName, department: initDept, officerPfId: initPfId, destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
-  const [returnForm, setReturnForm] = useState({ tripId: "", returnTime: now(), endKm: "", remarks: "" });
+  const [returnForm, setReturnForm] = useState({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
+  const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState("");
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -1747,7 +1746,8 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
     ? trips.find(t => !t.returnTime && (t.approvalStatus === "approved" || t.approvalStatus === "pending") && (t.bookedByPfId === userActiveTripPfId || t.officerPfId === userActiveTripPfId))
     : null;
 
-  const handleBook = () => {
+  const handleBook = async () => {
+    if (submitting) return;
     if (!matchedUser) { setMsg("❌ Please enter a valid PF ID first."); return; }
     if (!form.carId || !form.destination || !form.date || !form.departureTime) {
       setMsg("❌ Please fill all required fields."); return;
@@ -1757,6 +1757,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
       setMsg("❌ You already have an active/pending trip (" + userActiveTrip.carName + " → " + userActiveTrip.destination + "). Please cancel or return that vehicle before booking another.");
       return;
     }
+    setSubmitting(true);
     const car = cars.find(c => c.id === form.carId);
     const newTrip = {
       id: Date.now().toString(), ...form,
@@ -1768,26 +1769,40 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
       returnTime: "", endKm: "", remarks: "",
       bookedAt: new Date().toISOString(),
     };
-    saveTrips([...trips, newTrip]);
-    // Reset form — re-lookup current user's fresh data from merged list
-    const fresh = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
-    setPfInput(currentUser?.pfId || "");
-    setMatchedUser(fresh || null);
-    setForm({ carId: "", officerName: fresh?.name || currentUser?.name || "", department: fresh?.department || "", officerPfId: currentUser?.pfId || "", destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
-    setMsg("✅ Trip request submitted! Awaiting approval from admins.");
-    setTimeout(() => setMsg(""), 4000);
+    try {
+      await saveTrips([...trips, newTrip]);
+      // Reset form — re-lookup current user's fresh data from merged list
+      const fresh = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
+      setPfInput(currentUser?.pfId || "");
+      setMatchedUser(fresh || null);
+      setForm({ carId: "", officerName: fresh?.name || currentUser?.name || "", department: fresh?.department || "", officerPfId: currentUser?.pfId || "", destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
+      setMsg("✅ Trip request submitted! Awaiting approval from admins.");
+      setTimeout(() => setMsg(""), 4000);
+    } catch(e) {
+      setMsg("❌ Failed to save — check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleReturn = () => {
+  const handleReturn = async () => {
+    if (submitting) return;
     const tripId = returnForm.tripId || (trips.filter(t => !t.returnTime && t.approvalStatus === "approved" && (t.bookedByPfId === currentUser?.pfId || t.officerPfId === currentUser?.pfId))[0]?.id);
     if (!tripId || !returnForm.returnTime) { setMsg("❌ Please select trip and enter return time."); return; }
     const returnDate = returnForm.returnDate || today();
     const returnDateTime = returnDate + " " + returnForm.returnTime;
     const updated = trips.map(t => t.id === tripId ? { ...t, returnTime: returnDateTime, endKm: returnForm.endKm, remarks: returnForm.remarks } : t);
-    saveTrips(updated);
-    setReturnForm({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
-    setMsg("✅ Vehicle released successfully!");
-    setTimeout(() => { setMsg(""); setTab("dashboard"); }, 1500);
+    setSubmitting(true);
+    try {
+      await saveTrips(updated);
+      setReturnForm({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
+      setMsg("✅ Vehicle released successfully!");
+      setTimeout(() => { setMsg(""); setTab("dashboard"); }, 1500);
+    } catch(e) {
+      setMsg("❌ Failed to save — check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Only approved trips can be returned
@@ -1907,7 +1922,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               <label style={css.label}>Start Odometer (km)</label>
               <input type="number" style={css.input} value={form.startKm} onChange={e => set("startKm", e.target.value)} placeholder="e.g. 45230" />
             </div>
-            <button style={css.btn(G.info)} onClick={handleBook}>Submit Trip Request →</button>
+            <button style={{ ...css.btn(G.info), opacity: submitting ? 0.6 : 1 }} onClick={handleBook} disabled={submitting}>{submitting ? "Submitting…" : "Submit Trip Request →"}</button>
           </div>
         </div>
 
@@ -1987,8 +2002,8 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                     <input style={css.input} value={returnForm.remarks} onChange={e => setR("remarks", e.target.value)} placeholder="Any issues, notes..." />
                   </div>
                 </div>
-                <button style={{ ...css.btn(G.success), fontSize: 15, padding: "12px 20px" }} onClick={handleReturn}>
-                  🔓 Release Vehicle & Mark Returned
+                <button style={{ ...css.btn(G.success), fontSize: 15, padding: "12px 20px", opacity: submitting ? 0.6 : 1 }} onClick={handleReturn} disabled={submitting}>
+                  {submitting ? "Saving…" : "🔓 Release Vehicle & Mark Returned"}
                 </button>
               </div>
             );
@@ -2070,11 +2085,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
 
 // ── APPROVALS ─────────────────────────────────────────────────
 function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
-  const [rejectId, setRejectId] = useState(null);
-  const [rejectReason, setRejectReason] = useState("");
   const [filter, setFilter] = useState("pending");
-  const [vehicleChangeId, setVehicleChangeId] = useState(null); // tripId being reassigned
-  const [selectedCarId, setSelectedCarId] = useState("");
 
   const pending = trips.filter(t => t.approvalStatus === "pending");
   const approved = trips.filter(t => t.approvalStatus === "approved");
@@ -2095,26 +2106,25 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
       return { ...t, ...carFields, approvedBy: newApprovedBy, approvalStatus: fullyApproved ? "approved" : "pending" };
     });
     saveTrips(updated);
-    setVehicleChangeId(null);
-    setSelectedCarId("");
   };
 
-  const handleReject = (tripId) => {
+  const handleReject = (tripId, reason) => {
     const updated = trips.map(t => t.id !== tripId ? t : {
       ...t, approvalStatus: "rejected", rejectedBy: currentUser.pfId,
-      rejectedByName: currentUser.name, rejectionReason: rejectReason, rejectedAt: new Date().toISOString()
+      rejectedByName: currentUser.name, rejectionReason: reason, rejectedAt: new Date().toISOString()
     });
     saveTrips(updated);
-    setRejectId(null);
-    setRejectReason("");
   };
 
   const displayTrips = filter === "pending" ? pending : filter === "approved" ? approved : rejected;
 
   const ApprovalCard = ({ t }) => {
     const myApproved = t.approvedBy?.includes(currentUser.pfId);
-    const admin1Done = t.approvedBy?.includes(ADMIN_1.pfId);
-    const admin2Done = t.approvedBy?.includes(ADMIN_2.pfId);
+    // Per-card state — isolated so cards never interfere with each other
+    const [showApprovePanel, setShowApprovePanel] = useState(false);
+    const [cardCarId, setCardCarId] = useState(t.carId);
+    const [showRejectPanel, setShowRejectPanel] = useState(false);
+    const [rejectReason, setRejectReason] = useState("");
     return (
       <div style={{ ...css.card, marginBottom: 16, borderLeft: `4px solid ${t.approvalStatus === "approved" ? G.success : t.approvalStatus === "rejected" ? G.danger : G.warning}` }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
@@ -2157,8 +2167,8 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
             {/* Action buttons — only show for pending trips */}
             {t.approvalStatus === "pending" && !myApproved && (
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => { setVehicleChangeId(t.id); setSelectedCarId(t.carId); setRejectId(null); }}>✅ Approve</button>
-                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => { setRejectId(t.id); setVehicleChangeId(null); }}>❌ Reject</button>
+                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => { setShowApprovePanel(true); setCardCarId(t.carId); setShowRejectPanel(false); }}>✅ Approve</button>
+                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => { setShowRejectPanel(true); setShowApprovePanel(false); }}>❌ Reject</button>
               </div>
             )}
             {t.approvalStatus === "pending" && myApproved && (
@@ -2170,43 +2180,43 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
         </div>
 
         {/* Vehicle change + confirm approval panel */}
-        {vehicleChangeId === t.id && (
+        {showApprovePanel && (
           <div style={{ marginTop: 14, padding: 14, background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: G.success, marginBottom: 10 }}>✅ Confirm Approval</div>
             <div style={{ fontSize: 12, color: G.muted, marginBottom: 8 }}>You may assign a different available vehicle before approving.</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div>
                 <label style={{ ...css.label, color: G.text }}>Assign Vehicle</label>
-                <select style={css.select} value={selectedCarId} onChange={e => setSelectedCarId(e.target.value)}>
+                <select style={css.select} value={cardCarId} onChange={e => setCardCarId(e.target.value)}>
                   {(cars || []).map(c => {
                     const busy = isCarBusy && isCarBusy(c.id) && c.id !== t.carId;
                     return <option key={c.id} value={c.id} disabled={busy}>{c.name} — {c.plate}{busy ? " (On Duty)" : c.id === t.carId ? " (Requested)" : " ✓ Available"}</option>;
                   })}
                 </select>
               </div>
-              {selectedCarId !== t.carId && (
+              {cardCarId !== t.carId && (
                 <div style={{ fontSize: 12, padding: "6px 10px", background: "#fef9c3", borderRadius: 6, color: "#92400e" }}>
-                  ⚠️ Vehicle changed from <b>{t.carName}</b> to <b>{(cars || []).find(c => c.id === selectedCarId)?.name || selectedCarId}</b>
+                  ⚠️ Vehicle changed from <b>{t.carName}</b> to <b>{(cars || []).find(c => c.id === cardCarId)?.name || cardCarId}</b>
                 </div>
               )}
               <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => handleApprove(t.id, selectedCarId)}>
+                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => { handleApprove(t.id, cardCarId); setShowApprovePanel(false); }}>
                   ✅ Confirm &amp; Approve
                 </button>
-                <button style={{ ...css.btn(G.muted, true), fontSize: 12 }} onClick={() => { setVehicleChangeId(null); setSelectedCarId(""); }}>Cancel</button>
+                <button style={{ ...css.btn(G.muted, true), fontSize: 12 }} onClick={() => setShowApprovePanel(false)}>Cancel</button>
               </div>
             </div>
           </div>
         )}
 
         {/* Reject modal inline */}
-        {rejectId === t.id && (
+        {showRejectPanel && (
           <div style={{ marginTop: 14, padding: 14, background: "#fff1f2", borderRadius: 8, border: "1px solid #fecdd3" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: G.danger, marginBottom: 8 }}>Reason for Rejection</div>
             <input style={{ ...css.input, marginBottom: 10 }} value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Enter reason (optional)" autoFocus />
             <div style={{ display: "flex", gap: 8 }}>
-              <button style={css.btn(G.danger)} onClick={() => handleReject(t.id)}>Confirm Rejection</button>
-              <button style={css.btn(G.muted, true)} onClick={() => { setRejectId(null); setRejectReason(""); }}>Cancel</button>
+              <button style={css.btn(G.danger)} onClick={() => { handleReject(t.id, rejectReason); setShowRejectPanel(false); setRejectReason(""); }}>Confirm Rejection</button>
+              <button style={css.btn(G.muted, true)} onClick={() => { setShowRejectPanel(false); setRejectReason(""); }}>Cancel</button>
             </div>
           </div>
         )}
