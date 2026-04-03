@@ -1587,6 +1587,29 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
     if (!form.carId || !form.destination || !form.date || !form.departureTime) {
       setMsg("❌ Please fill all required fields."); return;
     }
+
+    // ── Date must be today only ──
+    if (form.date !== today()) {
+      setMsg("❌ Booking is only allowed for today's date. Please correct the date.");
+      set("date", today());
+      return;
+    }
+
+    // ── Departure time must be now or within 30 minutes from now ──
+    const [nowH, nowM] = now().split(":").map(Number);
+    const [depH, depM] = form.departureTime.split(":").map(Number);
+    const nowTotalMin = nowH * 60 + nowM;
+    const depTotalMin = depH * 60 + depM;
+    const diffMin = depTotalMin - nowTotalMin;
+    if (diffMin > 30) {
+      setMsg("🚫 Journey time cannot be more than 30 minutes from now. Please book closer to your actual departure time.");
+      return;
+    }
+    if (diffMin < -60) {
+      setMsg("❌ Departure time appears to be in the past. Please enter the correct time.");
+      return;
+    }
+
     if (isCarBusy(form.carId)) { setMsg("❌ This vehicle is already booked or pending approval. Please select another vehicle."); return; }
     if (userHasActiveTrip && userActiveTrip) {
       setMsg("❌ You already have an active/pending trip (" + userActiveTrip.carName + " → " + userActiveTrip.destination + "). Please cancel or return that vehicle before booking another.");
@@ -1735,11 +1758,11 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
             </div>
             <div style={css.formGrid}>
               <div>
-                <label style={css.label}>Date *</label>
-                <input type="date" style={css.input} value={form.date} onChange={e => set("date", e.target.value)} />
+                <label style={css.label}>Date * <span style={{ fontSize: 10, color: G.muted, fontWeight: 400 }}>(today only)</span></label>
+                <input type="date" style={{ ...css.input, opacity: 0.7, cursor: "not-allowed" }} value={today()} readOnly min={today()} max={today()} />
               </div>
               <div>
-                <label style={css.label}>Departure Time *</label>
+                <label style={css.label}>Departure Time * <span style={{ fontSize: 10, color: G.muted, fontWeight: 400 }}>(within 30 min)</span></label>
                 <input type="time" style={css.input} value={form.departureTime} onChange={e => set("departureTime", e.target.value)} />
               </div>
             </div>
