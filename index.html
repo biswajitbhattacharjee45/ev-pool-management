@@ -2440,7 +2440,16 @@ function TripLog({ cars, trips, currentUser }) {
                             <td style={css.td}>{t.startKm || "—"}</td>
                             <td style={css.td}>{t.endKm || "—"}</td>
                             <td style={{ ...css.td, fontWeight: 600 }}>{dist}</td>
-                            <td style={css.td}><span style={css.badge(t.returnTime ? G.success : G.warning)}>{t.returnTime ? "Done" : "Active"}</span></td>
+                            <td style={css.td}>
+                              {t.returnTime
+                                ? <span style={css.badge(G.success)}>✅ Done</span>
+                                : t.approvalStatus === "rejected"
+                                  ? <span style={css.badge(G.danger)}>❌ Rejected</span>
+                                  : t.approvalStatus === "pending"
+                                    ? <span style={css.badge(G.warning)}>⏳ Pending</span>
+                                    : <span style={css.badge("#0891b2")}>🚗 Active</span>
+                              }
+                            </td>
                           </tr>
                         );
                       })}
