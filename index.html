@@ -871,6 +871,9 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
     .ev-submit:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); }
     .ev-submit:active:not(:disabled) { transform: scale(0.98); }
     @keyframes goldShimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
+    @keyframes ctaBreathe { 0%,100%{box-shadow:0 0 14px rgba(59,130,246,0.5),0 4px 12px rgba(0,0,0,0.3);transform:scale(1)} 50%{box-shadow:0 0 36px rgba(59,130,246,0.95),0 0 60px rgba(59,130,246,0.45),0 4px 16px rgba(0,0,0,0.3);transform:scale(1.04)} }
+    .ev-book-cta { animation: ctaBreathe 2.2s ease-in-out infinite; }
+    .ev-book-cta:hover { animation: none !important; transform: translateY(-2px) !important; box-shadow: 0 0 44px rgba(59,130,246,1), 0 6px 20px rgba(0,0,0,0.35) !important; }
   `;
 
   return (
@@ -890,6 +893,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           </div>
           <div style={S.appName}>Pool EV Management</div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
+          <div style={{ marginTop: 8, display: 'inline-block', padding: '2px 10px', borderRadius: 20, background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.35)', fontSize: 11, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.08em' }}>ver 2.1</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.18)', backdropFilter: 'blur(8px)' }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums', textShadow: '0 0 12px rgba(147,197,253,0.5)' }}>
               {clock.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
@@ -1325,10 +1329,9 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
             <div style={{ fontSize: 12, color: "#94a3b8" }}>Book your trip in a few clicks — select vehicle, destination & time.</div>
           </div>
           <button
+            className="ev-book-cta"
             onClick={() => setTab("book")}
-            style={{ padding: "12px 28px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 0 20px rgba(59,130,246,0.5), 0 4px 12px rgba(0,0,0,0.3)", letterSpacing: "0.02em", whiteSpace: "nowrap", transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(59,130,246,0.7), 0 6px 16px rgba(0,0,0,0.3)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 0 20px rgba(59,130,246,0.5), 0 4px 12px rgba(0,0,0,0.3)"; }}
+            style={{ padding: "12px 28px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", letterSpacing: "0.02em", whiteSpace: "nowrap", transition: "box-shadow 0.2s, transform 0.2s" }}
           >⚡ Book a Vehicle Now →</button>
         </div>
         {/* ── Vehicle availability card ── */}
