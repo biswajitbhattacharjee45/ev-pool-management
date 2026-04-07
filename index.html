@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Pool EV" />
-  <title>⚡ Pool EV Management v2.0</title>
+  <title>⚡ Pool EV Management v2.2</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -535,10 +535,12 @@ const fmtTime = (t) => t || "—";
 
 // ── STYLES ────────────────────────────────────────────────────
 const G = {
-  bg: "#f0f4f8", card: "#ffffff", border: "#e2e8f0",
-  text: "#1e293b", muted: "#64748b", light: "#f8fafc",
-  success: "#16a34a", danger: "#dc2626", warning: "#d97706",
-  info: "#2563eb",
+  bg: "var(--g-bg)", card: "var(--g-card)", border: "var(--g-border)",
+  text: "var(--g-text)", muted: "var(--g-muted)", light: "var(--g-light)",
+  success: "var(--g-success)", danger: "var(--g-danger)", warning: "var(--g-warning)",
+  info: "var(--g-info)",
+  successBg: "var(--g-sbg)", dangerBg: "var(--g-dbg)", warningBg: "var(--g-wbg)",
+  infoBg: "var(--g-ibg)", mutedBg: "var(--g-mbg)",
 };
 
 const css = {
@@ -550,18 +552,21 @@ const css = {
   grid4: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
   card: { background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `1px solid ${G.border}` },
   carCard: (color, busy) => ({ background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `2px solid ${busy ? G.danger : G.success}`, position: "relative", overflow: "hidden" }),
-  badge: (color) => ({ display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: color + "20", color: color }),
+  badge: (color) => {
+    const bgMap = { [G.success]: G.successBg, [G.danger]: G.dangerBg, [G.warning]: G.warningBg, [G.info]: G.infoBg, [G.muted]: G.mutedBg };
+    return { display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: bgMap[color] || "rgba(100,116,139,0.12)", color };
+  },
   btn: (color = G.info, outline = false) => ({ padding: "9px 18px", borderRadius: 7, border: outline ? `1.5px solid ${color}` : "none", background: outline ? "transparent" : color, color: outline ? color : "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.15s" }),
   btnSm: (color = G.info) => ({ padding: "4px 12px", borderRadius: 5, border: "none", background: color, color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }),
-  input: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
-  select: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
+  input: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "var(--g-input-bg)", color: "var(--g-text)", boxSizing: "border-box" },
+  select: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "var(--g-input-bg)", color: "var(--g-text)", boxSizing: "border-box" },
   label: { fontSize: 12, fontWeight: 600, color: G.muted, marginBottom: 4, display: "block" },
   formGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 },
   table: { width: "100%", borderCollapse: "collapse" },
   th: { textAlign: "left", padding: "10px 12px", fontSize: 11, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `2px solid ${G.border}`, background: G.light, whiteSpace: "nowrap" },
   td: { padding: "10px 12px", borderBottom: `1px solid ${G.border}`, fontSize: 13, color: G.text },
   modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 },
-  modalBox: { background: "#fff", borderRadius: 12, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" },
+  modalBox: { background: "var(--g-card)", borderRadius: 12, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" },
   sectionTitle: { fontSize: 16, fontWeight: 700, color: G.text, marginBottom: 14 },
   row: { display: "flex", alignItems: "center", gap: 10 },
   statNum: { fontSize: 26, fontWeight: 800, color: G.text },
@@ -574,6 +579,11 @@ const css = {
 // ── MAIN APP ──────────────────────────────────────────────────
 function App() {
   const [tab, setTab] = useState("dashboard");
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("ev_theme") === "dark");
+  React.useEffect(() => {
+    document.body.classList.toggle("dark", darkMode);
+    localStorage.setItem("ev_theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
   const [cars, setCars] = useState(INITIAL_CARS);
   const isSavingCars = React.useRef(false);
   const saveCars = async (data) => {
@@ -803,6 +813,22 @@ function App() {
     <div style={css.app}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <style>{`
+        :root {
+          --g-bg:#f0f4f8; --g-card:#ffffff; --g-border:#e2e8f0;
+          --g-text:#1e293b; --g-muted:#64748b; --g-light:#f8fafc;
+          --g-success:#16a34a; --g-danger:#dc2626; --g-warning:#d97706; --g-info:#2563eb;
+          --g-input-bg:#ffffff;
+          --g-sbg:rgba(22,163,74,0.12); --g-dbg:rgba(220,38,38,0.12);
+          --g-wbg:rgba(217,119,6,0.12); --g-ibg:rgba(37,99,235,0.12); --g-mbg:rgba(100,116,139,0.12);
+        }
+        body.dark {
+          --g-bg:#0f172a; --g-card:#1e293b; --g-border:#334155;
+          --g-text:#f1f5f9; --g-muted:#94a3b8; --g-light:#0f172a;
+          --g-success:#22c55e; --g-danger:#f87171; --g-warning:#fbbf24; --g-info:#60a5fa;
+          --g-input-bg:#0f172a;
+          --g-sbg:rgba(34,197,94,0.15); --g-dbg:rgba(248,113,113,0.15);
+          --g-wbg:rgba(251,191,36,0.15); --g-ibg:rgba(96,165,250,0.15); --g-mbg:rgba(148,163,184,0.15);
+        }
         @media (max-width: 600px) {
           .desktop-nav { display: none !important; }
           .mobile-bottom-nav { display: flex !important; }
@@ -821,7 +847,7 @@ function App() {
       {/* ── HEADER ── */}
       <header style={css.header}>
         <div>
-          <div style={css.headerTitle}>⚡ Pool EV Management <span style={{ fontSize: 10, fontWeight: 600, background: "#3b82f6", color: "#fff", borderRadius: 4, padding: "1px 6px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.0</span></div>
+          <div style={css.headerTitle}>⚡ Pool EV Management <span style={{ fontSize: 10, fontWeight: 600, background: "#3b82f6", color: "#fff", borderRadius: 4, padding: "1px 6px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.2</span></div>
           <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}</div>
         </div>
         {/* Desktop nav */}
@@ -835,6 +861,7 @@ function App() {
             <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}</div>
             <div style={{ fontSize: 10, color: "#94a3b8" }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
           </div>
+          <button onClick={() => setDarkMode(d => !d)} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 14, cursor: "pointer", whiteSpace: "nowrap" }} title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>{darkMode ? "☀️" : "🌙"}</button>
           <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑 Password</button>
           <button onClick={handleLogout} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Logout</button>
         </div>
@@ -1055,7 +1082,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
             <div style={S.iconRingOuter}></div>
             <div style={S.iconRing}>⚡</div>
           </div>
-          <div style={S.appName}>Pool EV Management <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(59,130,246,0.2)", color: "#60a5fa", borderRadius: 4, padding: "2px 7px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.0</span></div>
+          <div style={S.appName}>Pool EV Management <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(59,130,246,0.2)", color: "#60a5fa", borderRadius: 4, padding: "2px 7px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.2</span></div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.18)', backdropFilter: 'blur(8px)' }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums', textShadow: '0 0 12px rgba(147,197,253,0.5)' }}>
@@ -1190,7 +1217,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           )}
         </div>
 
-        <div style={S.footer}>Pool EV Management v2.0 · {new Date().getFullYear()}</div>
+        <div style={S.footer}>Pool EV Management v2.2 · {new Date().getFullYear()}</div>
         <div style={{ textAlign: "center", marginTop: 16, padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.9))", border: "1.5px solid rgba(59,130,246,0.5)", backdropFilter: "blur(12px)", boxShadow: "0 0 28px rgba(59,130,246,0.18), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
           <div style={{ fontSize: 9, color: "#64748b", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 6 }}>✦ Designed &amp; Developed by ✦</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd", letterSpacing: "0.03em", textShadow: "0 0 16px rgba(147,197,253,0.8), 0 0 32px rgba(59,130,246,0.5), 0 0 60px rgba(59,130,246,0.25)" }}>Biswajit Bhattacharjee</div>
@@ -1229,6 +1256,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
   };
 
   const statusColor = { approved: G.success, pending: G.warning, rejected: G.danger };
+  const statusColorBg = { approved: G.successBg, pending: G.warningBg, rejected: G.dangerBg };
   const statusLabel = { approved: "✅ Approved — On Duty", pending: "⏳ Awaiting Approval", rejected: "❌ Rejected" };
 
   return (
@@ -1356,7 +1384,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
             <div key={t.id} style={{ padding: "14px", background: "#0f172a", borderRadius: 10, marginBottom: 10, borderLeft: `3px solid ${statusColor[t.approvalStatus] || G.muted}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                 <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{t.officerName}</div>
-                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: (statusColor[t.approvalStatus] || G.muted) + "25", color: statusColor[t.approvalStatus] || G.muted }}>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: statusColorBg[t.approvalStatus] || G.mutedBg, color: statusColor[t.approvalStatus] || G.muted }}>
                   {statusLabel[t.approvalStatus] || t.approvalStatus}
                 </span>
               </div>
@@ -1384,7 +1412,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
                 <div style={{ fontSize: 12, color: "#64748b" }}>{fmtDate(t.date)} · {t.department} · {t.departureTime}{t.returnTime ? ` – ${t.returnTime}` : ""}</div>
                 {t.startKm && t.endKm && <div style={{ fontSize: 11, color: "#475569" }}>Distance: {parseInt(t.endKm) - parseInt(t.startKm)} km</div>}
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: (statusColor[t.approvalStatus] || G.muted) + "20", color: statusColor[t.approvalStatus] || G.muted, flexShrink: 0 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: statusColorBg[t.approvalStatus] || G.mutedBg, color: statusColor[t.approvalStatus] || G.muted, flexShrink: 0 }}>
                 {t.approvalStatus?.toUpperCase()}
               </span>
             </div>
