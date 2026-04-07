@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Pool EV" />
-  <title>⚡ Pool EV Management v2.2</title>
+  <title>⚡ Pool EV Management</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,465 +45,329 @@
 
 // ── AUTHORISED USERS DATABASE ─────────────────────────────────
 const AUTHORISED_USERS = [
-  { name: 'SANKALPA BORTHAKUR', pfId: '100057', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Kaushik Das', pfId: '100729', department: 'Funds Settlement Link Office' },
-  { name: 'PRIYANKA MEDHI', pfId: '101280', department: 'Circle Complaint Resolution Centre' },
-  { name: 'SANJEEV BORO', pfId: '101521', department: 'Circle Security Deptt' },
-  { name: 'JEENA DAIMARY', pfId: '101689', department: 'WEALTH HUB' },
-  { name: 'DYUTOM DYUMON SAHA', pfId: '102218', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'RAHUL RAUT', pfId: '102222', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'ODELIA DARISHISHA SAWIAN', pfId: '102319', department: 'Adminstration(LHO,GHY)' },
-  { name: 'BIRJU GAYARY', pfId: '102545', department: 'WEALTH HUB' },
-  { name: 'ROSHAN DUTTA', pfId: '102558', department: 'WEALTH HUB' },
-  { name: 'BIRKHANG BASUMATARY', pfId: '102561', department: 'WEALTH HUB' },
-  { name: 'ROSY SUMI', pfId: '102571', department: 'WEALTH HUB' },
-  { name: 'ANWARUL HAQUE LASKAR', pfId: '102578', department: 'WEALTH HUB' },
-  { name: 'GULSHAN AHMED', pfId: '102591', department: 'WEALTH HUB' },
-  { name: 'HIDANGMAYUM SARDHANA SHARMA', pfId: '103176', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'SWAPAN DAS', pfId: '103289', department: 'Circle Security Deptt' },
-  { name: 'OBANG AO', pfId: '1032900', department: 'Circle Security Deptt' },
-  { name: 'PUSHPA THAPA', pfId: '1032901', department: 'Circle Security Deptt' },
-  { name: 'DILIP PRADHAN', pfId: '1032902', department: 'Circle Security Deptt' },
-  { name: 'MONALISA DAS', pfId: '103622', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'ARJUN RAJ GHOSH', pfId: '103623', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'DURGA DUTT THAKUR', pfId: '103874', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Bandita Sarma', pfId: '1038762', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Sahil Jaiswal', pfId: '1038765', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'DEBKUMAR SEN', pfId: '103891', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'MONALISA SAIKIA', pfId: '103894', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'HIRAKJYOTI DEURI', pfId: '103896', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'MUNNA TERON', pfId: '103897', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'SUJIT BASFORE', pfId: '104359', department: 'Adminstration(LHO,GHY)' },
-  { name: 'DAIBOKI KUMAR', pfId: '104796', department: 'Adminstration(LHO,GHY)' },
-  { name: 'NIRAJ PATHAK', pfId: '106285', department: 'Government Business Unit' },
-  { name: 'ANANYA DEBNATH', pfId: '106616', department: 'WEALTH HUB' },
-  { name: 'IRENGBAM JIO SINGH', pfId: '106906', department: 'Circle Security Deptt' },
-  { name: 'ARBAB KALAM', pfId: '106917', department: 'Premises & Estate' },
-  { name: 'Ridul Saud', pfId: '108513', department: 'Premises & Estate' },
-  { name: 'VICKEY ANAND', pfId: '1085150', department: 'Premises & Estate' },
-  { name: 'ANUBHAW CHOUDHARY', pfId: '1085155', department: 'Premises & Estate' },
-  { name: 'PARTHA BHOWMIK', pfId: '131997', department: 'WEALTH HUB' },
-  { name: 'PINAK GUPTA', pfId: '132071', department: 'RB&O-LHO-CIRCLE-CHANNEL MGMT & CUST SERV' },
-  { name: 'Sanjay Kumar Shaw', pfId: '132087', department: 'WEALTH HUB' },
-  { name: 'MANASH PRATIM DEKA', pfId: '132091', department: 'WEALTH HUB' },
-  { name: 'Chandan Jyoti Deka', pfId: '132097', department: 'WEALTH HUB' },
-  { name: 'Rakesh Das', pfId: '1321154', department: 'WEALTH HUB' },
-  { name: 'Sruti Laxmi Choudhury', pfId: '1321155', department: 'WEALTH HUB' },
-  { name: 'PRADIP KUMAR ROY', pfId: '132135', department: 'Account Traking Centre' },
-  { name: 'Diptanu Saha', pfId: '132144', department: 'WEALTH HUB' },
-  { name: 'BISWAJIT DEBBARMA', pfId: '132167', department: 'WEALTH HUB' },
-  { name: 'PRANJAL NATH', pfId: '132208', department: 'WEALTH HUB' },
-  { name: 'LETKHONEH HAOKIP', pfId: '132226', department: 'Lead Bank & RSETI' },
-  { name: 'TAPASH SEN', pfId: '132378', department: 'Circle Complaint Resolution Centre' },
-  { name: 'SWAPAN KUMAR DEBNATH', pfId: '132386', department: 'Circle Complaint Resolution Centre' },
-  { name: 'RAJIV NANDA', pfId: '132387', department: 'Local head Office,Guwahat' },
-  { name: 'JOYDIP DEBNATH', pfId: '133096', department: 'WEALTH HUB' },
-  { name: 'Ranjan Barthakur', pfId: '133097', department: 'WEALTH HUB' },
-  { name: 'Deben Deka', pfId: '318366', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Alois Daimari', pfId: '318922', department: 'Disciplinary Proceeding D' },
-  { name: 'Deo Bahadur Bisukarma', pfId: '319593', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Ajit Kalita', pfId: '319780', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Pranab Kumar Paul', pfId: '319842', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Pankaj Goswami', pfId: '319886', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Bibhas Das', pfId: '319947', department: 'Audit Department (BOD)' },
-  { name: 'Pramod Kumar Singh', pfId: '349976', department: 'Non Performing Asset' },
-  { name: 'Niranjan Baruah', pfId: '360018', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Shyamal Kumar Hazarika', pfId: '360042', department: 'Human Resources' },
-  { name: 'Dulal Roy', pfId: '360072', department: 'Disciplinary Proceeding D' },
-  { name: 'Gurupada Halder', pfId: '360116', department: 'Outreach' },
-  { name: 'Suren Kalita', pfId: '360217', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Sujit Dey', pfId: '360239', department: 'Public Relations & Comm.S' },
-  { name: 'Monoj Kumar Paul', pfId: '360333', department: 'RISK' },
-  { name: 'Shyamanta Konwar', pfId: '360390', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Monoj Sen', pfId: '360517', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Dhanendra Nath Brahma', pfId: '360520', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Ujjwal Sarmah', pfId: '360572', department: 'Human Resources' },
-  { name: 'Biswajit Bhattacharjee', pfId: '360664', department: 'Liaison' },
-  { name: 'Susanta Chakraborty', pfId: '360665', department: 'IT Support Services' },
-  { name: 'Suren Regon', pfId: '360681', department: 'Credit & Performance Monitoring' },
-  { name: 'Singh Nimai Mayanglambam', pfId: '360688', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Nijananda Badir', pfId: '360693', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Subhrangshu Dey', pfId: '360725', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Monjoy Bohora', pfId: '360754', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Hiren Sarma', pfId: '361084', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Ashok Kumar Ghosh', pfId: '361119', department: 'Government Business Unit' },
-  { name: 'Mahendra Deka', pfId: '361161', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Pabitra Nath Kakati', pfId: '361165', department: 'PPG Department Guwahati' },
-  { name: 'Dibakar Chakraborty', pfId: '361177', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Gunendra Kumar Barman', pfId: '361178', department: 'Outreach' },
-  { name: 'Madan Gopal Goswami', pfId: '361262', department: 'Premises & Estate' },
-  { name: 'Debananda Pao', pfId: '361276', department: 'AGM INVESTIGATION LHO GUWAHATI' },
-  { name: 'Prodeep Saikia', pfId: '361313', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Satyajit Chowdhury', pfId: '361328', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Pinak Dutta', pfId: '361344', department: 'Lead Bank & RSETI' },
-  { name: 'Rupak Bhowal', pfId: '361362', department: 'Human Resources' },
-  { name: 'Ranendra Narzary', pfId: '361366', department: 'PPG Department Guwahati' },
-  { name: 'Girindra Sarma', pfId: '361413', department: 'MIS&BPM' },
-  { name: 'Sandip Bhattacharjee', pfId: '361454', department: 'Human Resources' },
-  { name: 'Santanu Bhattacharjee', pfId: '361489', department: 'RISK' },
-  { name: 'Prabin Hazuwary', pfId: '361494', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'Kumud Chandra Boro', pfId: '361540', department: 'Audit Department (BOD)' },
-  { name: 'Dipak Chandra Sarmah', pfId: '361566', department: 'IT Support Services' },
-  { name: 'Amal Chandra Sarkar', pfId: '361570', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Sujit Das', pfId: '361571', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Jogat Jibon Paul', pfId: '361642', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Bijou Uddin Ahmed', pfId: '361649', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Dhiraj Choudhury', pfId: '361714', department: 'Disciplinary Proceeding D' },
-  { name: 'Abhijit Bhattacharjee', pfId: '361739', department: 'Liaison' },
-  { name: 'Shyam Kumar Upadhaya', pfId: '361775', department: 'Disciplinary Proceeding D' },
-  { name: 'Ratul Kumar Talukdar', pfId: '361776', department: 'Human Resources' },
-  { name: 'Prabhat Rajkhowa', pfId: '361800', department: 'Banking Ombudsman' },
-  { name: 'Alok Choudhury', pfId: '361840', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Prasanta Paul', pfId: '361855', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Rajesh Biswas', pfId: '361874', department: 'Credit & Performance Monitoring' },
-  { name: 'Ashok Chakraborty', pfId: '361921', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Alak Ranjan Paul', pfId: '361943', department: 'Funds Settlement Link Office' },
-  { name: 'Mrinal Kumar Hazarika', pfId: '361953', department: 'Human Resources' },
-  { name: 'Dibyendu Dhar', pfId: '361981', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Pradip Mazumder', pfId: '361988', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Rajib Bhagawati', pfId: '362010', department: 'CGM  Secretariat' },
-  { name: 'Subodh Kumar Das', pfId: '362019', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Jatin Kumar Boruah', pfId: '362049', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Chandra Kanta Rabha', pfId: '362081', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Piali Ghosh', pfId: '362084', department: 'Retail Loan LHO Ghy' },
-  { name: 'Shamim Ahmed', pfId: '362148', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Joy Ram Pait', pfId: '362175', department: 'Lead Bank & RSETI' },
-  { name: 'H. Haukhanpau', pfId: '362200', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Bijoy Kumar Saha', pfId: '362278', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Narendra Nath Saha', pfId: '362326', department: 'Non Performing Asset' },
-  { name: 'Abhijit Das', pfId: '362439', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Uttam Das', pfId: '362471', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Diganta Kumar Rabha', pfId: '362499', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Sabita Kalita', pfId: '362505', department: 'Premises & Estate' },
-  { name: 'Pijush Bora', pfId: '362592', department: 'Audit Department (BOD)' },
-  { name: 'Hatneikim  Gangte Imsong', pfId: '362608', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Tapan Kumar Narzy', pfId: '362633', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Benjamin Baglary', pfId: '362637', department: 'Human Resources' },
-  { name: 'Bhabatosh Dutta', pfId: '362665', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Muhammad Salauddin Mansoori', pfId: '362670', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Anirban Dutta', pfId: '362680', department: 'I O R Department' },
-  { name: 'L P Lalchangkima', pfId: '362727', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Papulal Harizan', pfId: '362748', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Niren Das', pfId: '362753', department: 'Funds Settlement Link Office' },
-  { name: 'Suraj Nath', pfId: '362770', department: 'I O R Department' },
-  { name: 'Dadhi Charan Basumatary', pfId: '362879', department: 'Network Credit Management' },
-  { name: 'Sohan Sarki', pfId: '362897', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Sambhu Rajbangshi', pfId: '362940', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Chanchal Chandra Paul', pfId: '362962', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Abhijit Das', pfId: '362986', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Nandu Ram Sharma', pfId: '363052', department: 'Human Resources' },
-  { name: 'Dandeswar Ray', pfId: '363064', department: 'CGM  Secretariat' },
-  { name: 'Komanly Khongwar', pfId: '363073', department: 'Account Traking Centre' },
-  { name: 'Odimenla Jamir', pfId: '363140', department: 'CLIC' },
-  { name: 'Sanjib Sen', pfId: '363189', department: 'Account Traking Centre' },
-  { name: 'Bimal Das', pfId: '363200', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Anil Gharphalia', pfId: '363224', department: 'Disciplinary Proceeding D' },
-  { name: 'Parag Roymedhi', pfId: '363251', department: 'Premises & Estate' },
-  { name: 'Sushil Brahma', pfId: '363259', department: 'IT Support Services' },
-  { name: 'Khamkhochinthang Hnunkhum Khuptong', pfId: '363319', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'S.Chinlianthang Ngaihte', pfId: '363327', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Besii Bosco Sani', pfId: '363330', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Theo Ayu Pao Paul', pfId: '363337', department: 'PPG Department Guwahati' },
-  { name: 'Joy Chandra Chakma', pfId: '363340', department: 'Lead Bank & RSETI' },
-  { name: 'Sita Kumari Basfore', pfId: '363341', department: 'Outreach' },
-  { name: 'Uttam Kumar Saha', pfId: '363345', department: 'Premises & Estate' },
-  { name: 'Plabon Borgohain', pfId: '363353', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Sumangali Choudhury', pfId: '363486', department: 'I O R Department' },
-  { name: 'Khaikhopao Haokip', pfId: '363516', department: 'Outreach' },
-  { name: 'Maheswar Choudhury', pfId: '363528', department: 'HR G.M (NW-I)' },
-  { name: 'Chandrajyoti Dowari', pfId: '363529', department: 'SME AGRI ASSET QUALITY NW1' },
-  { name: 'Nilamoni Hazarika', pfId: '363533', department: 'SME AGRI ASSET QUALITY NW1' },
-  { name: 'Bhabananda Talukdar', pfId: '363536', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Sarat Chandra Haloi', pfId: '363538', department: 'Adminstration(LHO,GHY)' },
-  { name: 'KC Vanlal Vena', pfId: '363540', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Sarbari Debbarman', pfId: '363545', department: 'WEALTH HUB' },
-  { name: 'Manawar Lyngdoh', pfId: '363550', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Sanjib Swargiary', pfId: '363553', department: 'Lead Bank & RSETI' },
-  { name: 'Santanu Buragohain', pfId: '363556', department: 'Human Resources' },
-  { name: 'Rupam Roy', pfId: '363561', department: 'PPG Department Guwahati' },
-  { name: 'Abinash Hembrom', pfId: '363586', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'C RAMDINSANGA', pfId: '363588', department: 'Lead Bank & RSETI' },
-  { name: 'Munindra Upadhyaya', pfId: '363612', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Pradip Malakar', pfId: '363669', department: 'Outreach' },
-  { name: 'I Temjen Changkiri', pfId: '363672', department: 'Human Resources' },
-  { name: 'Dhiraj Kumar Boro', pfId: '363682', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Pitambor Taye', pfId: '363691', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Suraj Pradhan', pfId: '363742', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Moloy Kanti Paul', pfId: '363755', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Manash Bhuyan', pfId: '363764', department: 'Human Resources' },
-  { name: 'Nirmalendu Dhar', pfId: '363791', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Mantu Das', pfId: '363880', department: 'Human Resources' },
-  { name: 'David N Lhouvum', pfId: '363898', department: 'AGM AGRI' },
-  { name: 'Pirbox Ali', pfId: '363945', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Dharitri Deka', pfId: '364060', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Prajnan Chaitanya Deka', pfId: '364103', department: 'Law' },
-  { name: 'Lienkholal Gangte', pfId: '364139', department: 'Outreach' },
-  { name: 'Ankur Pradhan', pfId: '364218', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Bijoy Sarma', pfId: '364257', department: 'Merchant Acquiring Business' },
-  { name: 'Partha Pratim Saikia', pfId: '364271', department: 'Human Resources' },
-  { name: 'Kamal Debnath', pfId: '364305', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Papan Kumar Das', pfId: '364310', department: 'Liaison' },
-  { name: 'Daisy Baro', pfId: '364372', department: 'Outreach' },
-  { name: 'Sujata Bhattacharjee', pfId: '364386', department: 'Lead Bank & RSETI' },
-  { name: 'Chandamita Gogoi', pfId: '364387', department: 'Small and Medium Enterpri' },
-  { name: 'Golap Hossain', pfId: '364392', department: 'I O R Department' },
-  { name: 'Abu Toufique Miftasul Hussain', pfId: '364417', department: 'CGM  Secretariat' },
-  { name: 'Ujjal Deka', pfId: '364420', department: 'Premises & Estate' },
-  { name: 'Dibyajyoti Saikia', pfId: '364436', department: 'Funds Settlement Link Office' },
-  { name: 'Puspita Nath', pfId: '364448', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Sudipto Bhattacharjee', pfId: '364453', department: 'BOPM NW-I' },
-  { name: 'Leenabati Mutum', pfId: '364496', department: 'PPG Department Guwahati' },
-  { name: 'Monica Dkhar', pfId: '364526', department: 'AGM AGRI' },
-  { name: 'Jyoti Krishna Nath', pfId: '364549', department: 'Human Resources' },
-  { name: 'Swaraj Hatibaruah', pfId: '364564', department: 'Human Resources' },
-  { name: 'Hari Krishna Chetia', pfId: '364565', department: 'Public Relations & Comm.S' },
-  { name: 'Papori Das Chakraborty', pfId: '364618', department: 'PROJECT LOTUS' },
-  { name: 'Priyanka Phukan', pfId: '364664', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Susanta Das', pfId: '364666', department: 'Retail Loan LHO Ghy' },
-  { name: 'Ramesh Chand Meena', pfId: '371062', department: 'OPR LHO GUWAHATI' },
-  { name: 'Sujit Kumar Singh', pfId: '373372', department: 'Banking Ombudsman' },
-  { name: 'Sanjeeb Kumar Dev', pfId: '379707', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Dilip Kumar Pathak', pfId: '392438', department: 'Retail Loan LHO Ghy' },
-  { name: 'Rakesh Kumar', pfId: '392471', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Diwakar Kumar', pfId: '393550', department: 'FRAUD MONITORING CELL' },
-  { name: 'Md Naiyar Imam', pfId: '394925', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Kishore Kumar Choudhary', pfId: '420027', department: 'Non Performing Asset' },
-  { name: 'Pramod Kumar', pfId: '427111', department: 'RBO-LHO-NW 2-RSC CVE  WEALTH' },
-  { name: 'Kamal Kishor Naik', pfId: '427314', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'Anthony Leyangi', pfId: '430763', department: 'Small and Medium Enterpri' },
-  { name: 'Urmilesh Kumar Pathak', pfId: '432798', department: 'AGM AGRI' },
-  { name: 'Rakesh Banerjee', pfId: '433855', department: 'RBO-LHO-NW 1-RSC CVE  WEALTH' },
-  { name: 'Lalremtluangi C', pfId: '434067', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Vijay Kumar Sharma', pfId: '435984', department: 'Circle Security Deptt' },
-  { name: 'Anurag Arpan', pfId: '441550', department: 'Small and Medium Enterpri' },
-  { name: 'Bhupen Borah', pfId: '447945', department: 'AGM AGRI' },
-  { name: 'Chongtham Chanchan', pfId: '447969', department: 'AGM AGRI2' },
-  { name: 'Roopam Das', pfId: '449494', department: 'Agri Bussiness Unit' },
-  { name: 'Bhaba Jyoti Dutta', pfId: '449519', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Md Jehirul Islam', pfId: '449528', department: 'WEALTH HUB' },
-  { name: 'Lopamudra Biswas Kangsa Banik', pfId: '449529', department: 'WEALTH HUB' },
-  { name: 'Lakhima Phukan', pfId: '449531', department: 'WEALTH HUB' },
-  { name: 'Adaha Nepuni', pfId: '449613', department: 'AGM AGRI' },
-  { name: 'Kshetrimayum Shanta Devi', pfId: '449615', department: 'WEALTH HUB' },
-  { name: 'Raj  Kumar Jaiswal', pfId: '449634', department: 'AGM AGRI2' },
-  { name: 'Satyendra Kumar', pfId: '452295', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Hrishikesh Jha', pfId: '456719', department: 'Audit Department (BOD)' },
-  { name: 'Amit Saklani', pfId: '457805', department: 'REH AGM LHO GUWAHATI' },
-  { name: 'Rajesh Chaturvedy', pfId: '458536', department: 'Rajbhasha' },
-  { name: 'Pankaj Kumar', pfId: '459000', department: 'AC – Sys. & Proc' },
-  { name: 'Nabajyoti Borah', pfId: '459240', department: 'Government Business Unit' },
-  { name: 'Vivek Kumar Singh', pfId: '459517', department: 'Rajbhasha' },
-  { name: 'Rakesh Kumar', pfId: '501108', department: 'SME AGRI ASSET QUALITY NW2' },
-  { name: 'Nishant Kumar', pfId: '501298', department: 'Procurment' },
-  { name: 'Manish Sinha', pfId: '501421', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Ipsita Itisudha Tarai', pfId: '511818', department: 'BPR( IT)' },
-  { name: 'Hemchandra Rajkumar Jha', pfId: '523888', department: 'BPR( IT)' },
-  { name: 'Parimal Langthasa', pfId: '524383', department: 'Funds Settlement Link Office' },
-  { name: 'BHASKAR KUMAR DEY SARKAR', pfId: '528968', department: 'Funds Settlement Link Office' },
-  { name: 'J CHUMBENTHUNG HUMTSOE', pfId: '531599', department: 'Data Processing Centre' },
-  { name: 'SUDHIR KUMAR JHA', pfId: '538913', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Johnson Tawmbing', pfId: '544260', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Manoj Kumar Choudhary', pfId: '552308', department: 'I O R Department' },
-  { name: 'Sanjeeb Kumar Kalita', pfId: '552310', department: 'Funds Settlement Link Office' },
-  { name: 'Amrita Das', pfId: '552316', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Sangita Kalita', pfId: '552351', department: 'PPG Department Guwahati' },
-  { name: 'Pratyush Baruah', pfId: '552352', department: 'Agri Bussiness Unit' },
-  { name: 'Paran Jyoti Deka', pfId: '552355', department: 'Human Resources' },
-  { name: 'Purabi Sarma', pfId: '552364', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Saurav Kumar Kalita', pfId: '552388', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Priti Prasun Sen', pfId: '552389', department: 'Human Resources' },
-  { name: 'Mehdi Hassan', pfId: '552414', department: 'IT Support Services' },
-  { name: 'Pallabi Borah', pfId: '552422', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Archana Saha', pfId: '552429', department: 'Outreach' },
-  { name: 'Shameek Purkayastha', pfId: '552431', department: 'Human Resources' },
-  { name: 'Utpal Deka', pfId: '552445', department: 'Credit & Performance Monitoring' },
-  { name: 'Bikramjeet Goswami', pfId: '552453', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Vivekananda Das', pfId: '552460', department: 'CLIC' },
-  { name: 'Samir Kumar Dey', pfId: '552543', department: 'Small and Medium Enterpri' },
-  { name: 'Devraj Phookan', pfId: '552592', department: 'Human Resources' },
-  { name: 'Ankur Pratim Saikia', pfId: '552599', department: 'WEALTH HUB' },
-  { name: 'Debankita Paul', pfId: '552636', department: 'AC – Sys. & Proc' },
-  { name: 'Bismita Borchetia', pfId: '552679', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Pranjal Dey', pfId: '552689', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Rituparna Basu Roy', pfId: '552713', department: 'CGM  Secretariat' },
-  { name: 'Krishang Buragohain', pfId: '552827', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Rajeev Kumar Das', pfId: '552831', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Bishnu Kinkar', pfId: '552866', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Pranjal Saikia', pfId: '552872', department: 'CLIC' },
-  { name: 'Krishna Mallick', pfId: '552882', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Shaonli Majumder', pfId: '552904', department: 'Human Resources' },
-  { name: 'Moumita Gandha Banik', pfId: '552905', department: 'RISK' },
-  { name: 'Mridul Goiary', pfId: '552920', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Gautam Swargiary', pfId: '552923', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Jinti Moni Khakhlary', pfId: '552932', department: 'Outreach' },
-  { name: 'Daisy B. Rabha', pfId: '552972', department: 'Public Relations & Comm.S' },
-  { name: 'Pandava Chakma', pfId: '552988', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Sandeepan Roy', pfId: '553055', department: 'Retail Loan LHO Ghy' },
-  { name: 'Vijaya Laxmi Phukan', pfId: '553066', department: 'Funds Settlement Link Office' },
-  { name: 'Koushiki Gupta', pfId: '553249', department: 'BPR( IT)' },
-  { name: 'Rahul Ranjan', pfId: '554433', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Satyaranjan Das', pfId: '554655', department: 'AC – Sys. & Proc' },
-  { name: 'John Borgoyari', pfId: '555936', department: 'IT Support Services' },
-  { name: 'Bhaskar Pegu', pfId: '555949', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Spondon Chelleng', pfId: '555976', department: 'Non Performing Asset' },
-  { name: 'Diganta Bordoloi', pfId: '569861', department: 'Data Processing Centre' },
-  { name: 'Rahul Deb Thakur', pfId: '577273', department: 'Human Resources' },
-  { name: 'Biswadeep Dey', pfId: '583854', department: 'IT Support Services' },
-  { name: 'Thangkholen Khongsai', pfId: '583861', department: 'Retail Loan LHO Ghy' },
-  { name: 'Debraj Barua', pfId: '583884', department: 'LEARNING and DEVELOPMENT GUWAHATI' },
-  { name: 'Raj Kumar Bhagat', pfId: '583941', department: 'Government Business Unit' },
-  { name: 'Tapash Paul', pfId: '583969', department: 'PPG Department Guwahati' },
-  { name: 'Mrinmoy Rajbongshi', pfId: '583975', department: 'IT Support Services' },
-  { name: 'Deba Kanta Phukan', pfId: '583989', department: 'WEALTH HUB' },
-  { name: 'Mriganka Buragohain', pfId: '583995', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Kishor Kumar Das', pfId: '583997', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Surajit Das', pfId: '584025', department: 'IT Support Services' },
-  { name: 'Baikuntha Phukan', pfId: '584033', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Rupjyoti Sarma', pfId: '584038', department: 'Human Resources' },
-  { name: 'Pawan Kumar Verma', pfId: '584047', department: 'Public Relations & Comm.S' },
-  { name: 'Sadananda Kalita', pfId: '584055', department: 'Premises & Estate' },
-  { name: 'Pranab Barman', pfId: '584056', department: 'Outreach' },
-  { name: 'Yendrembam Amarprem Singh', pfId: '584176', department: 'FINANCE AND OPERATIONS' },
-  { name: 'G Tawnliansiam', pfId: '584237', department: 'BPR( IT)' },
-  { name: 'Torida Sandor Marbaniang', pfId: '584243', department: 'BPR( IT)' },
-  { name: 'Bendangla Amer', pfId: '584332', department: 'BPR( IT)' },
-  { name: 'Sashilemba Longkumer', pfId: '584370', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Ruposmita Baruah', pfId: '584379', department: 'Account Traking Centre' },
-  { name: 'Anup Kumar Atreya', pfId: '588095', department: 'FINANCE AND OPERATIONS' },
-  { name: 'ANURADHA KUMARI', pfId: '590463', department: 'Retail Loan LHO Ghy' },
-  { name: 'Gaurica Naidu', pfId: '597377', department: 'Human Resources' },
-  { name: 'Asim Anand', pfId: '599947', department: 'Small and Medium Enterpri' },
-  { name: 'Niti Vidyarthi', pfId: '600417', department: 'Human Resources' },
-  { name: 'Prakash Kr Srivastava', pfId: '600457', department: 'Small and Medium Enterpri' },
-  { name: 'Amit Kumar Jha', pfId: '600516', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'DURLABH KHAUND', pfId: '601275', department: 'Banking Ombudsman' },
-  { name: 'Jagrit Jyoti Bora', pfId: '601276', department: 'Account Traking Centre' },
-  { name: 'Hiranyamayee Phukan', pfId: '601300', department: 'Vigilance Dpt(Guwahati)' },
-  { name: 'Saptarshi Roy', pfId: '601328', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Shahid Haque', pfId: '601329', department: 'PPG Department Guwahati' },
-  { name: 'Ayekpam Premjit Singh', pfId: '601361', department: 'DIGITAL & eCOMMERCE' },
-  { name: 'Pratiti Hazarika', pfId: '601387', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Sambit Kumar Pattanayak', pfId: '607957', department: 'Premises & Estate' },
-  { name: 'Irengbam Priyokumar Singh', pfId: '621382', department: 'LEARNING and DEVELOPMENT GUWAHATI' },
-  { name: 'Tuikhang Chuongchun Koren', pfId: '623829', department: 'IT Support Services' },
-  { name: 'AJOY PAUL', pfId: '625566', department: 'IT Support Services' },
-  { name: 'Ranjita Bastia Panda', pfId: '638275', department: 'DGM & CIRCLE CREDIT OFFICER' },
-  { name: 'Ramtawnlien H D', pfId: '640676', department: 'FRAUD MONITORING CELL' },
-  { name: 'KHAILUNMANG Vaiphei', pfId: '640686', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'JITENDRA KUMAR', pfId: '646392', department: 'RE & Retail Loans (DGM)' },
-  { name: 'MD FIROZ ALAM', pfId: '650702', department: 'Premises & Estate' },
-  { name: 'Jolen Prabha Tiru', pfId: '665353', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Naba Chandra Singh', pfId: '665930', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Tanmoy Barman', pfId: '671573', department: 'AC OPERATIONS (AGM) NW-2' },
-  { name: 'Avik Ghosh', pfId: '671583', department: 'Government Business Unit' },
-  { name: 'Aroj Kumar', pfId: '671585', department: 'IT Support Services' },
-  { name: 'Samar Jyoti Deka', pfId: '672319', department: 'Premises & Estate' },
-  { name: 'Rini Elizabeth Toppo', pfId: '672777', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Bikramjyoti Das', pfId: '673200', department: 'Digital Banking and TBU' },
-  { name: 'Joycee Vungngaihmawi Guite', pfId: '673237', department: 'Cust Experience Enhancement Deptt' },
-  { name: 'Daricor Pariat', pfId: '674578', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'Vipin Upadhyay', pfId: '675413', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Jitender Yadav', pfId: '677831', department: 'Credit & Performance Monitoring' },
-  { name: 'Bhabesh Bhagabati', pfId: '681742', department: 'Circle Security Deptt' },
-  { name: 'Ahindra Kumar Sinha', pfId: '681743', department: 'Circle Security Deptt' },
-  { name: 'Binita Kumari', pfId: '682472', department: 'Lead Bank & RSETI' },
-  { name: 'Tage Gyuthey', pfId: '684525', department: 'Premises & Estate' },
-  { name: 'Preetimayee Tripathy', pfId: '684700', department: 'Rajbhasha' },
-  { name: 'Bharat Baruah', pfId: '694480', department: 'CGM  Secretariat' },
-  { name: 'Plaban Mazumdar', pfId: '697966', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Manjit', pfId: '701488', department: 'CLIC' },
-  { name: 'Imdad Arif Ahmed', pfId: '701708', department: 'IT Support Services' },
-  { name: 'Shaiborlang Dkhar', pfId: '701744', department: 'Data Processing Centre' },
-  { name: 'Vikash Kumar', pfId: '705311', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'SANDEEP KUMAR', pfId: '708328', department: 'Rajbhasha' },
-  { name: 'SURYANSH BAMANIA', pfId: '711521', department: 'Rajbhasha' },
-  { name: 'Biju Gopinathan Pillai', pfId: '723122', department: 'Agri Bussiness Unit' },
-  { name: 'Brajesh Kumar R', pfId: '724020', department: 'BPR( IT)' },
-  { name: 'Salseng Sangma Marak', pfId: '725435', department: 'Human Resources' },
-  { name: 'Shibojit Soren', pfId: '733479', department: 'Premises & Estate' },
-  { name: 'Joydeep Das', pfId: '742797', department: 'FRAUD MONITORING CELL' },
-  { name: 'Gagan Baro', pfId: '742819', department: 'Human Resources' },
-  { name: 'Banty Sonowal', pfId: '742840', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Tulika Barman', pfId: '742851', department: 'Account Traking Centre' },
-  { name: 'Bandita Dihingia', pfId: '742868', department: 'IT Support Services' },
-  { name: 'Chandan Talukdar', pfId: '742909', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Gitika Nath', pfId: '742958', department: 'Account Traking Centre' },
-  { name: 'Nabanita Hazarika', pfId: '742983', department: 'Rajbhasha' },
-  { name: 'Subhasish Das', pfId: '742996', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Bhaskar Narayan Chakraborty', pfId: '743004', department: 'IT Support Services' },
-  { name: 'Sanjib Kumar Baishya', pfId: '743026', department: 'PROJECT LOTUS' },
-  { name: 'Trishna Barua', pfId: '743028', department: 'Audit Department (BOD)' },
-  { name: 'Prabhat Kumar Choudhary', pfId: '743049', department: 'Outreach' },
-  { name: 'HIRANYA KALITA', pfId: '743074', department: 'MIS&BPM' },
-  { name: 'Debankur Pathak', pfId: '743080', department: 'Human Resources' },
-  { name: 'Imran Ali', pfId: '743086', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Dhrubajyoti Pathak', pfId: '743090', department: 'GM Network -1( Guwahati)' },
-  { name: 'Sumi Das', pfId: '743097', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK' },
-  { name: 'Rijuwana Akhtar', pfId: '743111', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Arup Sarma', pfId: '743144', department: 'I O R Department' },
-  { name: 'Rahul Singh', pfId: '743159', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Sarda Sagar', pfId: '743451', department: 'Disciplinary Proceeding D' },
-  { name: 'ABHIJIT KHATIA', pfId: '743624', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Om Prakash Gupta', pfId: '743704', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Kabita Barai', pfId: '751542', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE' },
-  { name: 'Usharani Rajkhowa', pfId: '758325', department: 'Human Resources' },
-  { name: 'Pratima Patir', pfId: '758330', department: 'FINANCE AND OPERATIONS' },
-  { name: 'Bhaskar Jyoti Nath', pfId: '758455', department: 'Government Business Unit' },
-  { name: 'Karuna Kanta Das', pfId: '758504', department: 'IT Support Services' },
-  { name: 'Amar Jyoti Kalita', pfId: '758543', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Anupam Haloi', pfId: '758544', department: 'GM Network -2( Guwahati)' },
-  { name: 'Rameez Raja Ahmed', pfId: '758563', department: 'Premises & Estate' },
-  { name: 'Sandip Pathak', pfId: '758588', department: 'Human Resources' },
-  { name: 'Samiparna Dutta', pfId: '758613', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Arijit Dey', pfId: '758724', department: 'MIS&BPM' },
-  { name: 'Radha Shakti Boro', pfId: '760102', department: 'Human Resources' },
-  { name: 'Minakshi Ayushman Baruah', pfId: '760108', department: 'BOPM NW-I' },
-  { name: 'Tarun Dey', pfId: '763744', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Chaitanya Kirti', pfId: '767346', department: 'Agri Bussiness Unit' },
-  { name: 'Sonam Gagrai', pfId: '767579', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Rana Pratap Bhoi', pfId: '769179', department: 'Human Resources' },
-  { name: 'Amit Kumar', pfId: '781021', department: 'Law' },
-  { name: 'Swarndeep D', pfId: '781088', department: 'Retail Loan LHO Ghy' },
-  { name: 'Bikash Roy', pfId: '781627', department: 'Human Resources' },
-  { name: 'Gourab Goswami', pfId: '781756', department: 'BOPM NW-I' },
-  { name: 'JOLY GOSWAMI', pfId: '783075', department: 'FRAUD MONITORING CELL' },
-  { name: 'BISWAJIT DAS', pfId: '784432', department: 'Audit Department (BOD)' },
-  { name: 'Darshan Jyoti Deka', pfId: '787445', department: 'Banking Ombudsman' },
-  { name: 'HIMANGSHU KALITA', pfId: '787459', department: 'Lead Bank & RSETI' },
-  { name: 'ARNAB BARKATAKI', pfId: '787496', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'URMISNATA NANDA', pfId: '787542', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'DIJABRATA BHAGABATI', pfId: '787634', department: 'PPG Department Guwahati' },
-  { name: 'SAMIRAN NATH', pfId: '787641', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Suman Das', pfId: '787739', department: 'RB&O-LHO-NW 2-BOPM' },
-  { name: 'Ashish Kumar', pfId: '807291', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'Biswajit Chandra Das', pfId: '813095', department: 'WEALTH HUB' },
-  { name: 'Jitumoni Malakar', pfId: '813519', department: 'WEALTH HUB' },
-  { name: 'Sandipa Gogoi', pfId: '832983', department: 'Digital Banking and TBU' },
-  { name: 'Monchumi Bora', pfId: '833129', department: 'Adminstration(LHO,GHY)' },
-  { name: 'Nitish Kumar', pfId: '833307', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'SUDIP SARKAR', pfId: '845615', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'Aditi Paul', pfId: '847660', department: 'SURVEILLANCE & INVESTIGATION DEPTT.' },
-  { name: 'KONDURU PRANEETH', pfId: '847922', department: 'IT Support Services' },
-  { name: 'PRANJAL BHARALI', pfId: '848514', department: 'AC OPERATIONS (AGM) NW-1' },
-  { name: 'Bandana Rabha', pfId: '849099', department: 'Non Performing Asset' },
-  { name: 'RUPAM CHANDRA RABHA', pfId: '849190', department: 'Human Resources' },
-  { name: 'TISHA GHOSH', pfId: '851090', department: 'Premises & Estate' },
-  { name: 'GAYATRI SAIKIA', pfId: '851883', department: 'RE & Retail Loans (DGM)' },
-  { name: 'Maitreyi Roy', pfId: '851977', department: 'Account Traking Centre' },
-  { name: 'ANMOL GHOSHAL', pfId: '852326', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'PUNAM DEVI', pfId: '852955', department: 'MIS&BPM' },
-  { name: 'CHAYANIKA CHOUDHURY', pfId: '853221', department: 'Adminstration(LHO,GHY)' },
-  { name: 'HAROLD DHAR', pfId: '855740', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'BIBEK DEY', pfId: '855825', department: 'Circle Complaint Resolution Centre' },
-  { name: 'Meenakshi Baishya', pfId: '856114', department: 'Circle Security Deptt' },
-  { name: 'BIKRAM DAMAI', pfId: '857017', department: 'Account Traking Centre' },
-  { name: 'ARPITA MALLICK', pfId: '858063', department: 'Adminstration(LHO,GHY)' },
-  { name: 'PRITAM BASUMATARY', pfId: '859735', department: 'Account Traking Centre' },
-  { name: 'VISHAL BHALLA', pfId: '859858', department: 'Circle Security Deptt' },
-  { name: 'DIVESH ANAND', pfId: '860905', department: 'DIGITAL BANKING DEPARTMENT' },
-  { name: 'SATADRU DEY', pfId: '861347', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM' },
-  { name: 'KALYANI RAJBONGSHI', pfId: '862419', department: 'Small and Medium Enterpri' },
-  { name: 'Richard Uj Zaman', pfId: '864647', department: 'Circle Security Deptt' },
+  { name: 'PRIYANKA MEDHI', pfId: '101280', department: 'Circle Complaint Resolution Centre', designation: 'Deputy Manager' },
+  { name: 'ROSHAN DUTTA', pfId: '102558', department: 'WEALTH HUB', designation: 'WM-Cust RelatnshipEx' },
+  { name: 'NIRAJ PATHAK', pfId: '106285', department: 'Government Business Unit', designation: 'Assistant Manager' },
+  { name: 'ARBAB KALAM', pfId: '106917', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'Ridul Saud', pfId: '108513', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'VICKEY ANAND', pfId: '1085150', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'ANUBHAW CHOUDHARY', pfId: '1085155', department: 'Premises & Estate', designation: 'On probation (S)' },
+  { name: 'JOYDIP DEBNATH', pfId: '133096', department: 'WEALTH HUB', designation: 'VICE PRESIDENT' },
+  { name: 'Alois Daimari', pfId: '318922', department: 'Disciplinary Proceeding D', designation: 'Chief Manager' },
+  { name: 'Pankaj Goswami', pfId: '319886', department: 'Adminstration(LHO,GHY)', designation: 'Asst. Gen. Manager' },
+  { name: 'Bibhas Das', pfId: '319947', department: 'Audit Department (BOD)', designation: 'Asst. Gen. Manager' },
+  { name: 'Pramod Kumar Singh', pfId: '349976', department: 'Non Performing Asset', designation: 'Asst. Gen. Manager' },
+  { name: 'Niranjan Baruah', pfId: '360018', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Shyamal Kumar Hazarika', pfId: '360042', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Dulal Roy', pfId: '360072', department: 'Disciplinary Proceeding D', designation: 'Asst. Gen. Manager' },
+  { name: 'Gurupada Halder', pfId: '360116', department: 'Outreach', designation: 'Asst. Gen. Manager' },
+  { name: 'Monoj Kumar Paul', pfId: '360333', department: 'RISK', designation: 'Chief Manager' },
+  { name: 'Monoj Sen', pfId: '360517', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Asst. Gen. Manager' },
+  { name: 'Dhanendra Nath Brahma', pfId: '360520', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'Ujjwal Sarmah', pfId: '360572', department: 'Public Relations & Comm.S', designation: 'Asst. Gen. Manager' },
+  { name: 'Biswajit Bhattacharjee', pfId: '360664', department: 'Liaison', designation: 'Chief Manager(S)' },
+  { name: 'Susanta Chakraborty', pfId: '360665', department: 'IT Support Services', designation: 'Asst. Gen. Manager' },
+  { name: 'Suren Regon', pfId: '360681', department: 'Credit & Performance Monitoring', designation: 'Manager' },
+  { name: 'Singh Nimai Mayanglambam', pfId: '360688', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Nijananda Badir', pfId: '360693', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Asst. Gen. Manager' },
+  { name: 'Subhrangshu Dey', pfId: '360725', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Monjoy Bohora', pfId: '360754', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Asst. Gen. Manager' },
+  { name: 'Ashok Kumar Ghosh', pfId: '361119', department: 'Government Business Unit', designation: 'Chief Manager' },
+  { name: 'Gunendra Kumar Barman', pfId: '361178', department: 'Outreach', designation: 'Chief Manager' },
+  { name: 'Madan Gopal Goswami', pfId: '361262', department: 'Premises & Estate', designation: 'Chief Manager' },
+  { name: 'Debananda Pao', pfId: '361276', department: 'AGM INVESTIGATION LHO GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Prodeep Saikia', pfId: '361313', department: 'Cust Experience Enhancement Deptt', designation: 'Asst. Gen. Manager' },
+  { name: 'Satyajit Chowdhury', pfId: '361328', department: 'FINANCE AND OPERATIONS', designation: 'Chief Manager' },
+  { name: 'Pinak Dutta', pfId: '361344', department: 'Lead Bank & RSETI', designation: 'Chief Manager' },
+  { name: 'Rupak Bhowal', pfId: '361362', department: 'Human Resources', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Ranendra Narzary', pfId: '361366', department: 'PPG Department Guwahati', designation: 'Asst. Gen. Manager' },
+  { name: 'Girindra Sarma', pfId: '361413', department: 'MIS&BPM', designation: 'Asst. Gen. Manager' },
+  { name: 'Sandip Bhattacharjee', pfId: '361454', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Santanu Bhattacharjee', pfId: '361489', department: 'RISK', designation: 'Manager' },
+  { name: 'Prabin Hazuwary', pfId: '361494', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Chief Manager' },
+  { name: 'Kumud Chandra Boro', pfId: '361540', department: 'Audit Department (BOD)', designation: 'Chief Manager' },
+  { name: 'Dipak Chandra Sarmah', pfId: '361566', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Amal Chandra Sarkar', pfId: '361570', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Asst. Gen. Manager' },
+  { name: 'Sujit Das', pfId: '361571', department: 'RE & Retail Loans (DGM)', designation: 'Chief Manager' },
+  { name: 'Jogat Jibon Paul', pfId: '361642', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Chief Manager' },
+  { name: 'Bijou Uddin Ahmed', pfId: '361649', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Asst. Gen. Manager' },
+  { name: 'Dhiraj Choudhury', pfId: '361714', department: 'Disciplinary Proceeding D', designation: 'Chief Manager' },
+  { name: 'Abhijit Bhattacharjee', pfId: '361739', department: 'Liaison', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Shyam Kumar Upadhaya', pfId: '361775', department: 'Disciplinary Proceeding D', designation: 'Manager' },
+  { name: 'Prabhat Rajkhowa', pfId: '361800', department: 'Banking Ombudsman', designation: 'Manager' },
+  { name: 'Alok Choudhury', pfId: '361840', department: 'DIGITAL & eCOMMERCE', designation: 'Chief Manager' },
+  { name: 'Prasanta Paul', pfId: '361855', department: 'Vigilance Dpt(Guwahati)', designation: 'Manager' },
+  { name: 'Rajesh Biswas', pfId: '361874', department: 'Credit & Performance Monitoring', designation: 'Asst. Gen. Manager' },
+  { name: 'Ashok Chakraborty', pfId: '361921', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Alak Ranjan Paul', pfId: '361943', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Mrinal Kumar Hazarika', pfId: '361953', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Dibyendu Dhar', pfId: '361981', department: 'DIGITAL & eCOMMERCE', designation: 'Asst. Gen. Manager' },
+  { name: 'Pradip Mazumder', pfId: '361988', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Rajib Bhagawati', pfId: '362010', department: 'CGM  Secretariat', designation: 'Asst. Gen. Manager' },
+  { name: 'Subodh Kumar Das', pfId: '362019', department: 'Cust Experience Enhancement Deptt', designation: 'Chief Manager' },
+  { name: 'Jatin Kumar Boruah', pfId: '362049', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Chandra Kanta Rabha', pfId: '362081', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Assistant Manager' },
+  { name: 'Piali Ghosh', pfId: '362084', department: 'Retail Loan LHO Ghy', designation: 'Chief Manager' },
+  { name: 'Shamim Ahmed', pfId: '362148', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Joy Ram Pait', pfId: '362175', department: 'Lead Bank & RSETI', designation: 'Asst. Gen. Manager' },
+  { name: 'H. Haukhanpau', pfId: '362200', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Bijoy Kumar Saha', pfId: '362278', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Narendra Nath Saha', pfId: '362326', department: 'Non Performing Asset', designation: 'Chief Manager' },
+  { name: 'Abhijit Das', pfId: '362439', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'Uttam Das', pfId: '362471', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Chief Manager' },
+  { name: 'Diganta Kumar Rabha', pfId: '362499', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'Pijush Bora', pfId: '362592', department: 'Audit Department (BOD)', designation: 'Manager' },
+  { name: 'Hatneikim  Gangte Imsong', pfId: '362608', department: 'Circle Complaint Resolution Centre', designation: 'Chief Manager' },
+  { name: 'Tapan Kumar Narzy', pfId: '362633', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Deputy Manager' },
+  { name: 'Benjamin Baglary', pfId: '362637', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Bhabatosh Dutta', pfId: '362665', department: 'RE & Retail Loans (DGM)', designation: 'Chief Manager' },
+  { name: 'Muhammad Salauddin Mansoori', pfId: '362670', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Anirban Dutta', pfId: '362680', department: 'I O R Department', designation: 'Manager' },
+  { name: 'Suraj Nath', pfId: '362770', department: 'I O R Department', designation: 'Manager' },
+  { name: 'Dadhi Charan Basumatary', pfId: '362879', department: 'Network Credit Management', designation: 'Deputy Manager' },
+  { name: 'Sohan Sarki', pfId: '362897', department: 'Adminstration(LHO,GHY)', designation: 'Deputy Manager' },
+  { name: 'Chanchal Chandra Paul', pfId: '362962', department: 'RE & Retail Loans (DGM)', designation: 'Manager' },
+  { name: 'Abhijit Das', pfId: '362986', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Nandu Ram Sharma', pfId: '363052', department: 'Human Resources', designation: 'Asst. Gen. Manager' },
+  { name: 'Komanly Khongwar', pfId: '363073', department: 'Account Traking Centre', designation: 'Chief Manager' },
+  { name: 'Odimenla Jamir', pfId: '363140', department: 'CLIC', designation: 'Chief Manager' },
+  { name: 'Sanjib Sen', pfId: '363189', department: 'Account Traking Centre', designation: 'Manager' },
+  { name: 'Bimal Das', pfId: '363200', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Anil Gharphalia', pfId: '363224', department: 'Disciplinary Proceeding D', designation: 'Chief Manager' },
+  { name: 'Parag Roymedhi', pfId: '363251', department: 'Premises & Estate', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Sushil Brahma', pfId: '363259', department: 'IT Support Services', designation: 'Chief Manager' },
+  { name: 'Khamkhochinthang Hnunkhum Khuptong', pfId: '363319', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Asst. Gen. Manager' },
+  { name: 'S.Chinlianthang Ngaihte', pfId: '363327', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Besii Bosco Sani', pfId: '363330', department: 'Circle Complaint Resolution Centre', designation: 'Asst. Gen. Manager' },
+  { name: 'Theo Ayu Pao Paul', pfId: '363337', department: 'PPG Department Guwahati', designation: 'Chief Manager' },
+  { name: 'Joy Chandra Chakma', pfId: '363340', department: 'Lead Bank & RSETI', designation: 'Asst. Gen. Manager' },
+  { name: 'Uttam Kumar Saha', pfId: '363345', department: 'Premises & Estate', designation: 'Deputy Manager' },
+  { name: 'Plabon Borgohain', pfId: '363353', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Sumangali Choudhury', pfId: '363486', department: 'I O R Department', designation: 'Asst. Gen. Manager' },
+  { name: 'Khaikhopao Haokip', pfId: '363516', department: 'Outreach', designation: 'Asst. Gen. Manager' },
+  { name: 'Chandrajyoti Dowari', pfId: '363529', department: 'SME AGRI ASSET QUALITY NW1', designation: 'Manager' },
+  { name: 'Nilamoni Hazarika', pfId: '363533', department: 'SME AGRI ASSET QUALITY NW1', designation: 'Chief Manager' },
+  { name: 'KC Vanlal Vena', pfId: '363540', department: 'DIGITAL & eCOMMERCE', designation: 'Chief Manager' },
+  { name: 'Sarbari Debbarman', pfId: '363545', department: 'WEALTH HUB', designation: 'Manager' },
+  { name: 'Manawar Lyngdoh', pfId: '363550', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Sanjib Swargiary', pfId: '363553', department: 'Lead Bank & RSETI', designation: 'Manager' },
+  { name: 'Santanu Buragohain', pfId: '363556', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Rupam Roy', pfId: '363561', department: 'PPG Department Guwahati', designation: 'Deputy Manager' },
+  { name: 'Abinash Hembrom', pfId: '363586', department: 'RB&O-LHO-CIRCLE-COMPLIANCE & RISK', designation: 'Asst. Gen. Manager' },
+  { name: 'C RAMDINSANGA', pfId: '363588', department: 'Lead Bank & RSETI', designation: 'Chief Manager' },
+  { name: 'Munindra Upadhyaya', pfId: '363612', department: 'FINANCE AND OPERATIONS', designation: 'Asst. Gen. Manager' },
+  { name: 'Pradip Malakar', pfId: '363669', department: 'Outreach', designation: 'Manager' },
+  { name: 'I Temjen Changkiri', pfId: '363672', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Dhiraj Kumar Boro', pfId: '363682', department: 'Circle Complaint Resolution Centre', designation: 'Manager' },
+  { name: 'Pitambor Taye', pfId: '363691', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Suraj Pradhan', pfId: '363742', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Deputy Manager' },
+  { name: 'Moloy Kanti Paul', pfId: '363755', department: 'FINANCE AND OPERATIONS', designation: 'Chief Manager' },
+  { name: 'Manash Bhuyan', pfId: '363764', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Nirmalendu Dhar', pfId: '363791', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'David N Lhouvum', pfId: '363898', department: 'AGM AGRI', designation: 'Asst. Gen. Manager' },
+  { name: 'Dharitri Deka', pfId: '364060', department: 'Adminstration(LHO,GHY)', designation: 'Chief Manager (BMO IV)' },
+  { name: 'Prajnan Chaitanya Deka', pfId: '364103', department: 'Law', designation: 'Chief Manager(S)' },
+  { name: 'Lienkholal Gangte', pfId: '364139', department: 'Outreach', designation: 'Asst. Gen. Manager' },
+  { name: 'Ankur Pradhan', pfId: '364218', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Manager' },
+  { name: 'Bijoy Sarma', pfId: '364257', department: 'Merchant Acquiring Business', designation: 'Manager' },
+  { name: 'Partha Pratim Saikia', pfId: '364271', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Kamal Debnath', pfId: '364305', department: 'Adminstration(LHO,GHY)', designation: 'Manager' },
+  { name: 'Daisy Baro', pfId: '364372', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'Sujata Bhattacharjee', pfId: '364386', department: 'Lead Bank & RSETI', designation: 'Deputy Manager' },
+  { name: 'Chandamita Gogoi', pfId: '364387', department: 'Small and Medium Enterpri', designation: 'Manager' },
+  { name: 'Golap Hossain', pfId: '364392', department: 'I O R Department', designation: 'Deputy Manager' },
+  { name: 'Abu Toufique Miftasul Hussain', pfId: '364417', department: 'CGM  Secretariat', designation: 'Chief Manager' },
+  { name: 'Dibyajyoti Saikia', pfId: '364436', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Puspita Nath', pfId: '364448', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Chief Manager' },
+  { name: 'Sudipto Bhattacharjee', pfId: '364453', department: 'BOPM NW-I', designation: 'Chief Manager' },
+  { name: 'Leenabati Mutum', pfId: '364496', department: 'PPG Department Guwahati', designation: 'Deputy Manager' },
+  { name: 'Monica Dkhar', pfId: '364526', department: 'AGM AGRI', designation: 'Manager' },
+  { name: 'Jyoti Krishna Nath', pfId: '364549', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Swaraj Hatibaruah', pfId: '364564', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Papori Das Chakraborty', pfId: '364618', department: 'PROJECT LOTUS', designation: 'Manager' },
+  { name: 'Priyanka Phukan', pfId: '364664', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Susanta Das', pfId: '364666', department: 'Retail Loan LHO Ghy', designation: 'Asst. Gen. Manager' },
+  { name: 'Ramesh Chand Meena', pfId: '371062', department: 'OPR LHO GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Sujit Kumar Singh', pfId: '373372', department: 'Banking Ombudsman', designation: 'Asst. Gen. Manager' },
+  { name: 'Sanjeeb Kumar Dev', pfId: '379707', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Asst. Gen. Manager' },
+  { name: 'Dilip Kumar Pathak', pfId: '392438', department: 'Retail Loan LHO Ghy', designation: 'Chief Manager' },
+  { name: 'Rakesh Kumar', pfId: '392471', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Diwakar Kumar', pfId: '393550', department: 'FRAUD MONITORING CELL', designation: 'Chief Manager' },
+  { name: 'Md Naiyar Imam', pfId: '394925', department: 'Vigilance Dpt(Guwahati)', designation: 'Asst. Gen. Manager' },
+  { name: 'Kishore Kumar Choudhary', pfId: '420027', department: 'Non Performing Asset', designation: 'Chief Manager' },
+  { name: 'Pramod Kumar', pfId: '427111', department: 'RBO-LHO-NW 2-RSC CVE  WEALTH', designation: 'Asst. Gen. Manager' },
+  { name: 'Kamal Kishor Naik', pfId: '427314', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Asst. Gen. Manager' },
+  { name: 'Anthony Leyangi', pfId: '430763', department: 'Small and Medium Enterpri', designation: 'Chief Manager' },
+  { name: 'Urmilesh Kumar Pathak', pfId: '432798', department: 'AGM AGRI', designation: 'Chief Manager' },
+  { name: 'Rakesh Banerjee', pfId: '433855', department: 'RBO-LHO-NW 1-RSC CVE  WEALTH', designation: 'Asst. Gen. Manager' },
+  { name: 'Lalremtluangi C', pfId: '434067', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Vijay Kumar Sharma', pfId: '435984', department: 'Circle Security Deptt', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Anurag Arpan', pfId: '441550', department: 'Small and Medium Enterpri', designation: 'Asst. Gen. Manager' },
+  { name: 'Bhupen Borah', pfId: '447945', department: 'AGM AGRI', designation: 'Deputy Manager(S)' },
+  { name: 'Chongtham Chanchan', pfId: '447969', department: 'AGM AGRI2', designation: 'Chief Manager(S)' },
+  { name: 'Roopam Das', pfId: '449494', department: 'Agri Bussiness Unit', designation: 'Chief Manager(S)' },
+  { name: 'Bhaba Jyoti Dutta', pfId: '449519', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Manager(S)' },
+  { name: 'Md Jehirul Islam', pfId: '449528', department: 'WEALTH HUB', designation: 'Assistant Manager(S)' },
+  { name: 'Lopamudra Biswas Kangsa Banik', pfId: '449529', department: 'WEALTH HUB', designation: 'Deputy Manager(S)' },
+  { name: 'Lakhima Phukan', pfId: '449531', department: 'WEALTH HUB', designation: 'Manager(S)' },
+  { name: 'Adaha Nepuni', pfId: '449613', department: 'AGM AGRI', designation: 'Manager(S)' },
+  { name: 'Kshetrimayum Shanta Devi', pfId: '449615', department: 'WEALTH HUB', designation: 'Manager(S)' },
+  { name: 'Raj  Kumar Jaiswal', pfId: '449634', department: 'AGM AGRI2', designation: 'Manager(S)' },
+  { name: 'Satyendra Kumar', pfId: '452295', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Asst. Gen. Manager' },
+  { name: 'Hrishikesh Jha', pfId: '456719', department: 'Audit Department (BOD)', designation: 'Chief Manager' },
+  { name: 'Amit Saklani', pfId: '457805', department: 'REH AGM LHO GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Rajesh Chaturvedy', pfId: '458536', department: 'Rajbhasha', designation: 'Asst Gen. Manager(S)' },
+  { name: 'Pankaj Kumar', pfId: '459000', department: 'AC – Sys. & Proc', designation: 'Asst. Gen. Manager' },
+  { name: 'Nabajyoti Borah', pfId: '459240', department: 'Government Business Unit', designation: 'Asst. Gen. Manager' },
+  { name: 'Vivek Kumar Singh', pfId: '459517', department: 'Rajbhasha', designation: 'Chief Manager(S)' },
+  { name: 'Rakesh Kumar', pfId: '501108', department: 'SME AGRI ASSET QUALITY NW2', designation: 'Chief Manager' },
+  { name: 'Nishant Kumar', pfId: '501298', department: 'Procurment', designation: 'Manager' },
+  { name: 'Manish Sinha', pfId: '501421', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Chief Manager' },
+  { name: 'Hemchandra Rajkumar Jha', pfId: '523888', department: 'BPR( IT)', designation: 'Chief Manager' },
+  { name: 'Parimal Langthasa', pfId: '524383', department: 'Funds Settlement Link Office', designation: 'Asst. Gen. Manager' },
+  { name: 'BHASKAR KUMAR DEY SARKAR', pfId: '528968', department: 'Funds Settlement Link Office', designation: 'Chief Manager(S)' },
+  { name: 'J CHUMBENTHUNG HUMTSOE', pfId: '531599', department: 'Data Processing Centre', designation: 'Chief Manager(S)' },
+  { name: 'SUDHIR KUMAR JHA', pfId: '538913', department: 'RE & Retail Loans (DGM)', designation: 'Asst. Gen. Manager' },
+  { name: 'Johnson Tawmbing', pfId: '544260', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Chief Manager' },
+  { name: 'Manoj Kumar Choudhary', pfId: '552308', department: 'I O R Department', designation: 'Deputy Manager' },
+  { name: 'Sanjeeb Kumar Kalita', pfId: '552310', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Amrita Das', pfId: '552316', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Paran Jyoti Deka', pfId: '552355', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Purabi Sarma', pfId: '552364', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Assistant Manager' },
+  { name: 'Priti Prasun Sen', pfId: '552389', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Mehdi Hassan', pfId: '552414', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Pallabi Borah', pfId: '552422', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Chief Manager' },
+  { name: 'Shameek Purkayastha', pfId: '552431', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Vivekananda Das', pfId: '552460', department: 'CLIC', designation: 'Deputy Manager' },
+  { name: 'Samir Kumar Dey', pfId: '552543', department: 'Small and Medium Enterpri', designation: 'Deputy Manager' },
+  { name: 'Devraj Phookan', pfId: '552592', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Ankur Pratim Saikia', pfId: '552599', department: 'WEALTH HUB', designation: 'Manager' },
+  { name: 'Rajeev Kumar Das', pfId: '552831', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Deputy Manager' },
+  { name: 'Bishnu Kinkar', pfId: '552866', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Deputy Manager' },
+  { name: 'Pranjal Saikia', pfId: '552872', department: 'CLIC', designation: 'Deputy Manager' },
+  { name: 'Krishna Mallick', pfId: '552882', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Deputy Manager' },
+  { name: 'Moumita Gandha Banik', pfId: '552905', department: 'RISK', designation: 'Deputy Manager' },
+  { name: 'Mridul Goiary', pfId: '552920', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Gautam Swargiary', pfId: '552923', department: 'Adminstration(LHO,GHY)', designation: 'Deputy Manager' },
+  { name: 'Jinti Moni Khakhlary', pfId: '552932', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'Pandava Chakma', pfId: '552988', department: 'Cust Experience Enhancement Deptt', designation: 'Deputy Manager' },
+  { name: 'Sandeepan Roy', pfId: '553055', department: 'Retail Loan LHO Ghy', designation: 'Deputy Manager' },
+  { name: 'Vijaya Laxmi Phukan', pfId: '553066', department: 'Funds Settlement Link Office', designation: 'Deputy Manager' },
+  { name: 'Koushiki Gupta', pfId: '553249', department: 'BPR( IT)', designation: 'Deputy Manager' },
+  { name: 'Rahul Ranjan', pfId: '554433', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Satyaranjan Das', pfId: '554655', department: 'AC – Sys. & Proc', designation: 'Chief Manager' },
+  { name: 'John Borgoyari', pfId: '555936', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Bhaskar Pegu', pfId: '555949', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Spondon Chelleng', pfId: '555976', department: 'Non Performing Asset', designation: 'Manager' },
+  { name: 'Diganta Bordoloi', pfId: '569861', department: 'Data Processing Centre', designation: 'Deputy Manager(S)' },
+  { name: 'Rahul Deb Thakur', pfId: '577273', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Biswadeep Dey', pfId: '583854', department: 'IT Support Services', designation: 'Manager' },
+  { name: 'Thangkholen Khongsai', pfId: '583861', department: 'Retail Loan LHO Ghy', designation: 'Chief Manager' },
+  { name: 'Debraj Barua', pfId: '583884', department: 'LEARNING and DEVELOPMENT GUWAHATI', designation: 'Deputy Manager' },
+  { name: 'Raj Kumar Bhagat', pfId: '583941', department: 'Government Business Unit', designation: 'Deputy Manager' },
+  { name: 'Tapash Paul', pfId: '583969', department: 'PPG Department Guwahati', designation: 'Deputy Manager' },
+  { name: 'Mrinmoy Rajbongshi', pfId: '583975', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Deba Kanta Phukan', pfId: '583989', department: 'WEALTH HUB', designation: 'Manager' },
+  { name: 'Kishor Kumar Das', pfId: '583997', department: 'Adminstration(LHO,GHY)', designation: 'Deputy Manager' },
+  { name: 'Surajit Das', pfId: '584025', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Baikuntha Phukan', pfId: '584033', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Chief Manager' },
+  { name: 'Rupjyoti Sarma', pfId: '584038', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Pawan Kumar Verma', pfId: '584047', department: 'Public Relations & Comm.S', designation: 'Manager' },
+  { name: 'Pranab Barman', pfId: '584056', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'Yendrembam Amarprem Singh', pfId: '584176', department: 'FINANCE AND OPERATIONS', designation: 'Chief Manager' },
+  { name: 'G Tawnliansiam', pfId: '584237', department: 'BPR( IT)', designation: 'Deputy Manager' },
+  { name: 'Torida Sandor Marbaniang', pfId: '584243', department: 'BPR( IT)', designation: 'Chief Manager' },
+  { name: 'Bendangla Amer', pfId: '584332', department: 'BPR( IT)', designation: 'Chief Manager' },
+  { name: 'Sashilemba Longkumer', pfId: '584370', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Chief Manager' },
+  { name: 'Ruposmita Baruah', pfId: '584379', department: 'Account Traking Centre', designation: 'Manager' },
+  { name: 'Anup Kumar Atreya', pfId: '588095', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Asim Anand', pfId: '599947', department: 'Small and Medium Enterpri', designation: 'Chief Manager' },
+  { name: 'Niti Vidyarthi', pfId: '600417', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Prakash Kr Srivastava', pfId: '600457', department: 'Small and Medium Enterpri', designation: 'Chief Manager' },
+  { name: 'Amit Kumar Jha', pfId: '600516', department: 'Vigilance Dpt(Guwahati)', designation: 'Chief Manager' },
+  { name: 'DURLABH KHAUND', pfId: '601275', department: 'Banking Ombudsman', designation: 'Manager' },
+  { name: 'Manas Jyoti Deka', pfId: '601279', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Saptarshi Roy', pfId: '601328', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Deputy Manager' },
+  { name: 'Shahid Haque', pfId: '601329', department: 'PPG Department Guwahati', designation: 'Manager' },
+  { name: 'Ayekpam Premjit Singh', pfId: '601361', department: 'DIGITAL & eCOMMERCE', designation: 'Chief Manager' },
+  { name: 'Pratiti Hazarika', pfId: '601387', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Manager' },
+  { name: 'Sambit Kumar Pattanayak', pfId: '607957', department: 'Premises & Estate', designation: 'Asst. Gen. Manager' },
+  { name: 'Irengbam Priyokumar Singh', pfId: '621382', department: 'LEARNING and DEVELOPMENT GUWAHATI', designation: 'Asst. Gen. Manager' },
+  { name: 'Tuikhang Chuongchun Koren', pfId: '623829', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'AJOY PAUL', pfId: '625566', department: 'IT Support Services', designation: 'Deputy Manager(S)' },
+  { name: 'Ranjita Bastia Panda', pfId: '638275', department: 'DGM & CIRCLE CREDIT OFFICER', designation: 'Asst. Gen. Manager' },
+  { name: 'Ramtawnlien H D', pfId: '640676', department: 'FRAUD MONITORING CELL', designation: 'Asst. Gen. Manager' },
+  { name: 'KHAILUNMANG Vaiphei', pfId: '640686', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'JITENDRA KUMAR', pfId: '646392', department: 'RE & Retail Loans (DGM)', designation: 'Manager' },
+  { name: 'MD FIROZ ALAM', pfId: '650702', department: 'Premises & Estate', designation: 'Chief Manager(S)' },
+  { name: 'Jolen Prabha Tiru', pfId: '665353', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Tanmoy Barman', pfId: '671573', department: 'AC OPERATIONS (AGM) NW-2', designation: 'Manager(S)' },
+  { name: 'Avik Ghosh', pfId: '671583', department: 'Government Business Unit', designation: 'Manager(S)' },
+  { name: 'Aroj Kumar', pfId: '671585', department: 'IT Support Services', designation: 'Manager(S)' },
+  { name: 'Samar Jyoti Deka', pfId: '672319', department: 'Premises & Estate', designation: 'Deputy Manager(S)' },
+  { name: 'Rini Elizabeth Toppo', pfId: '672777', department: 'Circle Complaint Resolution Centre', designation: 'Manager' },
+  { name: 'Bikramjyoti Das', pfId: '673200', department: 'Digital Banking and TBU', designation: 'Manager' },
+  { name: 'Joycee Vungngaihmawi Guite', pfId: '673237', department: 'Cust Experience Enhancement Deptt', designation: 'Manager' },
+  { name: 'Daricor Pariat', pfId: '674578', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Manager' },
+  { name: 'Vipin Upadhyay', pfId: '675413', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Chief Manager' },
+  { name: 'Jitender Yadav', pfId: '677831', department: 'Credit & Performance Monitoring', designation: 'Chief Manager' },
+  { name: 'Binita Kumari', pfId: '682472', department: 'Lead Bank & RSETI', designation: 'Deputy Manager' },
+  { name: 'Tage Gyuthey', pfId: '684525', department: 'Premises & Estate', designation: 'Deputy Manager(S)' },
+  { name: 'Preetimayee Tripathy', pfId: '684700', department: 'Rajbhasha', designation: 'Manager(S)' },
+  { name: 'Plaban Mazumdar', pfId: '697966', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Manager' },
+  { name: 'Nitesh Sen', pfId: '697977', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Manjit', pfId: '701488', department: 'CLIC', designation: 'Deputy Manager' },
+  { name: 'Imdad Arif Ahmed', pfId: '701708', department: 'IT Support Services', designation: 'Deputy Manager(S)' },
+  { name: 'Shaiborlang Dkhar', pfId: '701744', department: 'Data Processing Centre', designation: 'Deputy Manager(S)' },
+  { name: 'Vikash Kumar', pfId: '705311', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Manager' },
+  { name: 'SANDEEP KUMAR', pfId: '708328', department: 'Rajbhasha', designation: 'Manager(S)' },
+  { name: 'SURYANSH BAMANIA', pfId: '711521', department: 'Rajbhasha', designation: 'Manager(S)' },
+  { name: 'Biju Gopinathan Pillai', pfId: '723122', department: 'Agri Bussiness Unit', designation: 'Chief Manager' },
+  { name: 'Brajesh Kumar R', pfId: '724020', department: 'BPR( IT)', designation: 'Asst. Gen. Manager' },
+  { name: 'Salseng Sangma Marak', pfId: '725435', department: 'Human Resources', designation: 'Chief Manager(S)' },
+  { name: 'Shibojit Soren', pfId: '733479', department: 'Premises & Estate', designation: 'Deputy Manager' },
+  { name: 'Joydeep Das', pfId: '742797', department: 'FRAUD MONITORING CELL', designation: 'Manager' },
+  { name: 'Gagan Baro', pfId: '742819', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Banty Sonowal', pfId: '742840', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Assistant Manager' },
+  { name: 'Chandan Talukdar', pfId: '742909', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Deputy Manager' },
+  { name: 'Subhasish Das', pfId: '742996', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Manager' },
+  { name: 'Bhaskar Narayan Chakraborty', pfId: '743004', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'Sanjib Kumar Baishya', pfId: '743026', department: 'PROJECT LOTUS', designation: 'Deputy Manager' },
+  { name: 'Prabhat Kumar Choudhary', pfId: '743049', department: 'Outreach', designation: 'Deputy Manager' },
+  { name: 'HIRANYA KALITA', pfId: '743074', department: 'MIS&BPM', designation: 'Manager' },
+  { name: 'Debankur Pathak', pfId: '743080', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'Imran Ali', pfId: '743086', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'Dhrubajyoti Pathak', pfId: '743090', department: 'GM Network -1( Guwahati)', designation: 'Deputy Manager' },
+  { name: 'Rahul Singh', pfId: '743159', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'ABHIJIT KHATIA', pfId: '743624', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Om Prakash Gupta', pfId: '743704', department: 'RB&O-LHO-CIRCLE-RSC CVE&WM', designation: 'Deputy Manager' },
+  { name: 'Kabita Barai', pfId: '751542', department: 'CENTRALIZED CLAIM SETTLEMENT CENTRE', designation: 'Deputy Manager' },
+  { name: 'Usharani Rajkhowa', pfId: '758325', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Pratima Patir', pfId: '758330', department: 'FINANCE AND OPERATIONS', designation: 'Manager' },
+  { name: 'Bhaskar Jyoti Nath', pfId: '758455', department: 'Government Business Unit', designation: 'Manager' },
+  { name: 'Karuna Kanta Das', pfId: '758504', department: 'IT Support Services', designation: 'Manager' },
+  { name: 'Amar Jyoti Kalita', pfId: '758543', department: 'RB&O-LHO-NW 2-BOPM', designation: 'Manager' },
+  { name: 'Anupam Haloi', pfId: '758544', department: 'GM Network -2( Guwahati)', designation: 'Deputy Manager' },
+  { name: 'Rameez Raja Ahmed', pfId: '758563', department: 'Premises & Estate', designation: 'Deputy Manager' },
+  { name: 'Arijit Dey', pfId: '758724', department: 'MIS&BPM', designation: 'Assistant Manager' },
+  { name: 'Radha Shakti Boro', pfId: '760102', department: 'Human Resources', designation: 'Chief Manager' },
+  { name: 'Minakshi Ayushman Baruah', pfId: '760108', department: 'BOPM NW-I', designation: 'Deputy Manager' },
+  { name: 'Chaitanya Kirti', pfId: '767346', department: 'Agri Bussiness Unit', designation: 'Deputy Manager' },
+  { name: 'Rana Pratap Bhoi', pfId: '769179', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Amit Kumar', pfId: '781021', department: 'Law', designation: 'Manager(S)' },
+  { name: 'Swarndeep D', pfId: '781088', department: 'Retail Loan LHO Ghy', designation: 'Deputy Manager' },
+  { name: 'Bikash Roy', pfId: '781627', department: 'Human Resources', designation: 'Manager' },
+  { name: 'Gourab Goswami', pfId: '781756', department: 'BOPM NW-I', designation: 'Manager' },
+  { name: 'JOLY GOSWAMI', pfId: '783075', department: 'FRAUD MONITORING CELL', designation: 'Deputy Manager' },
+  { name: 'BISWAJIT DAS', pfId: '784432', department: 'Audit Department (BOD)', designation: 'Manager' },
+  { name: 'Nitish Kumar', pfId: '833307', department: 'DIGITAL BANKING DEPARTMENT', designation: 'Deputy Manager' },
+  { name: 'Aditi Paul', pfId: '847660', department: 'SURVEILLANCE & INVESTIGATION DEPTT.', designation: 'Deputy Manager' },
+  { name: 'KONDURU PRANEETH', pfId: '847922', department: 'IT Support Services', designation: 'Deputy Manager' },
+  { name: 'PRANJAL BHARALI', pfId: '848514', department: 'AC OPERATIONS (AGM) NW-1', designation: 'Deputy Manager' },
+  { name: 'Bandana Rabha', pfId: '849099', department: 'Non Performing Asset', designation: 'Deputy Manager' },
+  { name: 'RUPAM CHANDRA RABHA', pfId: '849190', department: 'Human Resources', designation: 'Deputy Manager' },
+  { name: 'VISHAL BHALLA', pfId: '859858', department: 'Circle Security Deptt', designation: 'Manager(S)' },
+  { name: 'PAPAN KUMAR DAS', pfId: '364310', department: 'Liaison Deptt', designation: 'Senior Associate' },
 ];
 
 // Admin PF IDs — Biswajit Bhattacharjee & Abhijit Bhattacharjee
@@ -535,12 +399,10 @@ const fmtTime = (t) => t || "—";
 
 // ── STYLES ────────────────────────────────────────────────────
 const G = {
-  bg: "var(--g-bg)", card: "var(--g-card)", border: "var(--g-border)",
-  text: "var(--g-text)", muted: "var(--g-muted)", light: "var(--g-light)",
-  success: "var(--g-success)", danger: "var(--g-danger)", warning: "var(--g-warning)",
-  info: "var(--g-info)",
-  successBg: "var(--g-sbg)", dangerBg: "var(--g-dbg)", warningBg: "var(--g-wbg)",
-  infoBg: "var(--g-ibg)", mutedBg: "var(--g-mbg)",
+  bg: "#f0f4f8", card: "#ffffff", border: "#e2e8f0",
+  text: "#1e293b", muted: "#64748b", light: "#f8fafc",
+  success: "#16a34a", danger: "#dc2626", warning: "#d97706",
+  info: "#2563eb",
 };
 
 const css = {
@@ -552,21 +414,18 @@ const css = {
   grid4: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
   card: { background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `1px solid ${G.border}` },
   carCard: (color, busy) => ({ background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `2px solid ${busy ? G.danger : G.success}`, position: "relative", overflow: "hidden" }),
-  badge: (color) => {
-    const bgMap = { [G.success]: G.successBg, [G.danger]: G.dangerBg, [G.warning]: G.warningBg, [G.info]: G.infoBg, [G.muted]: G.mutedBg };
-    return { display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: bgMap[color] || "rgba(100,116,139,0.12)", color };
-  },
+  badge: (color) => ({ display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: color + "20", color: color }),
   btn: (color = G.info, outline = false) => ({ padding: "9px 18px", borderRadius: 7, border: outline ? `1.5px solid ${color}` : "none", background: outline ? "transparent" : color, color: outline ? color : "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.15s" }),
   btnSm: (color = G.info) => ({ padding: "4px 12px", borderRadius: 5, border: "none", background: color, color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }),
-  input: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "var(--g-input-bg)", color: "var(--g-text)", boxSizing: "border-box" },
-  select: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "var(--g-input-bg)", color: "var(--g-text)", boxSizing: "border-box" },
+  input: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
+  select: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
   label: { fontSize: 12, fontWeight: 600, color: G.muted, marginBottom: 4, display: "block" },
   formGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 },
   table: { width: "100%", borderCollapse: "collapse" },
   th: { textAlign: "left", padding: "10px 12px", fontSize: 11, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `2px solid ${G.border}`, background: G.light, whiteSpace: "nowrap" },
   td: { padding: "10px 12px", borderBottom: `1px solid ${G.border}`, fontSize: 13, color: G.text },
   modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 },
-  modalBox: { background: "var(--g-card)", borderRadius: 12, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" },
+  modalBox: { background: "#fff", borderRadius: 12, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" },
   sectionTitle: { fontSize: 16, fontWeight: 700, color: G.text, marginBottom: 14 },
   row: { display: "flex", alignItems: "center", gap: 10 },
   statNum: { fontSize: 26, fontWeight: 800, color: G.text },
@@ -579,11 +438,6 @@ const css = {
 // ── MAIN APP ──────────────────────────────────────────────────
 function App() {
   const [tab, setTab] = useState("dashboard");
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("ev_theme") === "dark");
-  React.useEffect(() => {
-    document.body.classList.toggle("dark", darkMode);
-    localStorage.setItem("ev_theme", darkMode ? "dark" : "light");
-  }, [darkMode]);
   const [cars, setCars] = useState(INITIAL_CARS);
   const isSavingCars = React.useRef(false);
   const saveCars = async (data) => {
@@ -613,7 +467,6 @@ function App() {
   const [loaded, setLoaded] = useState(false);
   const [passwords, setPasswords] = useState({});
   const [showChangePw, setShowChangePw] = useState(false);
-  const [activeSessions, setActiveSessions] = useState({});
 
   // Simple hash for password storage (not cryptographic, but adequate for this app)
   const hashPw = (pw) => btoa(encodeURIComponent(pw + "_evpool_salt"));
@@ -693,12 +546,12 @@ function App() {
 
     const unsubs = [];
     try {
-      // trips: accept both cache and server snapshots so pending bookings
-      // from other users are reflected immediately without waiting for server round-trip
-      unsubs.push(db.collection("trips").onSnapshot(snap => {
+      // { includeMetadataChanges: false } — only fire on server-confirmed changes, not cache
+      const snapOpts = { includeMetadataChanges: false };
+      unsubs.push(db.collection("trips").onSnapshot(snapOpts, snap => {
+        if (snap.metadata.fromCache) return; // ignore stale cache snapshots
         setTrips(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
-      const snapOpts = { includeMetadataChanges: false };
       unsubs.push(db.collection("maintenance").onSnapshot(snapOpts, snap => {
         if (snap.metadata.fromCache) return;
         setMaintenance(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -711,10 +564,6 @@ function App() {
         if (snap.metadata.fromCache) return;
         if (snap.exists) setLiveLocations(snap.data());
       }));
-      unsubs.push(db.collection("config").doc("sessions").onSnapshot(snapOpts, snap => {
-        if (snap.metadata.fromCache) return;
-        setActiveSessions(snap.exists ? (snap.data() || {}) : {});
-      }));
     } catch(e) { console.error("Firebase listener error:", e); }
 
     return () => unsubs.forEach(u => { try { u(); } catch {} });
@@ -722,13 +571,19 @@ function App() {
 
   const _fsWrite = async (colName, data) => {
     const db = window.__db; if (!db) return;
-    // Upsert all records by ID — never auto-delete.
-    // Deletion based on in-memory state caused data loss when the app loaded
-    // with partial data (slow network / new device) and a save was triggered
-    // before all Firestore records had arrived via onSnapshot.
-    await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
+    try {
+      // Step 1: Write/update all current records (safe — no deletes yet)
+      await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
+      // Step 2: Delete only records that are no longer in the data array
+      const snap = await db.collection(colName).get({ source: 'server' });
+      const currentIds = new Set(data.map(t => String(t.id)));
+      const toDelete = snap.docs.filter(d => !currentIds.has(d.id));
+      if (toDelete.length > 0) {
+        await Promise.all(toDelete.map(d => d.ref.delete()));
+      }
+    } catch(e) { console.error("_fsWrite error:", e); }
   };
-  const saveTrips = async (data) => { setTrips(data); await _fsWrite("trips", data); };
+  const saveTrips = async (data) => { setTrips(data); _fsWrite("trips", data); };
   const saveMaint = async (data) => { setMaintenance(data); _fsWrite("maintenance", data); };
   const saveFuel  = async (data) => { setFuelLogs(data); _fsWrite("fuel", data); };
   const saveLive  = async (data) => {
@@ -739,48 +594,16 @@ function App() {
   const handleLogin = async (user) => {
     setCurrentUser(user);
     try { localStorage.setItem("ev_session", JSON.stringify(user)); } catch {}
-    try {
-      const db = window.__db;
-      if (db && user.pfId) {
-        const sessionKey = user.pfId;
-        const now = new Date().toISOString();
-        await db.collection("config").doc("sessions").set({
-          [sessionKey]: { pfId: user.pfId, name: user.name, role: user.role || "staff", department: user.department || "", loginAt: now, lastSeen: now }
-        }, { merge: true });
-      }
-    } catch(e) {}
   };
   const handleLogout = async () => {
-    try {
-      const db = window.__db;
-      if (db && currentUser?.pfId) {
-        const FieldValue = firebase.firestore.FieldValue;
-        await db.collection("config").doc("sessions").update({ [currentUser.pfId]: FieldValue.delete() });
-      }
-    } catch(e) {}
     setCurrentUser(null);
     try { localStorage.removeItem("ev_session"); } catch {}
     setTab("dashboard");
   };
 
-  // Heartbeat — update lastSeen every 5 minutes so admins can distinguish
-  // active sessions from stale ones (e.g. tab closed without logging out).
-  useEffect(() => {
-    if (!currentUser?.pfId) return;
-    const ping = async () => {
-      try {
-        const db = window.__db;
-        if (db) await db.collection("config").doc("sessions").update({ [currentUser.pfId + ".lastSeen"]: new Date().toISOString() });
-      } catch(e) {}
-    };
-    ping(); // immediate ping on mount / user change
-    const interval = setInterval(ping, 5 * 60 * 1000); // every 5 minutes
-    return () => clearInterval(interval);
-  }, [currentUser?.pfId]);
-
   const activeTripForCar = (carId) => trips.find(t => t.carId === carId && !t.returnTime && t.approvalStatus === "approved");
-  const pendingTripForCar = (carId) => trips.find(t => t.carId === carId && !t.returnTime && t.approvalStatus === "pending");
-  const isCarBusy = (carId) => !!(activeTripForCar(carId) || pendingTripForCar(carId));
+  // Block vehicle as soon as any pending OR approved trip exists (first-come-first-serve)
+  const isCarBusy = (carId) => trips.some(t => t.carId === carId && !t.returnTime && (t.approvalStatus === "approved" || t.approvalStatus === "pending"));
 
   if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
 
@@ -790,7 +613,7 @@ function App() {
   if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} />;
 
 
-  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, pendingTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword, activeSessions };
+  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword };
 
   const pendingCount = trips.filter(t => t.approvalStatus === "pending").length;
 
@@ -813,22 +636,9 @@ function App() {
     <div style={css.app}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <style>{`
-        :root {
-          --g-bg:#f0f4f8; --g-card:#ffffff; --g-border:#e2e8f0;
-          --g-text:#1e293b; --g-muted:#64748b; --g-light:#f8fafc;
-          --g-success:#16a34a; --g-danger:#dc2626; --g-warning:#d97706; --g-info:#2563eb;
-          --g-input-bg:#ffffff;
-          --g-sbg:rgba(22,163,74,0.12); --g-dbg:rgba(220,38,38,0.12);
-          --g-wbg:rgba(217,119,6,0.12); --g-ibg:rgba(37,99,235,0.12); --g-mbg:rgba(100,116,139,0.12);
-        }
-        body.dark {
-          --g-bg:#0f172a; --g-card:#1e293b; --g-border:#334155;
-          --g-text:#f1f5f9; --g-muted:#94a3b8; --g-light:#0f172a;
-          --g-success:#22c55e; --g-danger:#f87171; --g-warning:#fbbf24; --g-info:#60a5fa;
-          --g-input-bg:#0f172a;
-          --g-sbg:rgba(34,197,94,0.15); --g-dbg:rgba(248,113,113,0.15);
-          --g-wbg:rgba(251,191,36,0.15); --g-ibg:rgba(96,165,250,0.15); --g-mbg:rgba(148,163,184,0.15);
-        }
+        @keyframes ctaBreathe { 0%,100%{box-shadow:0 0 14px rgba(59,130,246,0.5),0 4px 12px rgba(0,0,0,0.3);transform:scale(1)} 50%{box-shadow:0 0 38px rgba(59,130,246,1),0 0 65px rgba(59,130,246,0.5),0 4px 16px rgba(0,0,0,0.3);transform:scale(1.05)} }
+        .ev-book-cta { animation: ctaBreathe 2.2s ease-in-out infinite !important; }
+        .ev-book-cta:hover { animation: none !important; transform: translateY(-2px) scale(1.03) !important; box-shadow: 0 0 50px rgba(59,130,246,1), 0 6px 20px rgba(0,0,0,0.35) !important; }
         @media (max-width: 600px) {
           .desktop-nav { display: none !important; }
           .mobile-bottom-nav { display: flex !important; }
@@ -847,8 +657,11 @@ function App() {
       {/* ── HEADER ── */}
       <header style={css.header}>
         <div>
-          <div style={css.headerTitle}>⚡ Pool EV Management <span style={{ fontSize: 10, fontWeight: 600, background: "#3b82f6", color: "#fff", borderRadius: 4, padding: "1px 6px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.2</span></div>
-          <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={css.headerTitle}>⚡ Pool EV Management</div>
+            <span style={{ padding: '1px 7px', borderRadius: 20, background: '#2563eb', fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', boxShadow: '0 0 8px rgba(59,130,246,0.5)' }}>ver 2.1</span>
+          </div>
+          <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
         </div>
         {/* Desktop nav */}
         <nav className="desktop-nav" style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
@@ -858,10 +671,9 @@ function App() {
         </nav>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
           <div style={{ textAlign: "right" }} className="hide-mobile">
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
             <div style={{ fontSize: 10, color: "#94a3b8" }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
           </div>
-          <button onClick={() => setDarkMode(d => !d)} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 14, cursor: "pointer", whiteSpace: "nowrap" }} title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>{darkMode ? "☀️" : "🌙"}</button>
           <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑 Password</button>
           <button onClick={handleLogout} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Logout</button>
         </div>
@@ -875,7 +687,7 @@ function App() {
         {tab === "tracking"    && (currentUser.isAdmin || currentUser.isAssistant) && <LiveTracking {...props} />}
         {tab === "fuel"        && (currentUser.isAdmin || currentUser.isAssistant) && <FuelLog {...props} />}
         {tab === "maintenance" && (currentUser.isAdmin || currentUser.isAssistant) && <Maintenance {...props} />}
-        {tab === "approvals"   && currentUser.isAdmin && <Approvals {...props} />}
+        {tab === "approvals"   && currentUser.isAdmin && <Approvals {...props} cars={cars} isCarBusy={isCarBusy} />}
         {tab === "users"       && currentUser.isAdmin && <UserManagement {...props} cars={cars} saveCars={saveCars} />}
       </div>
 
@@ -935,7 +747,7 @@ function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose
       <div style={{ ...css.modalBox, maxWidth: 420 }} onClick={e => e.stopPropagation()}>
         <div style={{ fontSize: 28, textAlign: "center", marginBottom: 6 }}>🔑</div>
         <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 4 }}>Change Password</div>
-        <div style={{ fontSize: 12, color: G.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name} · PF: {currentUser.pfId}</div>
+        <div style={{ fontSize: 12, color: G.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''} · PF: {currentUser.pfId}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
             <label style={css.label}>Current Password</label>
@@ -1005,7 +817,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
     if (!checkPassword(pfId.trim(), password)) { setError("❌ Incorrect password. Please try again."); return; }
     setLoading(true);
     setTimeout(() => {
-      onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), isAssistant: !!(user.isAssistant), role: "staff" });
+      onLogin({ name: user.name, pfId: user.pfId, department: user.department || "", designation: user.designation || "", isAdmin: ADMIN_PF_IDS.includes(user.pfId), isAssistant: !!(user.isAssistant), role: "staff" });
       setLoading(false);
     }, 600);
   };
@@ -1065,6 +877,9 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
     .ev-submit:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); }
     .ev-submit:active:not(:disabled) { transform: scale(0.98); }
     @keyframes goldShimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
+    @keyframes ctaBreathe { 0%,100%{box-shadow:0 0 14px rgba(59,130,246,0.5),0 4px 12px rgba(0,0,0,0.3);transform:scale(1)} 50%{box-shadow:0 0 36px rgba(59,130,246,0.95),0 0 60px rgba(59,130,246,0.45),0 4px 16px rgba(0,0,0,0.3);transform:scale(1.04)} }
+    .ev-book-cta { animation: ctaBreathe 2.2s ease-in-out infinite; }
+    .ev-book-cta:hover { animation: none !important; transform: translateY(-2px) !important; box-shadow: 0 0 44px rgba(59,130,246,1), 0 6px 20px rgba(0,0,0,0.35) !important; }
   `;
 
   return (
@@ -1082,7 +897,10 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
             <div style={S.iconRingOuter}></div>
             <div style={S.iconRing}>⚡</div>
           </div>
-          <div style={S.appName}>Pool EV Management <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(59,130,246,0.2)", color: "#60a5fa", borderRadius: 4, padding: "2px 7px", marginLeft: 4, verticalAlign: "middle", letterSpacing: "0.02em" }}>v2.2</span></div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 6 }}>
+            <div style={S.appName}>Pool EV Management</div>
+            <span style={{ marginTop: 2, padding: '2px 8px', borderRadius: 20, background: '#2563eb', fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', boxShadow: '0 0 10px rgba(59,130,246,0.6)' }}>ver 2.1</span>
+          </div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.18)', backdropFilter: 'blur(8px)' }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums', textShadow: '0 0 12px rgba(147,197,253,0.5)' }}>
@@ -1142,7 +960,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
                 <div style={S.matchCard}>
                   <div style={S.matchAvatar}>{matched.name.charAt(0)}</div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#4ade80" }}>{matched.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#4ade80" }}>{matched.name}{matched.designation ? `, ${matched.designation}` : ''}</div>
                     <div style={{ fontSize: 10, color: "#16a34a" }}>✓ {matched.department || "Authorised user"}</div>
                   </div>
                   <div style={{ marginLeft: "auto", fontSize: 16 }}>✅</div>
@@ -1217,7 +1035,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           )}
         </div>
 
-        <div style={S.footer}>Pool EV Management v2.2 · {new Date().getFullYear()}</div>
+        <div style={S.footer}>Pool EV Management · {new Date().getFullYear()}</div>
         <div style={{ textAlign: "center", marginTop: 16, padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.9))", border: "1.5px solid rgba(59,130,246,0.5)", backdropFilter: "blur(12px)", boxShadow: "0 0 28px rgba(59,130,246,0.18), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
           <div style={{ fontSize: 9, color: "#64748b", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 6 }}>✦ Designed &amp; Developed by ✦</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd", letterSpacing: "0.03em", textShadow: "0 0 16px rgba(147,197,253,0.8), 0 0 32px rgba(59,130,246,0.5), 0 0 60px rgba(59,130,246,0.25)" }}>Biswajit Bhattacharjee</div>
@@ -1256,7 +1074,6 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
   };
 
   const statusColor = { approved: G.success, pending: G.warning, rejected: G.danger };
-  const statusColorBg = { approved: G.successBg, pending: G.warningBg, rejected: G.dangerBg };
   const statusLabel = { approved: "✅ Approved — On Duty", pending: "⏳ Awaiting Approval", rejected: "❌ Rejected" };
 
   return (
@@ -1384,7 +1201,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
             <div key={t.id} style={{ padding: "14px", background: "#0f172a", borderRadius: 10, marginBottom: 10, borderLeft: `3px solid ${statusColor[t.approvalStatus] || G.muted}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                 <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{t.officerName}</div>
-                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: statusColorBg[t.approvalStatus] || G.mutedBg, color: statusColor[t.approvalStatus] || G.muted }}>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: (statusColor[t.approvalStatus] || G.muted) + "25", color: statusColor[t.approvalStatus] || G.muted }}>
                   {statusLabel[t.approvalStatus] || t.approvalStatus}
                 </span>
               </div>
@@ -1412,7 +1229,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
                 <div style={{ fontSize: 12, color: "#64748b" }}>{fmtDate(t.date)} · {t.department} · {t.departureTime}{t.returnTime ? ` – ${t.returnTime}` : ""}</div>
                 {t.startKm && t.endKm && <div style={{ fontSize: 11, color: "#475569" }}>Distance: {parseInt(t.endKm) - parseInt(t.startKm)} km</div>}
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: statusColorBg[t.approvalStatus] || G.mutedBg, color: statusColor[t.approvalStatus] || G.muted, flexShrink: 0 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: (statusColor[t.approvalStatus] || G.muted) + "20", color: statusColor[t.approvalStatus] || G.muted, flexShrink: 0 }}>
                 {t.approvalStatus?.toUpperCase()}
               </span>
             </div>
@@ -1520,10 +1337,9 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
             <div style={{ fontSize: 12, color: "#94a3b8" }}>Book your trip in a few clicks — select vehicle, destination & time.</div>
           </div>
           <button
+            className="ev-book-cta"
             onClick={() => setTab("book")}
-            style={{ padding: "12px 28px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 0 20px rgba(59,130,246,0.5), 0 4px 12px rgba(0,0,0,0.3)", letterSpacing: "0.02em", whiteSpace: "nowrap", transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(59,130,246,0.7), 0 6px 16px rgba(0,0,0,0.3)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 0 20px rgba(59,130,246,0.5), 0 4px 12px rgba(0,0,0,0.3)"; }}
+            style={{ padding: "12px 28px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", letterSpacing: "0.02em", whiteSpace: "nowrap", transition: "box-shadow 0.2s, transform 0.2s" }}
           >⚡ Book a Vehicle Now →</button>
         </div>
         {/* ── Vehicle availability card ── */}
@@ -1544,7 +1360,10 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                   <div style={{ fontWeight: 700, fontSize: 13, color: G.text }}>{car.name}</div>
                   <div style={{ fontSize: 11, color: G.muted }}>{car.plate}</div>
                   <div style={{ marginTop: 6 }}>
-                    <span style={css.badge(busy ? G.danger : G.success)}>{busy ? "● On Duty" : "● Available"}</span>
+                    {(() => {
+                    const isPending = busy && trips.some(t => t.carId === car.id && !t.returnTime && t.approvalStatus === "pending");
+                    return <span style={css.badge(isPending ? G.warning : busy ? G.danger : G.success)}>{isPending ? "● Pending" : busy ? "● On Duty" : "● Available"}</span>;
+                  })()}
                   </div>
                 </div>
               );
@@ -1728,7 +1547,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
 }
 
 // ── BOOK TRIP ─────────────────────────────────────────────────
-function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pendingTripForCar, setTab, currentUser, allUsers }) {
+function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab, currentUser, allUsers }) {
 
   const freshUser = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
   const initName = freshUser?.name || currentUser?.name || "";
@@ -1738,8 +1557,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
   const [pfInput, setPfInput] = useState(initPfId);
   const [matchedUser, setMatchedUser] = useState(initPfId ? { name: initName, pfId: initPfId, department: initDept } : null);
   const [form, setForm] = useState({ carId: "", officerName: initName, department: initDept, officerPfId: initPfId, destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
-  const [returnForm, setReturnForm] = useState({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
-  const [submitting, setSubmitting] = useState(false);
+  const [returnForm, setReturnForm] = useState({ tripId: "", returnTime: now(), endKm: "", remarks: "" });
   const [msg, setMsg] = useState("");
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -1753,7 +1571,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
       const found = allUsers.find(u => u.pfId === trimmed);
       if (found) {
         setMatchedUser(found);
-        setForm(f => ({ ...f, officerName: found.name, department: found.department || "", officerPfId: found.pfId }));
+        setForm(f => ({ ...f, officerName: found.name, department: found.department || "", designation: found.designation || "", officerPfId: found.pfId }));
       } else {
         setMatchedUser(null);
         setForm(f => ({ ...f, officerName: "", department: "", officerPfId: "" }));
@@ -1775,19 +1593,39 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
     ? trips.find(t => !t.returnTime && (t.approvalStatus === "approved" || t.approvalStatus === "pending") && (t.bookedByPfId === userActiveTripPfId || t.officerPfId === userActiveTripPfId))
     : null;
 
-  const handleBook = async () => {
-    if (submitting) return;
+  const handleBook = () => {
     if (!matchedUser) { setMsg("❌ Please enter a valid PF ID first."); return; }
     if (!form.carId || !form.destination || !form.date || !form.departureTime) {
       setMsg("❌ Please fill all required fields."); return;
     }
-    if (activeTripForCar(form.carId)) { setMsg("❌ This vehicle is currently on duty."); return; }
-    if (pendingTripForCar(form.carId)) { setMsg("❌ This vehicle has already been booked by someone else and is awaiting approval."); return; }
+
+    // ── Date must be today only ──
+    if (form.date !== today()) {
+      setMsg("❌ Booking is only allowed for today's date. Please correct the date.");
+      set("date", today());
+      return;
+    }
+
+    // ── Departure time must be now or within 30 minutes from now ──
+    const [nowH, nowM] = now().split(":").map(Number);
+    const [depH, depM] = form.departureTime.split(":").map(Number);
+    const nowTotalMin = nowH * 60 + nowM;
+    const depTotalMin = depH * 60 + depM;
+    const diffMin = depTotalMin - nowTotalMin;
+    if (diffMin > 30) {
+      setMsg("🚫 Journey time cannot be more than 30 minutes from now. Please book closer to your actual departure time.");
+      return;
+    }
+    if (diffMin < -60) {
+      setMsg("❌ Departure time appears to be in the past. Please enter the correct time.");
+      return;
+    }
+
+    if (isCarBusy(form.carId)) { setMsg("❌ This vehicle is already booked or pending approval. Please select another vehicle."); return; }
     if (userHasActiveTrip && userActiveTrip) {
       setMsg("❌ You already have an active/pending trip (" + userActiveTrip.carName + " → " + userActiveTrip.destination + "). Please cancel or return that vehicle before booking another.");
       return;
     }
-    setSubmitting(true);
     const car = cars.find(c => c.id === form.carId);
     const newTrip = {
       id: Date.now().toString(), ...form,
@@ -1799,40 +1637,26 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
       returnTime: "", endKm: "", remarks: "",
       bookedAt: new Date().toISOString(),
     };
-    try {
-      await saveTrips([...trips, newTrip]);
-      // Reset form — re-lookup current user's fresh data from merged list
-      const fresh = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
-      setPfInput(currentUser?.pfId || "");
-      setMatchedUser(fresh || null);
-      setForm({ carId: "", officerName: fresh?.name || currentUser?.name || "", department: fresh?.department || "", officerPfId: currentUser?.pfId || "", destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
-      setMsg("✅ Trip request submitted! Awaiting approval from admins.");
-      setTimeout(() => setMsg(""), 4000);
-    } catch(e) {
-      setMsg("❌ Failed to save — check your connection and try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    saveTrips([...trips, newTrip]);
+    // Reset form — re-lookup current user's fresh data from merged list
+    const fresh = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
+    setPfInput(currentUser?.pfId || "");
+    setMatchedUser(fresh || null);
+    setForm({ carId: "", officerName: fresh?.name || currentUser?.name || "", department: fresh?.department || "", officerPfId: currentUser?.pfId || "", destination: "", purpose: "", date: today(), departureTime: now(), startKm: "" });
+    setMsg("✅ Trip request submitted! Awaiting approval from admins.");
+    setTimeout(() => setMsg(""), 4000);
   };
 
-  const handleReturn = async () => {
-    if (submitting) return;
+  const handleReturn = () => {
     const tripId = returnForm.tripId || (trips.filter(t => !t.returnTime && t.approvalStatus === "approved" && (t.bookedByPfId === currentUser?.pfId || t.officerPfId === currentUser?.pfId))[0]?.id);
     if (!tripId || !returnForm.returnTime) { setMsg("❌ Please select trip and enter return time."); return; }
     const returnDate = returnForm.returnDate || today();
     const returnDateTime = returnDate + " " + returnForm.returnTime;
     const updated = trips.map(t => t.id === tripId ? { ...t, returnTime: returnDateTime, endKm: returnForm.endKm, remarks: returnForm.remarks } : t);
-    setSubmitting(true);
-    try {
-      await saveTrips(updated);
-      setReturnForm({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
-      setMsg("✅ Vehicle released successfully!");
-      setTimeout(() => { setMsg(""); setTab("dashboard"); }, 1500);
-    } catch(e) {
-      setMsg("❌ Failed to save — check your connection and try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    saveTrips(updated);
+    setReturnForm({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
+    setMsg("✅ Vehicle released successfully!");
+    setTimeout(() => { setMsg(""); setTab("dashboard"); }, 1500);
   };
 
   // Only approved trips can be returned
@@ -1885,7 +1709,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
                   {matchedUser.name.charAt(0)}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: "#166534" }}>{matchedUser.name}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: "#166534" }}>{matchedUser.name}{matchedUser.designation ? `, ${matchedUser.designation}` : ''}</div>
                   <div style={{ fontSize: 12, color: "#16a34a" }}>🏢 {matchedUser.department || "—"}</div>
                 </div>
                 <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 600 }}>✓ Verified</div>
@@ -1897,10 +1721,10 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
               <select style={css.select} value={form.carId} onChange={e => set("carId", e.target.value)}>
                 <option value="">-- Choose Vehicle --</option>
                 {cars.map(c => {
-                  const onDuty = !!activeTripForCar(c.id);
-                  const booked = !onDuty && !!pendingTripForCar(c.id);
-                  const label = onDuty ? "(On Duty)" : booked ? "(Booked — Pending Approval)" : "(Available)";
-                  return <option key={c.id} value={c.id} disabled={onDuty || booked}>{c.name} — {c.plate} | Driver: {c.driver} {label}</option>;
+                  const busy = isCarBusy(c.id);
+                  const isPending = busy && trips.some(t => t.carId === c.id && !t.returnTime && t.approvalStatus === "pending");
+                  const statusLabel = isPending ? "(Pending Booking)" : busy ? "(On Duty)" : "(Available)";
+                  return <option key={c.id} value={c.id} disabled={busy}>{c.name} — {c.plate} | Driver: {c.driver} {statusLabel}</option>;
                 })}
               </select>
             </div>
@@ -1945,11 +1769,11 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
             </div>
             <div style={css.formGrid}>
               <div>
-                <label style={css.label}>Date *</label>
-                <input type="date" style={css.input} value={form.date} onChange={e => set("date", e.target.value)} />
+                <label style={css.label}>Date * <span style={{ fontSize: 10, color: G.muted, fontWeight: 400 }}>(today only)</span></label>
+                <input type="date" style={{ ...css.input, opacity: 0.7, cursor: "not-allowed" }} value={today()} readOnly min={today()} max={today()} />
               </div>
               <div>
-                <label style={css.label}>Departure Time *</label>
+                <label style={css.label}>Departure Time * <span style={{ fontSize: 10, color: G.muted, fontWeight: 400 }}>(within 30 min)</span></label>
                 <input type="time" style={css.input} value={form.departureTime} onChange={e => set("departureTime", e.target.value)} />
               </div>
             </div>
@@ -1957,7 +1781,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
               <label style={css.label}>Start Odometer (km)</label>
               <input type="number" style={css.input} value={form.startKm} onChange={e => set("startKm", e.target.value)} placeholder="e.g. 45230" />
             </div>
-            <button style={{ ...css.btn(G.info), opacity: submitting ? 0.6 : 1 }} onClick={handleBook} disabled={submitting}>{submitting ? "Submitting…" : "Submit Trip Request →"}</button>
+            <button style={css.btn(G.info)} onClick={handleBook}>Submit Trip Request →</button>
           </div>
         </div>
 
@@ -2037,8 +1861,8 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
                     <input style={css.input} value={returnForm.remarks} onChange={e => setR("remarks", e.target.value)} placeholder="Any issues, notes..." />
                   </div>
                 </div>
-                <button style={{ ...css.btn(G.success), fontSize: 15, padding: "12px 20px", opacity: submitting ? 0.6 : 1 }} onClick={handleReturn} disabled={submitting}>
-                  {submitting ? "Saving…" : "🔓 Release Vehicle & Mark Returned"}
+                <button style={{ ...css.btn(G.success), fontSize: 15, padding: "12px 20px" }} onClick={handleReturn}>
+                  🔓 Release Vehicle & Mark Returned
                 </button>
               </div>
             );
@@ -2119,47 +1943,58 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, pending
 }
 
 // ── APPROVALS ─────────────────────────────────────────────────
-function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, activeTripForCar, pendingTripForCar }) {
+function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
+  const [rejectId, setRejectId] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
   const [filter, setFilter] = useState("pending");
+  const [changeVehicleId, setChangeVehicleId] = useState(null);
+  const [selectedNewCar, setSelectedNewCar] = useState("");
 
   const pending = trips.filter(t => t.approvalStatus === "pending");
   const approved = trips.filter(t => t.approvalStatus === "approved");
   const rejected = trips.filter(t => t.approvalStatus === "rejected");
 
-  const handleApprove = (tripId, overrideCarId) => {
+  const handleApprove = (tripId) => {
     const updated = trips.map(t => {
       if (t.id !== tripId) return t;
       const newApprovedBy = [...(t.approvedBy || [])];
       if (!newApprovedBy.includes(currentUser.pfId)) newApprovedBy.push(currentUser.pfId);
       const fullyApproved = newApprovedBy.includes(ADMIN_1.pfId) || newApprovedBy.includes(ADMIN_2.pfId);
-      // Apply vehicle override if admin chose a different car
-      let carFields = {};
-      if (overrideCarId && overrideCarId !== t.carId) {
-        const car = (cars || []).find(c => c.id === overrideCarId);
-        if (car) carFields = { carId: car.id, carName: car.name, carPlate: car.plate, driver: car.driver, driverPhone: car.driverPhone };
-      }
-      return { ...t, ...carFields, approvedBy: newApprovedBy, approvalStatus: fullyApproved ? "approved" : "pending" };
+      return { ...t, approvedBy: newApprovedBy, approvalStatus: fullyApproved ? "approved" : "pending" };
     });
     saveTrips(updated);
   };
 
-  const handleReject = (tripId, reason) => {
+  const handleReject = (tripId) => {
     const updated = trips.map(t => t.id !== tripId ? t : {
       ...t, approvalStatus: "rejected", rejectedBy: currentUser.pfId,
-      rejectedByName: currentUser.name, rejectionReason: reason, rejectedAt: new Date().toISOString()
+      rejectedByName: currentUser.name, rejectionReason: rejectReason, rejectedAt: new Date().toISOString()
     });
     saveTrips(updated);
+    setRejectId(null);
+    setRejectReason("");
+  };
+
+  const handleChangeVehicle = (tripId) => {
+    if (!selectedNewCar) return;
+    const car = cars.find(c => c.id === selectedNewCar);
+    if (!car) return;
+    const updated = trips.map(t => t.id !== tripId ? t : {
+      ...t, carId: car.id, carName: car.name, carPlate: car.plate,
+      driver: car.driver, driverPhone: car.driverPhone,
+      vehicleChangedBy: currentUser.name, vehicleChangedAt: new Date().toISOString()
+    });
+    saveTrips(updated);
+    setChangeVehicleId(null);
+    setSelectedNewCar("");
   };
 
   const displayTrips = filter === "pending" ? pending : filter === "approved" ? approved : rejected;
 
   const ApprovalCard = ({ t }) => {
     const myApproved = t.approvedBy?.includes(currentUser.pfId);
-    // Per-card state — isolated so cards never interfere with each other
-    const [showApprovePanel, setShowApprovePanel] = useState(false);
-    const [cardCarId, setCardCarId] = useState(t.carId);
-    const [showRejectPanel, setShowRejectPanel] = useState(false);
-    const [rejectReason, setRejectReason] = useState("");
+    const admin1Done = t.approvedBy?.includes(ADMIN_1.pfId);
+    const admin2Done = t.approvedBy?.includes(ADMIN_2.pfId);
     return (
       <div style={{ ...css.card, marginBottom: 16, borderLeft: `4px solid ${t.approvalStatus === "approved" ? G.success : t.approvalStatus === "rejected" ? G.danger : G.warning}` }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
@@ -2172,7 +2007,10 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, activeTripF
               {t.approvalStatus === "rejected" && <span style={css.badge(G.danger)}>❌ Rejected</span>}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", fontSize: 13 }}>
-              <div><span style={{ color: G.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span><span style={{ color: G.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</span>
+                {t.vehicleChangedBy && <span style={{ fontSize: 10, color: G.info, fontStyle: "italic" }}>Changed by {t.vehicleChangedBy}</span>}
+              </div>
               <div><span style={{ color: G.muted }}>Driver:</span> {t.driver}</div>
               <div><span style={{ color: G.muted }}>Department:</span> {t.department}</div>
               <div><span style={{ color: G.muted }}>Date:</span> {fmtDate(t.date)} at {t.departureTime}</div>
@@ -2202,8 +2040,8 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, activeTripF
             {/* Action buttons — only show for pending trips */}
             {t.approvalStatus === "pending" && !myApproved && (
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => { setShowApprovePanel(true); setCardCarId(t.carId); setShowRejectPanel(false); }}>✅ Approve</button>
-                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => { setShowRejectPanel(true); setShowApprovePanel(false); }}>❌ Reject</button>
+                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => handleApprove(t.id)}>✅ Approve</button>
+                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => setRejectId(t.id)}>❌ Reject</button>
               </div>
             )}
             {t.approvalStatus === "pending" && myApproved && (
@@ -2211,50 +2049,58 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, activeTripF
                 ✅ You have approved this request
               </div>
             )}
+            {/* Change Vehicle button — always visible for admin on pending trips */}
+            {t.approvalStatus === "pending" && (
+              <button
+                style={{ ...css.btn(G.info, true), fontSize: 12, marginTop: 4 }}
+                onClick={() => { setChangeVehicleId(changeVehicleId === t.id ? null : t.id); setSelectedNewCar(""); }}
+              >🔄 Change Vehicle</button>
+            )}
           </div>
         </div>
 
-        {/* Vehicle change + confirm approval panel */}
-        {showApprovePanel && (
-          <div style={{ marginTop: 14, padding: 14, background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: G.success, marginBottom: 10 }}>✅ Confirm Approval</div>
-            <div style={{ fontSize: 12, color: G.muted, marginBottom: 8 }}>You may assign a different available vehicle before approving.</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <div>
-                <label style={{ ...css.label, color: G.text }}>Assign Vehicle</label>
-                <select style={css.select} value={cardCarId} onChange={e => setCardCarId(e.target.value)}>
-                  {(cars || []).map(c => {
-                    const onDuty = !!(activeTripForCar && activeTripForCar(c.id));
-                    const hasPending = !onDuty && !!(pendingTripForCar && pendingTripForCar(c.id)) && c.id !== t.carId;
-                    const disabled = onDuty;
-                    const label = onDuty ? " (On Duty)" : hasPending ? " (Pending Booking)" : c.id === t.carId ? " (Requested)" : " ✓ Available";
-                    return <option key={c.id} value={c.id} disabled={disabled}>{c.name} — {c.plate}{label}</option>;
-                  })}
-                </select>
-              </div>
-              {cardCarId !== t.carId && (
-                <div style={{ fontSize: 12, padding: "6px 10px", background: "#fef9c3", borderRadius: 6, color: "#92400e" }}>
-                  ⚠️ Vehicle changed from <b>{t.carName}</b> to <b>{(cars || []).find(c => c.id === cardCarId)?.name || cardCarId}</b>
-                </div>
-              )}
-              <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => { handleApprove(t.id, cardCarId); setShowApprovePanel(false); }}>
-                  ✅ Confirm &amp; Approve
-                </button>
-                <button style={{ ...css.btn(G.muted, true), fontSize: 12 }} onClick={() => setShowApprovePanel(false)}>Cancel</button>
-              </div>
+        {/* Change Vehicle panel */}
+        {changeVehicleId === t.id && (
+          <div style={{ marginTop: 14, padding: 14, background: "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: G.info, marginBottom: 10 }}>🔄 Change Assigned Vehicle</div>
+            <div style={{ fontSize: 12, color: G.muted, marginBottom: 10 }}>
+              Currently: <b>{t.carName}</b> ({t.carPlate}) · Driver: {t.driver}
+            </div>
+            <select
+              style={{ ...css.input, marginBottom: 10 }}
+              value={selectedNewCar}
+              onChange={e => setSelectedNewCar(e.target.value)}
+            >
+              <option value="">— Select a vehicle —</option>
+              {cars.map(c => {
+                const busyForOther = trips.some(x => x.carId === c.id && x.id !== t.id && !x.returnTime && (x.approvalStatus === "approved" || x.approvalStatus === "pending"));
+                const isPending = busyForOther && trips.some(x => x.carId === c.id && x.id !== t.id && !x.returnTime && x.approvalStatus === "pending");
+                return (
+                  <option key={c.id} value={c.id} disabled={busyForOther}>
+                    {c.name} — {c.plate} | Driver: {c.driver} {busyForOther ? (isPending ? "(Pending Booking)" : "(On Duty)") : c.id === t.carId ? "(Current)" : "(Available)"}
+                  </option>
+                );
+              })}
+            </select>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                style={{ ...css.btn(G.info), fontSize: 12 }}
+                disabled={!selectedNewCar || selectedNewCar === t.carId}
+                onClick={() => handleChangeVehicle(t.id)}
+              >✅ Confirm Change</button>
+              <button style={{ ...css.btn(G.muted, true), fontSize: 12 }} onClick={() => { setChangeVehicleId(null); setSelectedNewCar(""); }}>Cancel</button>
             </div>
           </div>
         )}
 
         {/* Reject modal inline */}
-        {showRejectPanel && (
+        {rejectId === t.id && (
           <div style={{ marginTop: 14, padding: 14, background: "#fff1f2", borderRadius: 8, border: "1px solid #fecdd3" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: G.danger, marginBottom: 8 }}>Reason for Rejection</div>
             <input style={{ ...css.input, marginBottom: 10 }} value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Enter reason (optional)" autoFocus />
             <div style={{ display: "flex", gap: 8 }}>
-              <button style={css.btn(G.danger)} onClick={() => { handleReject(t.id, rejectReason); setShowRejectPanel(false); setRejectReason(""); }}>Confirm Rejection</button>
-              <button style={css.btn(G.muted, true)} onClick={() => { setShowRejectPanel(false); setRejectReason(""); }}>Cancel</button>
+              <button style={css.btn(G.danger)} onClick={() => handleReject(t.id)}>Confirm Rejection</button>
+              <button style={css.btn(G.muted, true)} onClick={() => { setRejectId(null); setRejectReason(""); }}>Cancel</button>
             </div>
           </div>
         )}
@@ -2628,7 +2474,16 @@ function TripLog({ cars, trips, currentUser }) {
                             <td style={css.td}>{t.startKm || "—"}</td>
                             <td style={css.td}>{t.endKm || "—"}</td>
                             <td style={{ ...css.td, fontWeight: 600 }}>{dist}</td>
-                            <td style={css.td}><span style={css.badge(t.returnTime ? G.success : G.warning)}>{t.returnTime ? "Done" : "Active"}</span></td>
+                            <td style={css.td}>
+                              {t.returnTime
+                                ? <span style={css.badge(G.success)}>✅ Done</span>
+                                : t.approvalStatus === "rejected"
+                                  ? <span style={css.badge(G.danger)}>❌ Rejected</span>
+                                  : t.approvalStatus === "pending"
+                                    ? <span style={css.badge(G.warning)}>⏳ Pending</span>
+                                    : <span style={css.badge("#0891b2")}>🚗 Active</span>
+                              }
+                            </td>
                           </tr>
                         );
                       })}
@@ -2935,23 +2790,9 @@ function DriverEditCard({ car, onSave }) {
 }
 
 // ── USER MANAGEMENT ──────────────────────────────────────────
-function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword, activeSessions }) {
+function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword }) {
   const users = allUsers;
   const saveUsers = saveAllUsers;
-
-  // Always hold the latest users in a ref so forceSaveToServer never reads
-  // a stale closure value (e.g. when clicked quickly after an edit, before
-  // React has re-rendered with the updated allUsers prop).
-  const latestUsersRef = React.useRef(allUsers);
-  latestUsersRef.current = allUsers;
-
-  // Derive session list with status labels
-  const sessionList = Object.values(activeSessions || {}).map(s => {
-    const lastSeen = s.lastSeen ? new Date(s.lastSeen) : null;
-    const minsAgo = lastSeen ? Math.floor((Date.now() - lastSeen.getTime()) / 60000) : 999;
-    const status = minsAgo <= 10 ? "active" : minsAgo <= 30 ? "idle" : "stale";
-    return { ...s, minsAgo, status };
-  }).sort((a, b) => (a.loginAt > b.loginAt ? -1 : 1));
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ name: "", pfId: "", department: "" });
   const [msg, setMsg] = useState("");
@@ -2962,20 +2803,38 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
 
   const showMsg = (m) => { setMsg(m); setTimeout(() => setMsg(""), 4000); };
 
-  // Force-write current live user list to Firebase — saves all additions, edits, role changes.
-  // Uses latestUsersRef (not the closure variable) so it always writes the most
-  // up-to-date list even if called before React has completed a re-render.
+  // Force-write current live user list to Firebase — saves all additions, edits, role changes
   const forceSaveToServer = async () => {
-    const currentList = latestUsersRef.current;
     showMsg("⏳ Saving current user list to server...");
     try {
       const db = window.__db;
       if (db) {
-        await db.collection("config").doc("users").set({ list: currentList, _seeded: true });
-        showMsg("✅ Done! Current user list (" + currentList.length + " users) saved permanently on all devices.");
+        await db.collection("config").doc("users").set({ list: users, _seeded: true });
+        showMsg("✅ Done! Current user list (" + users.length + " users) saved permanently on all devices.");
       }
     } catch(e) {
       showMsg("❌ Save failed: " + e.message);
+    }
+  };
+
+  // Sync fresh AUTHORISED_USERS from code to Firebase, preserving isAssistant flags
+  const [syncConfirm, setSyncConfirm] = useState(false);
+  const syncNewUserList = async () => {
+    showMsg("⏳ Syncing new user list to Firebase...");
+    try {
+      const db = window.__db;
+      if (!db) { showMsg("❌ No database connection."); return; }
+      // Preserve isAssistant flags from current list
+      const newList = AUTHORISED_USERS.map(u => {
+        const existing = users.find(e => e.pfId === u.pfId);
+        return { ...u, isAssistant: !!(existing?.isAssistant) };
+      });
+      await db.collection("config").doc("users").set({ list: newList, _seeded: true });
+      saveAllUsers(newList);
+      showMsg("✅ Done! New list of " + newList.length + " users synced to Firebase. Old list replaced.");
+      setSyncConfirm(false);
+    } catch(e) {
+      showMsg("❌ Sync failed: " + e.message);
     }
   };
 
@@ -2994,12 +2853,11 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
     showMsg("✅ User removed.");
   };
 
-  const handleEdit = async () => {
+  const handleEdit = () => {
     if (!editUser.name.trim() || !editUser.department.trim()) { showMsg("❌ Name and department are required."); return; }
-    const updated = users.map(u => u.pfId === editUser.pfId ? { ...u, name: editUser.name.trim().toUpperCase(), department: editUser.department.trim() } : u);
+    saveUsers(users.map(u => u.pfId === editUser.pfId ? { ...u, name: editUser.name.trim().toUpperCase(), department: editUser.department.trim() } : u));
     setEditUser(null);
-    await saveUsers(updated);
-    showMsg("✅ User updated and saved.");
+    showMsg("✅ User updated.");
   };
 
   const filtered = users.filter(u =>
@@ -3011,48 +2869,6 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-      {/* ── WHO'S ONLINE ── */}
-      <div style={{ background: "#0f172a", borderRadius: 12, padding: "16px 20px", border: "1px solid #1e293b" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: sessionList.length > 0 ? 14 : 0 }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e", flexShrink: 0 }}></div>
-          <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 14 }}>Who's Online</div>
-          <span style={{ background: "#1e293b", color: "#94a3b8", borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 700 }}>{sessionList.filter(s => s.status !== "stale").length} active</span>
-          <span style={{ color: "#475569", fontSize: 12, marginLeft: "auto" }}>Updates live · Active = last seen &lt;10 min · Idle = 10–30 min</span>
-        </div>
-        {sessionList.length === 0 && <div style={{ color: "#475569", fontSize: 13 }}>No active sessions right now.</div>}
-        {sessionList.length > 0 && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 10 }}>
-            {sessionList.map(s => {
-              const dot = s.status === "active" ? "#22c55e" : s.status === "idle" ? "#f59e0b" : "#64748b";
-              const label = s.status === "active" ? "Active" : s.status === "idle" ? "Idle" : "Session expired";
-              const loginTime = s.loginAt ? new Date(s.loginAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "—";
-              const loginDate = s.loginAt ? new Date(s.loginAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) : "—";
-              return (
-                <div key={s.pfId} style={{ background: "#1e293b", borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "center", gap: 12, border: `1px solid ${dot}30` }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: s.status === "active" ? "#14532d" : s.status === "idle" ? "#451a03" : "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", color: dot, fontWeight: 800, fontSize: 14, flexShrink: 0, border: `2px solid ${dot}` }}>
-                    {s.name ? s.name.charAt(0) : "?"}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</div>
-                    <div style={{ color: "#64748b", fontSize: 11 }}>{s.department || s.role || "Staff"}</div>
-                    <div style={{ color: "#475569", fontSize: 11 }}>Logged in {loginDate} at {loginTime}</div>
-                  </div>
-                  <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: dot + "20", color: dot, borderRadius: 20, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: dot, display: "inline-block" }}></span>
-                      {label}
-                    </div>
-                    <div style={{ color: "#475569", fontSize: 10, marginTop: 3 }}>
-                      {s.status !== "stale" ? `${s.minsAgo}m ago` : "30+ min"}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
       {/* ── FORCE SAVE BANNER ── */}
       <div style={{ background: "#065f46", borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div>
@@ -3062,6 +2878,24 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
         <button onClick={forceSaveToServer} style={{ background: "#10b981", border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
           💾 Force Save to Server
         </button>
+      </div>
+
+      {/* Sync new user list from code */}
+      <div style={{ background: "#1e3a5f", borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, border: "1.5px solid rgba(59,130,246,0.4)" }}>
+        <div>
+          <div style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>🔄 Sync New User Database from Code</div>
+          <div style={{ color: "#93c5fd", fontSize: 12, marginTop: 2 }}>Replaces Firebase with the latest {AUTHORISED_USERS.length}-user list. Assistant roles are preserved.</div>
+        </div>
+        {!syncConfirm
+          ? <button onClick={() => setSyncConfirm(true)} style={{ background: "#3b82f6", border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+              🔄 Sync Now
+            </button>
+          : <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <span style={{ color: "#fcd34d", fontSize: 12, fontWeight: 600 }}>⚠️ This will replace all {users.length} current users. Sure?</span>
+              <button onClick={syncNewUserList} style={{ background: "#ef4444", border: "none", borderRadius: 8, padding: "8px 16px", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Yes, Replace</button>
+              <button onClick={() => setSyncConfirm(false)} style={{ background: "transparent", border: "1px solid #475569", borderRadius: 8, padding: "8px 16px", color: "#94a3b8", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>Cancel</button>
+            </div>
+        }
       </div>
 
       <div style={css.grid4}>
@@ -3149,7 +2983,10 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
                   <td style={css.td}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ width: 28, height: 28, borderRadius: "50%", background: isAdmin ? G.info : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 11, flexShrink: 0 }}>{u.name.charAt(0)}</div>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>{u.name}</div>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 13 }}>{u.name}</div>
+                        {u.designation && <div style={{ fontSize: 10, color: G.muted }}>{u.designation}</div>}
+                      </div>
                     </div>
                   </td>
                   <td style={{ ...css.td, fontFamily: "monospace" }}>{u.pfId}</td>
