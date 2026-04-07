@@ -398,46 +398,58 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-dig
 const fmtTime = (t) => t || "—";
 
 // ── STYLES ────────────────────────────────────────────────────
-const G = {
-  bg: "#f0f4f8", card: "#ffffff", border: "#e2e8f0",
-  text: "#1e293b", muted: "#64748b", light: "#f8fafc",
-  success: "#16a34a", danger: "#dc2626", warning: "#d97706",
-  info: "#2563eb",
-};
+// G and css are functions of darkMode — call them with the current theme value
+const makeG = (dark) => ({
+  bg:      dark ? "#0f172a" : "#f0f4f8",
+  card:    dark ? "#1e293b" : "#ffffff",
+  border:  dark ? "#334155" : "#e2e8f0",
+  text:    dark ? "#f1f5f9" : "#1e293b",
+  muted:   dark ? "#94a3b8" : "#64748b",
+  light:   dark ? "#1e293b" : "#f8fafc",
+  success: "#16a34a", danger: "#dc2626", warning: "#d97706", info: "#2563eb",
+});
+// Static G for module-level references (login screen etc.) — light default
+const G = makeG(false);
 
-const css = {
-  app: { minHeight: "100vh", background: G.bg, fontFamily: "'DM Sans', sans-serif", fontSize: 14 },
-  header: { background: "#1e293b", color: "#fff", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, boxShadow: "0 2px 8px rgba(0,0,0,0.2)", position: "sticky", top: 0, zIndex: 100 },
-  headerTitle: { fontSize: 16, fontWeight: 700, letterSpacing: "-0.3px" },
-  headerSub: { fontSize: 10, color: "#94a3b8", marginTop: 1 },
-  body: { padding: "16px", maxWidth: 1100, margin: "0 auto", paddingBottom: 80 },
-  grid4: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
-  card: { background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `1px solid ${G.border}` },
-  carCard: (color, busy) => ({ background: G.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `2px solid ${busy ? G.danger : G.success}`, position: "relative", overflow: "hidden" }),
-  badge: (color) => ({ display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: color + "20", color: color }),
-  btn: (color = G.info, outline = false) => ({ padding: "9px 18px", borderRadius: 7, border: outline ? `1.5px solid ${color}` : "none", background: outline ? "transparent" : color, color: outline ? color : "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.15s" }),
-  btnSm: (color = G.info) => ({ padding: "4px 12px", borderRadius: 5, border: "none", background: color, color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }),
-  input: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
-  select: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${G.border}`, fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
-  label: { fontSize: 12, fontWeight: 600, color: G.muted, marginBottom: 4, display: "block" },
-  formGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 },
-  table: { width: "100%", borderCollapse: "collapse" },
-  th: { textAlign: "left", padding: "10px 12px", fontSize: 11, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `2px solid ${G.border}`, background: G.light, whiteSpace: "nowrap" },
-  td: { padding: "10px 12px", borderBottom: `1px solid ${G.border}`, fontSize: 13, color: G.text },
-  modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 },
-  modalBox: { background: "#fff", borderRadius: 12, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" },
-  sectionTitle: { fontSize: 16, fontWeight: 700, color: G.text, marginBottom: 14 },
-  row: { display: "flex", alignItems: "center", gap: 10 },
-  statNum: { fontSize: 26, fontWeight: 800, color: G.text },
-  statLabel: { fontSize: 11, color: G.muted, fontWeight: 600 },
-  // Mobile bottom nav
-  bottomNav: { position: "fixed", bottom: 0, left: 0, right: 0, background: "#1e293b", display: "flex", zIndex: 200, borderTop: "1px solid #334155", boxShadow: "0 -4px 12px rgba(0,0,0,0.2)" },
-  bottomNavBtn: (active) => ({ flex: 1, padding: "8px 4px 10px", border: "none", background: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active ? "#60a5fa" : "#64748b", fontSize: 9, fontWeight: active ? 700 : 500, transition: "color 0.15s", minWidth: 0 }),
+const makeCss = (dark) => {
+  const T = makeG(dark);
+  return {
+    app: { minHeight: "100vh", background: T.bg, fontFamily: "'DM Sans', sans-serif", fontSize: 14, transition: "background 0.25s" },
+    header: { background: dark ? "#020617" : "#1e293b", color: "#fff", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, boxShadow: "0 2px 8px rgba(0,0,0,0.2)", position: "sticky", top: 0, zIndex: 100 },
+    headerTitle: { fontSize: 16, fontWeight: 700, letterSpacing: "-0.3px" },
+    headerSub: { fontSize: 10, color: "#94a3b8", marginTop: 1 },
+    body: { padding: "16px", maxWidth: 1100, margin: "0 auto", paddingBottom: 80 },
+    grid4: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
+    card: { background: T.card, borderRadius: 10, padding: 16, boxShadow: dark ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 4px rgba(0,0,0,0.07)", border: `1px solid ${T.border}`, transition: "background 0.25s, border-color 0.25s" },
+    carCard: (color, busy) => ({ background: T.card, borderRadius: 10, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", border: `2px solid ${busy ? T.danger : T.success}`, position: "relative", overflow: "hidden" }),
+    badge: (color) => ({ display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: color + "20", color: color }),
+    btn: (color = T.info, outline = false) => ({ padding: "9px 18px", borderRadius: 7, border: outline ? `1.5px solid ${color}` : "none", background: outline ? "transparent" : color, color: outline ? color : "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.15s" }),
+    btnSm: (color = T.info) => ({ padding: "4px 12px", borderRadius: 5, border: "none", background: color, color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }),
+    input: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${T.border}`, fontSize: 14, outline: "none", background: dark ? "#0f172a" : "#fff", color: T.text, boxSizing: "border-box" },
+    select: { width: "100%", padding: "10px 12px", borderRadius: 7, border: `1.5px solid ${T.border}`, fontSize: 14, outline: "none", background: dark ? "#0f172a" : "#fff", color: T.text, boxSizing: "border-box" },
+    label: { fontSize: 12, fontWeight: 600, color: T.muted, marginBottom: 4, display: "block" },
+    formGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 },
+    table: { width: "100%", borderCollapse: "collapse" },
+    th: { textAlign: "left", padding: "10px 12px", fontSize: 11, fontWeight: 700, color: T.muted, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `2px solid ${T.border}`, background: T.light, whiteSpace: "nowrap" },
+    td: { padding: "10px 12px", borderBottom: `1px solid ${T.border}`, fontSize: 13, color: T.text },
+    modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 },
+    modalBox: { background: T.card, borderRadius: 12, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", border: `1px solid ${T.border}` },
+    sectionTitle: { fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 14 },
+    row: { display: "flex", alignItems: "center", gap: 10 },
+    statNum: { fontSize: 26, fontWeight: 800, color: T.text },
+    statLabel: { fontSize: 11, color: T.muted, fontWeight: 600 },
+    bottomNav: { position: "fixed", bottom: 0, left: 0, right: 0, background: dark ? "#020617" : "#1e293b", display: "flex", zIndex: 200, borderTop: `1px solid ${dark ? "#1e293b" : "#334155"}`, boxShadow: "0 -4px 12px rgba(0,0,0,0.2)" },
+    bottomNavBtn: (active) => ({ flex: 1, padding: "8px 4px 10px", border: "none", background: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active ? "#60a5fa" : "#64748b", fontSize: 9, fontWeight: active ? 700 : 500, transition: "color 0.15s", minWidth: 0 }),
+  };
 };
 
 // ── MAIN APP ──────────────────────────────────────────────────
 function App() {
   const [tab, setTab] = useState("dashboard");
+  const [darkMode, setDarkMode] = useState(() => { try { return localStorage.getItem("ev_darkmode") === "1"; } catch { return false; } });
+  const toggleDark = () => setDarkMode(d => { const n = !d; try { localStorage.setItem("ev_darkmode", n ? "1" : "0"); } catch {} return n; });
+  const css = makeCss(darkMode);
+  const T = makeG(darkMode);
   const [cars, setCars] = useState(INITIAL_CARS);
   const isSavingCars = React.useRef(false);
   const saveCars = async (data) => {
@@ -605,15 +617,15 @@ function App() {
   // Block vehicle as soon as any pending OR approved trip exists (first-come-first-serve)
   const isCarBusy = (carId) => trips.some(t => t.carId === carId && !t.returnTime && (t.approvalStatus === "approved" || t.approvalStatus === "pending"));
 
-  if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", color: G.muted, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
+  if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: T.bg, fontFamily: "sans-serif", color: T.muted, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
 
   if (!currentUser) return <LoginScreen onLogin={handleLogin} allUsers={allUsers} checkPassword={checkPassword} />;
 
   // Driver portal — separate minimal interface
-  if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} />;
+  if (currentUser.role === "driver") return <DriverPortal driver={currentUser} trips={trips} saveTrips={saveTrips} onLogout={handleLogout} darkMode={darkMode} />;
 
 
-  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword };
+  const props = { cars, trips, maintenance, fuelLogs, liveLocations, saveTrips, saveMaint, saveFuel, saveLive, saveCars, isCarBusy, activeTripForCar, currentUser, allUsers, saveAllUsers, savePassword, checkPassword, darkMode, T, css };
 
   const pendingCount = trips.filter(t => t.approvalStatus === "pending").length;
 
@@ -659,7 +671,7 @@ function App() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={css.headerTitle}>⚡ Pool EV Management</div>
-            <span style={{ padding: '1px 7px', borderRadius: 20, background: '#2563eb', fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', boxShadow: '0 0 8px rgba(59,130,246,0.5)' }}>ver 2.1</span>
+            <span style={{ padding: '1px 7px', borderRadius: 20, background: '#2563eb', fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', boxShadow: '0 0 8px rgba(59,130,246,0.5)' }}>ver 2.3</span>
           </div>
           <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
         </div>
@@ -669,13 +681,15 @@ function App() {
             <button key={id} style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: tab === id ? 700 : 500, background: tab === id ? "#3b82f6" : "transparent", color: tab === id ? "#fff" : "#94a3b8" }} onClick={() => setTab(id)}>{icon} {label}</button>
           ))}
         </nav>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8 }}>
           <div style={{ textAlign: "right" }} className="hide-mobile">
             <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
             <div style={{ fontSize: 10, color: "#94a3b8" }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
           </div>
-          <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑 Password</button>
-          <button onClick={handleLogout} style={{ padding: "5px 10px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Logout</button>
+          {/* Dark / Light mode toggle */}
+          <button onClick={toggleDark} title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 13, cursor: "pointer", lineHeight: 1, whiteSpace: "nowrap" }}>{darkMode ? "☀️" : "🌙"}</button>
+          <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑</button>
+          <button onClick={handleLogout} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>⏻</button>
         </div>
       </header>
 
@@ -698,7 +712,7 @@ function App() {
             <span style={{ fontSize: 18 }}>{icon}</span>
             <span style={{ fontSize: 9, lineHeight: 1 }}>{label}</span>
             {id === "approvals" && pendingCount > 0 && (
-              <span style={{ position: "absolute", top: 4, background: G.danger, color: "#fff", borderRadius: 10, fontSize: 8, fontWeight: 800, padding: "1px 4px" }}>{pendingCount}</span>
+              <span style={{ position: "absolute", top: 4, background: T.danger, color: "#fff", borderRadius: 10, fontSize: 8, fontWeight: 800, padding: "1px 4px" }}>{pendingCount}</span>
             )}
           </button>
         ))}
@@ -711,6 +725,7 @@ function App() {
           checkPassword={checkPassword}
           savePassword={savePassword}
           onClose={() => setShowChangePw(false)}
+          darkMode={darkMode}
         />
       )}
     </div>
@@ -718,7 +733,9 @@ function App() {
 }
 
 // ── CHANGE PASSWORD MODAL ────────────────────────────────────
-function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose }) {
+function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose, darkMode }) {
+  const css = makeCss(darkMode);
+  const T = makeG(darkMode);
   const [oldPw, setOldPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
@@ -747,7 +764,7 @@ function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose
       <div style={{ ...css.modalBox, maxWidth: 420 }} onClick={e => e.stopPropagation()}>
         <div style={{ fontSize: 28, textAlign: "center", marginBottom: 6 }}>🔑</div>
         <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 4 }}>Change Password</div>
-        <div style={{ fontSize: 12, color: G.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''} · PF: {currentUser.pfId}</div>
+        <div style={{ fontSize: 12, color: T.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''} · PF: {currentUser.pfId}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
             <label style={css.label}>Current Password</label>
@@ -755,7 +772,7 @@ function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose
               <input style={{ ...css.input, paddingRight: 40 }} type={showOld ? "text" : "password"} value={oldPw} onChange={e => setOldPw(e.target.value)} placeholder="Enter current password" autoFocus />
               <button onClick={() => setShowOld(v => !v)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 15 }}>{showOld ? "🙈" : "👁️"}</button>
             </div>
-            <div style={{ fontSize: 10, color: G.muted, marginTop: 3 }}>Default is your PF ID if you haven't changed it.</div>
+            <div style={{ fontSize: 10, color: T.muted, marginTop: 3 }}>Default is your PF ID if you haven't changed it.</div>
           </div>
           <div>
             <label style={css.label}>New Password</label>
@@ -766,16 +783,16 @@ function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose
           </div>
           <div>
             <label style={css.label}>Confirm New Password</label>
-            <input style={{ ...css.input, border: confirmPw && newPw !== confirmPw ? `1.5px solid ${G.danger}` : undefined }} type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="Re-enter new password" onKeyDown={e => e.key === "Enter" && handleChange()} />
+            <input style={{ ...css.input, border: confirmPw && newPw !== confirmPw ? `1.5px solid ${T.danger}` : undefined }} type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="Re-enter new password" onKeyDown={e => e.key === "Enter" && handleChange()} />
           </div>
           {msg && (
-            <div style={{ padding: "10px 14px", background: msgType === "success" ? "#f0fdf4" : "#fef2f2", border: `1px solid ${msgType === "success" ? "#bbf7d0" : "#fecaca"}`, borderRadius: 8, fontSize: 13, color: msgType === "success" ? G.success : G.danger }}>
+            <div style={{ padding: "10px 14px", background: msgType === "success" ? (darkMode ? "#052e16" : "#f0fdf4") : (darkMode ? "#450a0a" : "#fef2f2"), border: `1px solid ${msgType === "success" ? "#bbf7d0" : "#fecaca"}`, borderRadius: 8, fontSize: 13, color: msgType === "success" ? T.success : T.danger }}>
               {msg}
             </div>
           )}
           <div style={{ display: "flex", gap: 10 }}>
-            <button style={css.btn(G.info)} onClick={handleChange} disabled={saving}>{saving ? "Saving..." : "💾 Change Password"}</button>
-            <button style={css.btn(G.muted, true)} onClick={onClose}>Cancel</button>
+            <button style={css.btn(T.info)} onClick={handleChange} disabled={saving}>{saving ? "Saving..." : "💾 Change Password"}</button>
+            <button style={css.btn(T.muted, true)} onClick={onClose}>Cancel</button>
           </div>
         </div>
       </div>
@@ -899,7 +916,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 6 }}>
             <div style={S.appName}>Pool EV Management</div>
-            <span style={{ marginTop: 2, padding: '2px 8px', borderRadius: 20, background: '#2563eb', fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', boxShadow: '0 0 10px rgba(59,130,246,0.6)' }}>ver 2.1</span>
+            <span style={{ marginTop: 2, padding: '2px 8px', borderRadius: 20, background: '#2563eb', fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', boxShadow: '0 0 10px rgba(59,130,246,0.6)' }}>ver 2.3</span>
           </div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.18)', backdropFilter: 'blur(8px)' }}>
@@ -1047,7 +1064,8 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
 }
 
 // ── DRIVER PORTAL ─────────────────────────────────────────────
-function DriverPortal({ driver, trips, saveTrips, onLogout }) {
+function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
+  const T = makeG(darkMode);
   const myTrips = trips.filter(t => t.carId === driver.carId).slice().reverse();
   const activeTrip = myTrips.find(t => !t.returnTime && t.approvalStatus === "approved");
   const pendingTrips = myTrips.filter(t => t.approvalStatus === "pending");
@@ -1073,7 +1091,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
     setTimeout(() => setReturnMsg(""), 3000);
   };
 
-  const statusColor = { approved: G.success, pending: G.warning, rejected: G.danger };
+  const statusColor = { approved: T.success, pending: T.warning, rejected: T.danger };
   const statusLabel = { approved: "✅ Approved — On Duty", pending: "⏳ Awaiting Approval", rejected: "❌ Rejected" };
 
   return (
@@ -1098,7 +1116,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
       <div style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
 
         {/* Current status card */}
-        <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, marginBottom: 16, border: `2px solid ${activeTrip ? G.success : "#334155"}` }}>
+        <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, marginBottom: 16, border: `2px solid ${activeTrip ? T.success : "#334155"}` }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Current Vehicle Status</div>
           {activeTrip ? (
             <div>
@@ -1198,10 +1216,10 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
           {todayTrips.length === 0 ? (
             <div style={{ fontSize: 13, color: "#475569", textAlign: "center", padding: "12px 0" }}>No trips scheduled for today</div>
           ) : todayTrips.map(t => (
-            <div key={t.id} style={{ padding: "14px", background: "#0f172a", borderRadius: 10, marginBottom: 10, borderLeft: `3px solid ${statusColor[t.approvalStatus] || G.muted}` }}>
+            <div key={t.id} style={{ padding: "14px", background: "#0f172a", borderRadius: 10, marginBottom: 10, borderLeft: `3px solid ${statusColor[t.approvalStatus] || T.muted}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                 <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{t.officerName}</div>
-                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: (statusColor[t.approvalStatus] || G.muted) + "25", color: statusColor[t.approvalStatus] || G.muted }}>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: (statusColor[t.approvalStatus] || T.muted) + "25", color: statusColor[t.approvalStatus] || T.muted }}>
                   {statusLabel[t.approvalStatus] || t.approvalStatus}
                 </span>
               </div>
@@ -1223,13 +1241,13 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
             <div style={{ fontSize: 13, color: "#475569", textAlign: "center", padding: "12px 0" }}>No trips recorded yet</div>
           ) : myTrips.slice(0, 10).map(t => (
             <div key={t.id} style={{ display: "flex", gap: 12, padding: "10px 0", borderBottom: "1px solid #0f172a", alignItems: "flex-start" }}>
-              <div style={{ width: 8, height: 8, borderRadius: "50%", background: statusColor[t.approvalStatus] || G.muted, marginTop: 5, flexShrink: 0 }} />
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: statusColor[t.approvalStatus] || T.muted, marginTop: 5, flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{t.officerName} → {t.destination}</div>
                 <div style={{ fontSize: 12, color: "#64748b" }}>{fmtDate(t.date)} · {t.department} · {t.departureTime}{t.returnTime ? ` – ${t.returnTime}` : ""}</div>
                 {t.startKm && t.endKm && <div style={{ fontSize: 11, color: "#475569" }}>Distance: {parseInt(t.endKm) - parseInt(t.startKm)} km</div>}
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: (statusColor[t.approvalStatus] || G.muted) + "20", color: statusColor[t.approvalStatus] || G.muted, flexShrink: 0 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: (statusColor[t.approvalStatus] || T.muted) + "20", color: statusColor[t.approvalStatus] || T.muted, flexShrink: 0 }}>
                 {t.approvalStatus?.toUpperCase()}
               </span>
             </div>
@@ -1242,7 +1260,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout }) {
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
-function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBusy, activeTripForCar, currentUser, setTab }) {
+function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBusy, activeTripForCar, currentUser, setTab, darkMode, T, css }) {
   const [view, setView] = useState("pf"); // "pf" | "driver"
   const [search, setSearch] = useState("");
   const [expandedDates, setExpandedDates] = useState({ [today()]: true }); // today expanded by default
@@ -1276,9 +1294,9 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
   );
 
   const statusBadge = (t) => {
-    if (t.returnTime) return <span style={css.badge(G.success)}>Returned</span>;
-    if (t.approvalStatus === "pending") return <span style={css.badge(G.warning)}>Pending</span>;
-    if (t.approvalStatus === "rejected") return <span style={css.badge(G.danger)}>Rejected</span>;
+    if (t.returnTime) return <span style={css.badge(T.success)}>Returned</span>;
+    if (t.approvalStatus === "pending") return <span style={css.badge(T.warning)}>Pending</span>;
+    if (t.approvalStatus === "rejected") return <span style={css.badge(T.danger)}>Rejected</span>;
     return <span style={css.badge("#0891b2")}>Active</span>;
   };
 
@@ -1287,10 +1305,10 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
       {/* ── Stat cards ── */}
       <div style={css.grid4}>
         {[
-          { label: "EVs Available",    val: cars.length - activeTrips.length, color: G.success,  icon: "✅", tab: "dashboard", hint: "View vehicle status ↓" },
+          { label: "EVs Available",    val: cars.length - activeTrips.length, color: T.success,  icon: "✅", tab: "dashboard", hint: "View vehicle status ↓" },
           { label: "Active Trips",     val: activeTrips.length,               color: "#0891b2",  icon: "🚗", tab: "trips",     hint: "View Trip Log →" },
-          { label: "Pending Approvals",val: pendingTrips.length,              color: G.warning,  icon: "⏳", tab: "approvals", hint: "Go to Approvals →" },
-          { label: "Today's Trips",    val: todayTrips.length,                color: G.info,     icon: "📋", tab: "trips",     hint: "View Trip Log →" },
+          { label: "Pending Approvals",val: pendingTrips.length,              color: T.warning,  icon: "⏳", tab: "approvals", hint: "Go to Approvals →" },
+          { label: "Today's Trips",    val: todayTrips.length,                color: T.info,     icon: "📋", tab: "trips",     hint: "View Trip Log →" },
         ].map(s => (
           <div key={s.label}
             onClick={() => s.tab && setTab && setTab(s.tab)}
@@ -1314,7 +1332,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
             {[["pf","👤 PF ID Wise"],["driver","🧑‍✈️ Driver Wise"]].map(([v, label]) => (
               <button key={v} onClick={() => { setView(v); setSearch(""); }}
                 style={{ padding: "7px 20px", borderRadius: 6, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13,
-                  background: view === v ? "#1e293b" : "transparent", color: view === v ? "#fff" : G.muted, transition: "all 0.15s" }}>
+                  background: view === v ? "#1e293b" : "transparent", color: view === v ? "#fff" : T.muted, transition: "all 0.15s" }}>
                 {label}
               </button>
             ))}
@@ -1345,24 +1363,24 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         {/* ── Vehicle availability card ── */}
         <div style={{ ...css.card, textAlign: "center", padding: 40 }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🚗</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: G.text, marginBottom: 8 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 8 }}>
             {cars.length - activeTrips.length} of {cars.length} vehicles available
           </div>
-          <div style={{ fontSize: 13, color: G.muted, marginBottom: 20 }}>
+          <div style={{ fontSize: 13, color: T.muted, marginBottom: 20 }}>
             {activeTrips.length > 0 ? `${activeTrips.length} vehicle${activeTrips.length > 1 ? "s" : ""} currently on duty` : "All vehicles are available for booking"}
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
             {cars.map(car => {
               const busy = isCarBusy(car.id);
               return (
-                <div key={car.id} style={{ padding: "12px 20px", borderRadius: 10, border: `2px solid ${busy ? G.danger : G.success}`, background: busy ? "#fef2f2" : "#f0fdf4", minWidth: 140 }}>
+                <div key={car.id} style={{ padding: "12px 20px", borderRadius: 10, border: `2px solid ${busy ? T.danger : T.success}`, background: busy ? (darkMode ? "#450a0a" : "#fef2f2") : (darkMode ? "#052e16" : "#f0fdf4"), minWidth: 140 }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>🚙</div>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: G.text }}>{car.name}</div>
-                  <div style={{ fontSize: 11, color: G.muted }}>{car.plate}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: T.text }}>{car.name}</div>
+                  <div style={{ fontSize: 11, color: T.muted }}>{car.plate}</div>
                   <div style={{ marginTop: 6 }}>
                     {(() => {
                     const isPending = busy && trips.some(t => t.carId === car.id && !t.returnTime && t.approvalStatus === "pending");
-                    return <span style={css.badge(isPending ? G.warning : busy ? G.danger : G.success)}>{isPending ? "● Pending" : busy ? "● On Duty" : "● Available"}</span>;
+                    return <span style={css.badge(isPending ? T.warning : busy ? T.danger : T.success)}>{isPending ? "● Pending" : busy ? "● On Duty" : "● Available"}</span>;
                   })()}
                   </div>
                 </div>
@@ -1385,7 +1403,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         const sortedDates = Object.keys(dateMap).sort((a, b) => b.localeCompare(a));
         if (sortedDates.length === 0) return (
           <div style={css.card}>
-            <div style={{ textAlign: "center", padding: 40, color: G.muted }}>No trips recorded yet{search ? ` for "${search}"` : ""}.</div>
+            <div style={{ textAlign: "center", padding: 40, color: T.muted }}>No trips recorded yet{search ? ` for "${search}"` : ""}.</div>
           </div>
         );
         return (
@@ -1397,21 +1415,21 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
               const activeCount = dayTrips.filter(t => !t.returnTime && t.approvalStatus === "approved").length;
               const pendingCount2 = dayTrips.filter(t => t.approvalStatus === "pending").length;
               return (
-                <div key={date} style={{ marginBottom: 12, borderRadius: 10, border: `1px solid ${isToday ? G.info : G.border}`, overflow: "hidden" }}>
+                <div key={date} style={{ marginBottom: 12, borderRadius: 10, border: `1px solid ${isToday ? T.info : T.border}`, overflow: "hidden" }}>
                   {/* Date header — clickable */}
                   <div onClick={() => toggleDate(date)}
-                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isToday ? "#eff6ff" : G.light, cursor: "pointer", userSelect: "none", borderBottom: isOpen ? `1px solid ${G.border}` : "none" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isToday ? (darkMode ? "#0c1e3c" : "#eff6ff") : T.light, cursor: "pointer", userSelect: "none", borderBottom: isOpen ? `1px solid ${T.border}` : "none" }}>
                     <span style={{ fontSize: 16 }}>{isOpen ? "▾" : "▸"}</span>
                     <div style={{ flex: 1 }}>
-                      <span style={{ fontWeight: 800, fontSize: 14, color: isToday ? G.info : G.text }}>
+                      <span style={{ fontWeight: 800, fontSize: 14, color: isToday ? T.info : T.text }}>
                         {isToday ? "📅 Today — " : "📅 "}{fmtDate(date)}
                       </span>
-                      {isToday && <span style={{ marginLeft: 8, fontSize: 11, background: G.info, color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>TODAY</span>}
+                      {isToday && <span style={{ marginLeft: 8, fontSize: 11, background: T.info, color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>TODAY</span>}
                     </div>
                     <div style={{ display: "flex", gap: 14, fontSize: 12 }}>
-                      <span style={{ color: G.muted }}><b style={{ color: G.text }}>{dayTrips.length}</b> trips</span>
-                      {activeCount > 0 && <span style={{ color: G.success, fontWeight: 700 }}>● {activeCount} active</span>}
-                      {pendingCount2 > 0 && <span style={{ color: G.warning, fontWeight: 700 }}>⏳ {pendingCount2} pending</span>}
+                      <span style={{ color: T.muted }}><b style={{ color: T.text }}>{dayTrips.length}</b> trips</span>
+                      {activeCount > 0 && <span style={{ color: T.success, fontWeight: 700 }}>● {activeCount} active</span>}
+                      {pendingCount2 > 0 && <span style={{ color: T.warning, fontWeight: 700 }}>⏳ {pendingCount2} pending</span>}
                     </div>
                   </div>
                   {/* Trip table — shown when expanded */}
@@ -1422,16 +1440,16 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                       </tr></thead>
                       <tbody>
                         {dayTrips.map((t, i) => (
-                          <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? "#f0fdf4" : "transparent" }}>
-                            <td style={{ ...css.td, color: G.muted, fontSize: 11 }}>{i + 1}</td>
+                          <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
+                            <td style={{ ...css.td, color: T.muted, fontSize: 11 }}>{i + 1}</td>
                             <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
-                            <td style={{ ...css.td, fontSize: 12, color: G.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
-                            <td style={css.td}><div style={{ fontWeight: 600 }}>{t.carName}</div><div style={{ fontSize: 11, color: G.muted }}>{t.carPlate}</div></td>
+                            <td style={{ ...css.td, fontSize: 12, color: T.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                            <td style={css.td}><div style={{ fontWeight: 600 }}>{t.carName}</div><div style={{ fontSize: 11, color: T.muted }}>{t.carPlate}</div></td>
                             <td style={css.td}>{t.driver}</td>
                             <td style={css.td}>{t.destination}</td>
-                            <td style={{ ...css.td, color: G.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
+                            <td style={{ ...css.td, color: T.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
                             <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
-                            <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: G.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: T.muted }}>—</span>}</td>
                             <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
                             <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
                             <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
@@ -1452,7 +1470,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         <div style={css.card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div style={css.sectionTitle}>Trip Entries — Driver Wise</div>
-            <div style={{ fontSize: 12, color: G.muted }}>{cars.length} vehicles · {trips.length} total entries</div>
+            <div style={{ fontSize: 12, color: T.muted }}>{cars.length} vehicles · {trips.length} total entries</div>
           </div>
           {filteredDriver.map(({ car, trips: carTrips }) => {
             const dateMap2 = {};
@@ -1463,28 +1481,28 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
             const completed = carTrips.filter(t => t.returnTime).length;
             const totalKm = carTrips.reduce((s, t) => s + (t.startKm && t.endKm ? parseInt(t.endKm) - parseInt(t.startKm) : 0), 0);
             return (
-              <div key={car.id} style={{ marginBottom: 24, borderRadius: 10, border: `2px solid ${busy ? G.danger : G.border}`, overflow: "hidden" }}>
+              <div key={car.id} style={{ marginBottom: 24, borderRadius: 10, border: `2px solid ${busy ? T.danger : T.border}`, overflow: "hidden" }}>
                 {/* Driver header */}
-                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: busy ? "#fff1f2" : G.light, borderBottom: `1px solid ${G.border}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: busy ? (darkMode ? "#450a0a" : "#fff1f2") : T.light, borderBottom: `1px solid ${T.border}` }}>
                   <div style={{ width: 44, height: 44, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, color: "#fff", fontSize: 18, flexShrink: 0 }}>
                     {car.driver.charAt(0)}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 800, fontSize: 15, color: G.text }}>🧑‍✈️ {car.driver}</div>
-                    <div style={{ fontSize: 12, color: G.muted }}>{car.name} · <b>{car.plate}</b> · {car.model}</div>
-                    <div style={{ fontSize: 12, color: G.muted }}>📞 <a href={`tel:${car.driverPhone}`} style={{ color: G.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>🧑‍✈️ {car.driver}</div>
+                    <div style={{ fontSize: 12, color: T.muted }}>{car.name} · <b>{car.plate}</b> · {car.model}</div>
+                    <div style={{ fontSize: 12, color: T.muted }}>📞 <a href={`tel:${car.driverPhone}`} style={{ color: T.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
                   </div>
                   <div style={{ display: "flex", gap: 16, fontSize: 12, textAlign: "center" }}>
-                    <div><div style={{ fontWeight: 800, fontSize: 20, color: G.text }}>{carTrips.length}</div><div style={{ color: G.muted }}>Trips</div></div>
-                    <div><div style={{ fontWeight: 800, fontSize: 20, color: G.success }}>{completed}</div><div style={{ color: G.muted }}>Done</div></div>
-                    {totalKm > 0 && <div><div style={{ fontWeight: 800, fontSize: 20, color: G.info }}>{totalKm}</div><div style={{ color: G.muted }}>km</div></div>}
-                    <span style={{ ...css.badge(busy ? G.danger : G.success), alignSelf: "center", fontSize: 12 }}>{busy ? "● On Duty" : "● Available"}</span>
+                    <div><div style={{ fontWeight: 800, fontSize: 20, color: T.text }}>{carTrips.length}</div><div style={{ color: T.muted }}>Trips</div></div>
+                    <div><div style={{ fontWeight: 800, fontSize: 20, color: T.success }}>{completed}</div><div style={{ color: T.muted }}>Done</div></div>
+                    {totalKm > 0 && <div><div style={{ fontWeight: 800, fontSize: 20, color: T.info }}>{totalKm}</div><div style={{ color: T.muted }}>km</div></div>}
+                    <span style={{ ...css.badge(busy ? T.danger : T.success), alignSelf: "center", fontSize: 12 }}>{busy ? "● On Duty" : "● Available"}</span>
                   </div>
                 </div>
 
                 {/* Active trip highlight */}
                 {active && (
-                  <div style={{ padding: "10px 16px", background: "#f0fdf4", borderBottom: `1px solid #bbf7d0`, display: "flex", gap: 20, flexWrap: "wrap", fontSize: 13 }}>
+                  <div style={{ padding: "10px 16px", background: darkMode ? "#052e16" : "#f0fdf4", borderBottom: `1px solid #bbf7d0`, display: "flex", gap: 20, flexWrap: "wrap", fontSize: 13 }}>
                     <div>🚦 <b>Currently with:</b> {active.officerName}</div>
                     <div>📍 <b>To:</b> {active.destination}</div>
                     <div>🏢 {active.department}</div>
@@ -1494,7 +1512,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                 )}
 
                 {carTrips.length === 0
-                  ? <div style={{ padding: "20px 16px", color: G.muted, fontSize: 13 }}>No trips recorded for this vehicle yet.</div>
+                  ? <div style={{ padding: "20px 16px", color: T.muted, fontSize: 13 }}>No trips recorded for this vehicle yet.</div>
                   : sortedDates2.map(date => {
                     const dayT = dateMap2[date];
                     const isTodayD = date === today();
@@ -1502,11 +1520,11 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                     return (
                       <div key={date}>
                         <div onClick={() => toggleDate("drv_"+car.id+"_"+date)}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", background: isTodayD ? "#eff6ff" : "#fafafa", cursor: "pointer", borderBottom: `1px solid ${G.border}`, userSelect: "none" }}>
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", background: isTodayD ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e293b" : "#fafafa"), cursor: "pointer", borderBottom: `1px solid ${T.border}`, userSelect: "none" }}>
                           <span style={{ fontSize: 13 }}>{isOpenD ? "▾" : "▸"}</span>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: isTodayD ? G.info : G.text }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
-                          {isTodayD && <span style={{ fontSize: 10, background: G.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
-                          <span style={{ marginLeft: "auto", fontSize: 12, color: G.muted }}>{dayT.length} trip{dayT.length !== 1 ? "s" : ""}</span>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: isTodayD ? T.info : T.text }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
+                          {isTodayD && <span style={{ fontSize: 10, background: T.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
+                          <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{dayT.length} trip{dayT.length !== 1 ? "s" : ""}</span>
                         </div>
                         {isOpenD && (
                           <div className="scroll-table"><table style={css.table}>
@@ -1515,15 +1533,15 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                             </tr></thead>
                             <tbody>
                               {dayT.map((t, i) => (
-                                <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? "#f0fdf4" : "transparent" }}>
-                                  <td style={{ ...css.td, color: G.muted, fontSize: 11 }}>{i + 1}</td>
+                                <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
+                                  <td style={{ ...css.td, color: T.muted, fontSize: 11 }}>{i + 1}</td>
                                   <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
-                                  <td style={{ ...css.td, fontSize: 12, color: G.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                                  <td style={{ ...css.td, fontSize: 12, color: T.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
                                   <td style={{ ...css.td, fontSize: 12 }}>{t.department}</td>
                                   <td style={css.td}>{t.destination}</td>
-                                  <td style={{ ...css.td, color: G.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
+                                  <td style={{ ...css.td, color: T.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
                                   <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
-                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: G.muted }}>—</span>}</td>
+                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: T.muted }}>—</span>}</td>
                                   <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
                                   <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
                                   <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
@@ -1547,7 +1565,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
 }
 
 // ── BOOK TRIP ─────────────────────────────────────────────────
-function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab, currentUser, allUsers }) {
+function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab, currentUser, allUsers, darkMode, T, css }) {
 
   const freshUser = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
   const initName = freshUser?.name || currentUser?.name || "";
@@ -1665,10 +1683,10 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
   const myTrips = trips.filter(t => t.bookedByPfId === currentUser?.pfId).slice().reverse().slice(0, 5);
 
   const approvalBadge = (t) => {
-    if (t.approvalStatus === "approved") return <span style={css.badge(G.success)}>✅ Approved</span>;
-    if (t.approvalStatus === "rejected") return <span style={css.badge(G.danger)}>❌ Rejected</span>;
+    if (t.approvalStatus === "approved") return <span style={css.badge(T.success)}>✅ Approved</span>;
+    if (t.approvalStatus === "rejected") return <span style={css.badge(T.danger)}>❌ Rejected</span>;
     const count = t.approvedBy?.length || 0;
-    return <span style={css.badge(G.warning)}>⏳ Awaiting Approval</span>;
+    return <span style={css.badge(T.warning)}>⏳ Awaiting Approval</span>;
   };
 
   return (
@@ -1677,11 +1695,11 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
         {/* Book */}
         <div style={css.card}>
           <div style={css.sectionTitle}>📤 Request a Vehicle</div>
-          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13, fontWeight: 600 }}>{msg}</div>}
+          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? (darkMode ? "#052e16" : "#dcfce7") : (darkMode ? "#450a0a" : "#fee2e2"), marginBottom: 14, fontSize: 13, fontWeight: 600 }}>{msg}</div>}
 
           {/* Approval notice for non-admins */}
           {!currentUser?.isAdmin && (
-            <div style={{ padding: "10px 14px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, marginBottom: 16, fontSize: 12, color: "#1e40af" }}>
+            <div style={{ padding: "10px 14px", background: darkMode ? "#0c1e3c" : "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, marginBottom: 16, fontSize: 12, color: "#1e40af" }}>
             ℹ️ Your trip request will be sent for approval to <b>Biswajit Bhattacharjee</b> and <b>Abhijit Bhattacharjee</b>. Approval from either one will confirm your vehicle.
             </div>
           )}
@@ -1691,20 +1709,20 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
             <div>
               <label style={css.label}>Officer PF ID *</label>
               <input
-                style={{ ...css.input, border: `1.5px solid ${pfInput.length >= 5 ? (matchedUser ? "#16a34a" : "#dc2626") : G.border}`, transition: "border-color 0.2s" }}
+                style={{ ...css.input, border: `1.5px solid ${pfInput.length >= 5 ? (matchedUser ? "#16a34a" : "#dc2626") : T.border}`, transition: "border-color 0.2s" }}
                 value={pfInput}
                 onChange={e => handlePfInput(e.target.value)}
                 placeholder="Enter PF ID to auto-fill name & department"
                 maxLength={10}
               />
               {pfInput.length >= 5 && !matchedUser && (
-                <div style={{ fontSize: 11, color: G.danger, marginTop: 4 }}>⚠ PF ID not found in authorised users list</div>
+                <div style={{ fontSize: 11, color: T.danger, marginTop: 4 }}>⚠ PF ID not found in authorised users list</div>
               )}
             </div>
 
             {/* Auto-populated user info card */}
             {matchedUser && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: darkMode ? "#052e16" : "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8 }}>
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
                   {matchedUser.name.charAt(0)}
                 </div>
@@ -1734,8 +1752,8 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               const selCar = cars.find(c => c.id === form.carId);
               if (!selCar) return null;
               return (
-                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: selCar.color || G.info, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: darkMode ? "#0c1e3c" : "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: selCar.color || T.info, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
                     {selCar.driver.charAt(0)}
                   </div>
                   <div style={{ flex: 1 }}>
@@ -1752,11 +1770,11 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
             <div style={css.formGrid}>
               <div>
                 <label style={css.label}>Officer Name</label>
-                <input style={{ ...css.input, background: "#f8fafc", color: matchedUser ? G.text : G.muted }} value={form.officerName} readOnly placeholder="Auto-filled from PF ID" />
+                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: matchedUser ? T.text : T.muted }} value={form.officerName} readOnly placeholder="Auto-filled from PF ID" />
               </div>
               <div>
                 <label style={css.label}>Department</label>
-                <input style={{ ...css.input, background: "#f8fafc", color: matchedUser ? G.text : G.muted }} value={form.department} readOnly placeholder="Auto-filled from PF ID" />
+                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: matchedUser ? T.text : T.muted }} value={form.department} readOnly placeholder="Auto-filled from PF ID" />
               </div>
             </div>
             <div>
@@ -1769,11 +1787,11 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
             </div>
             <div style={css.formGrid}>
               <div>
-                <label style={css.label}>Date * <span style={{ fontSize: 10, color: G.muted, fontWeight: 400 }}>(today only)</span></label>
+                <label style={css.label}>Date * <span style={{ fontSize: 10, color: T.muted, fontWeight: 400 }}>(today only)</span></label>
                 <input type="date" style={{ ...css.input, opacity: 0.7, cursor: "not-allowed" }} value={today()} readOnly min={today()} max={today()} />
               </div>
               <div>
-                <label style={css.label}>Departure Time * <span style={{ fontSize: 10, color: G.muted, fontWeight: 400 }}>(within 30 min)</span></label>
+                <label style={css.label}>Departure Time * <span style={{ fontSize: 10, color: T.muted, fontWeight: 400 }}>(within 30 min)</span></label>
                 <input type="time" style={css.input} value={form.departureTime} onChange={e => set("departureTime", e.target.value)} />
               </div>
             </div>
@@ -1781,7 +1799,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               <label style={css.label}>Start Odometer (km)</label>
               <input type="number" style={css.input} value={form.startKm} onChange={e => set("startKm", e.target.value)} placeholder="e.g. 45230" />
             </div>
-            <button style={css.btn(G.info)} onClick={handleBook}>Submit Trip Request →</button>
+            <button style={css.btn(T.info)} onClick={handleBook}>Submit Trip Request →</button>
           </div>
         </div>
 
@@ -1795,7 +1813,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               : activeTrips.filter(t => t.bookedByPfId === currentUser.pfId || t.officerPfId === currentUser.pfId);
 
             return myActiveTrips.length === 0 ? (
-              <div style={{ textAlign: "center", color: G.muted, padding: 40 }}>
+              <div style={{ textAlign: "center", color: T.muted, padding: 40 }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
                 <div>{currentUser.isAdmin ? "No approved active trips to return" : "You have no active trip to release"}</div>
               </div>
@@ -1820,12 +1838,12 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                   const tripId = returnForm.tripId || (myActiveTrips.length === 1 ? myActiveTrips[0].id : null);
                   const t = trips.find(x => x.id === tripId);
                   return t ? (
-                    <div style={{ background: "#f0fdf4", borderRadius: 8, padding: 14, fontSize: 13, border: "1px solid #bbf7d0" }}>
+                    <div style={{ background: darkMode ? "#052e16" : "#f0fdf4", borderRadius: 8, padding: 14, fontSize: 13, border: "1px solid #bbf7d0" }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: "#166534", marginBottom: 8 }}>🚙 {t.carName} — {t.carPlate}</div>
-                      <div style={{ color: G.muted }}><b>Destination:</b> {t.destination}</div>
-                      {t.startKm && <div style={{ color: G.muted }}><b>Start KM:</b> {t.startKm}</div>}
+                      <div style={{ color: T.muted }}><b>Destination:</b> {t.destination}</div>
+                      {t.startKm && <div style={{ color: T.muted }}><b>Start KM:</b> {t.startKm}</div>}
                       {t.driver && t.driverPhone && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10, padding: "10px 12px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10, padding: "10px 12px", background: darkMode ? "#0c1e3c" : "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: 700, fontSize: 13, color: "#0c4a6e" }}>🧑‍✈️ {t.driver}</div>
                             <div style={{ fontSize: 12, color: "#0369a1" }}>{t.driverPhone}</div>
@@ -1861,7 +1879,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                     <input style={css.input} value={returnForm.remarks} onChange={e => setR("remarks", e.target.value)} placeholder="Any issues, notes..." />
                   </div>
                 </div>
-                <button style={{ ...css.btn(G.success), fontSize: 15, padding: "12px 20px" }} onClick={handleReturn}>
+                <button style={{ ...css.btn(T.success), fontSize: 15, padding: "12px 20px" }} onClick={handleReturn}>
                   🔓 Release Vehicle & Mark Returned
                 </button>
               </div>
@@ -1871,12 +1889,12 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
           {/* Admin: show all currently out vehicles */}
           {currentUser.isAdmin && activeTrips.length > 0 && (
             <div style={{ marginTop: 24 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: G.muted, marginBottom: 10 }}>CURRENTLY OUT (APPROVED)</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.muted, marginBottom: 10 }}>CURRENTLY OUT (APPROVED)</div>
               {activeTrips.map(t => (
-                <div key={t.id} style={{ padding: "10px 12px", background: "#f0fdf4", borderRadius: 8, marginBottom: 8, borderLeft: "3px solid #16a34a" }}>
+                <div key={t.id} style={{ padding: "10px 12px", background: darkMode ? "#052e16" : "#f0fdf4", borderRadius: 8, marginBottom: 8, borderLeft: "3px solid #16a34a" }}>
                   <div style={{ fontWeight: 700, fontSize: 13 }}>{t.carName} — {t.carPlate}</div>
-                  <div style={{ fontSize: 12, color: G.muted }}>🧑‍✈️ {t.driver} | {t.officerName} ({t.department})</div>
-                  <div style={{ fontSize: 12, color: G.muted }}>→ {t.destination} · Left at {t.departureTime}</div>
+                  <div style={{ fontSize: 12, color: T.muted }}>🧑‍✈️ {t.driver} | {t.officerName} ({t.department})</div>
+                  <div style={{ fontSize: 12, color: T.muted }}>→ {t.destination} · Left at {t.departureTime}</div>
                 </div>
               ))}
             </div>
@@ -1895,14 +1913,14 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                 <tr key={t.id}>
                   <td style={css.td}>{t.carName}</td>
                   <td style={css.td}>{t.destination}</td>
-                  <td style={{ ...css.td, color: G.muted }}>{t.purpose || "—"}</td>
+                  <td style={{ ...css.td, color: T.muted }}>{t.purpose || "—"}</td>
                   <td style={css.td}>{fmtDate(t.date)}</td>
                   <td style={css.td}>{t.departureTime}</td>
                   <td style={css.td}>{approvalBadge(t)}</td>
                   <td style={css.td}>
                     {t.approvalStatus === "rejected"
-                      ? <span style={{ color: G.danger, fontSize: 12 }}>Reason: {t.rejectionReason || "—"}</span>
-                      : <span style={{ fontSize: 12, color: G.muted }}>
+                      ? <span style={{ color: T.danger, fontSize: 12 }}>Reason: {t.rejectionReason || "—"}</span>
+                      : <span style={{ fontSize: 12, color: T.muted }}>
                           {ADMIN_1.name}: {t.approvedBy?.includes(ADMIN_1.pfId) ? "✅" : "⏳"} &nbsp;
                           {ADMIN_2.name}: {t.approvedBy?.includes(ADMIN_2.pfId) ? "✅" : "⏳"}
                         </span>
@@ -1922,7 +1940,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                           style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #fca5a5", background: "#fef2f2", color: "#dc2626", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                         >✕ Cancel</button>
                       ) : (
-                        <span style={{ fontSize: 12, color: G.muted }}>—</span>
+                        <span style={{ fontSize: 12, color: T.muted }}>—</span>
                       )}
                       {!t.returnTime && t.driverPhone && (
                         <a href={`tel:${t.driverPhone}`}
@@ -1943,7 +1961,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
 }
 
 // ── APPROVALS ─────────────────────────────────────────────────
-function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
+function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T, css }) {
   const [rejectId, setRejectId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [filter, setFilter] = useState("pending");
@@ -1996,29 +2014,29 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
     const admin1Done = t.approvedBy?.includes(ADMIN_1.pfId);
     const admin2Done = t.approvedBy?.includes(ADMIN_2.pfId);
     return (
-      <div style={{ ...css.card, marginBottom: 16, borderLeft: `4px solid ${t.approvalStatus === "approved" ? G.success : t.approvalStatus === "rejected" ? G.danger : G.warning}` }}>
+      <div style={{ ...css.card, marginBottom: 16, borderLeft: `4px solid ${t.approvalStatus === "approved" ? T.success : t.approvalStatus === "rejected" ? T.danger : T.warning}` }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <div style={{ fontWeight: 800, fontSize: 15 }}>{t.officerName}</div>
-              <span style={{ fontSize: 11, color: G.muted }}>PF: {t.bookedByPfId}</span>
-              {t.approvalStatus === "pending" && <span style={css.badge(G.warning)}>⏳ Pending</span>}
-              {t.approvalStatus === "approved" && <span style={css.badge(G.success)}>✅ Approved</span>}
-              {t.approvalStatus === "rejected" && <span style={css.badge(G.danger)}>❌ Rejected</span>}
+              <span style={{ fontSize: 11, color: T.muted }}>PF: {t.bookedByPfId}</span>
+              {t.approvalStatus === "pending" && <span style={css.badge(T.warning)}>⏳ Pending</span>}
+              {t.approvalStatus === "approved" && <span style={css.badge(T.success)}>✅ Approved</span>}
+              {t.approvalStatus === "rejected" && <span style={css.badge(T.danger)}>❌ Rejected</span>}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", fontSize: 13 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span><span style={{ color: G.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</span>
-                {t.vehicleChangedBy && <span style={{ fontSize: 10, color: G.info, fontStyle: "italic" }}>Changed by {t.vehicleChangedBy}</span>}
+                <span><span style={{ color: T.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</span>
+                {t.vehicleChangedBy && <span style={{ fontSize: 10, color: T.info, fontStyle: "italic" }}>Changed by {t.vehicleChangedBy}</span>}
               </div>
-              <div><span style={{ color: G.muted }}>Driver:</span> {t.driver}</div>
-              <div><span style={{ color: G.muted }}>Department:</span> {t.department}</div>
-              <div><span style={{ color: G.muted }}>Date:</span> {fmtDate(t.date)} at {t.departureTime}</div>
-              <div><span style={{ color: G.muted }}>Destination:</span> <b>{t.destination}</b></div>
-              <div><span style={{ color: G.muted }}>Purpose:</span> {t.purpose || "—"}</div>
+              <div><span style={{ color: T.muted }}>Driver:</span> {t.driver}</div>
+              <div><span style={{ color: T.muted }}>Department:</span> {t.department}</div>
+              <div><span style={{ color: T.muted }}>Date:</span> {fmtDate(t.date)} at {t.departureTime}</div>
+              <div><span style={{ color: T.muted }}>Destination:</span> <b>{t.destination}</b></div>
+              <div><span style={{ color: T.muted }}>Purpose:</span> {t.purpose || "—"}</div>
             </div>
             {t.approvalStatus === "rejected" && (
-              <div style={{ marginTop: 8, padding: "6px 10px", background: "#fee2e2", borderRadius: 6, fontSize: 12, color: G.danger }}>
+              <div style={{ marginTop: 8, padding: "6px 10px", background: darkMode ? "#450a0a" : "#fee2e2", borderRadius: 6, fontSize: 12, color: T.danger }}>
                 ❌ Rejected by {t.rejectedByName} — "{t.rejectionReason || 'No reason given'}"
               </div>
             )}
@@ -2026,13 +2044,13 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
 
           {/* Approval status indicators */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 200 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: "0.05em" }}>Approval Status</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: "uppercase", letterSpacing: "0.05em" }}>Approval Status</div>
             {[ADMIN_1, ADMIN_2].map(admin => (
-              <div key={admin.pfId} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: t.approvedBy?.includes(admin.pfId) ? "#f0fdf4" : "#fafafa", borderRadius: 6, border: `1px solid ${t.approvedBy?.includes(admin.pfId) ? "#bbf7d0" : G.border}` }}>
+              <div key={admin.pfId} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: t.approvedBy?.includes(admin.pfId) ? (darkMode ? "#052e16" : "#f0fdf4") : (darkMode ? "#1e293b" : "#fafafa"), borderRadius: 6, border: `1px solid ${t.approvedBy?.includes(admin.pfId) ? "#bbf7d0" : T.border}` }}>
                 <div style={{ fontSize: 16 }}>{t.approvedBy?.includes(admin.pfId) ? "✅" : "⏳"}</div>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700 }}>{admin.name}</div>
-                  <div style={{ fontSize: 11, color: G.muted }}>{t.approvedBy?.includes(admin.pfId) ? "Approved" : "Awaiting"}</div>
+                  <div style={{ fontSize: 11, color: T.muted }}>{t.approvedBy?.includes(admin.pfId) ? "Approved" : "Awaiting"}</div>
                 </div>
               </div>
             ))}
@@ -2040,19 +2058,19 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
             {/* Action buttons — only show for pending trips */}
             {t.approvalStatus === "pending" && !myApproved && (
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                <button style={{ ...css.btn(G.success), flex: 1, fontSize: 12 }} onClick={() => handleApprove(t.id)}>✅ Approve</button>
-                <button style={{ ...css.btn(G.danger, true), flex: 1, fontSize: 12 }} onClick={() => setRejectId(t.id)}>❌ Reject</button>
+                <button style={{ ...css.btn(T.success), flex: 1, fontSize: 12 }} onClick={() => handleApprove(t.id)}>✅ Approve</button>
+                <button style={{ ...css.btn(T.danger, true), flex: 1, fontSize: 12 }} onClick={() => setRejectId(t.id)}>❌ Reject</button>
               </div>
             )}
             {t.approvalStatus === "pending" && myApproved && (
-              <div style={{ padding: "6px 10px", background: "#f0fdf4", borderRadius: 6, fontSize: 12, color: G.success, fontWeight: 600 }}>
+              <div style={{ padding: "6px 10px", background: darkMode ? "#052e16" : "#f0fdf4", borderRadius: 6, fontSize: 12, color: T.success, fontWeight: 600 }}>
                 ✅ You have approved this request
               </div>
             )}
             {/* Change Vehicle button — always visible for admin on pending trips */}
             {t.approvalStatus === "pending" && (
               <button
-                style={{ ...css.btn(G.info, true), fontSize: 12, marginTop: 4 }}
+                style={{ ...css.btn(T.info, true), fontSize: 12, marginTop: 4 }}
                 onClick={() => { setChangeVehicleId(changeVehicleId === t.id ? null : t.id); setSelectedNewCar(""); }}
               >🔄 Change Vehicle</button>
             )}
@@ -2061,9 +2079,9 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
 
         {/* Change Vehicle panel */}
         {changeVehicleId === t.id && (
-          <div style={{ marginTop: 14, padding: 14, background: "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: G.info, marginBottom: 10 }}>🔄 Change Assigned Vehicle</div>
-            <div style={{ fontSize: 12, color: G.muted, marginBottom: 10 }}>
+          <div style={{ marginTop: 14, padding: 14, background: darkMode ? "#0c1e3c" : "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.info, marginBottom: 10 }}>🔄 Change Assigned Vehicle</div>
+            <div style={{ fontSize: 12, color: T.muted, marginBottom: 10 }}>
               Currently: <b>{t.carName}</b> ({t.carPlate}) · Driver: {t.driver}
             </div>
             <select
@@ -2084,23 +2102,23 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
             </select>
             <div style={{ display: "flex", gap: 8 }}>
               <button
-                style={{ ...css.btn(G.info), fontSize: 12 }}
+                style={{ ...css.btn(T.info), fontSize: 12 }}
                 disabled={!selectedNewCar || selectedNewCar === t.carId}
                 onClick={() => handleChangeVehicle(t.id)}
               >✅ Confirm Change</button>
-              <button style={{ ...css.btn(G.muted, true), fontSize: 12 }} onClick={() => { setChangeVehicleId(null); setSelectedNewCar(""); }}>Cancel</button>
+              <button style={{ ...css.btn(T.muted, true), fontSize: 12 }} onClick={() => { setChangeVehicleId(null); setSelectedNewCar(""); }}>Cancel</button>
             </div>
           </div>
         )}
 
         {/* Reject modal inline */}
         {rejectId === t.id && (
-          <div style={{ marginTop: 14, padding: 14, background: "#fff1f2", borderRadius: 8, border: "1px solid #fecdd3" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: G.danger, marginBottom: 8 }}>Reason for Rejection</div>
+          <div style={{ marginTop: 14, padding: 14, background: darkMode ? "#450a0a" : "#fff1f2", borderRadius: 8, border: "1px solid #fecdd3" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.danger, marginBottom: 8 }}>Reason for Rejection</div>
             <input style={{ ...css.input, marginBottom: 10 }} value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Enter reason (optional)" autoFocus />
             <div style={{ display: "flex", gap: 8 }}>
-              <button style={css.btn(G.danger)} onClick={() => handleReject(t.id)}>Confirm Rejection</button>
-              <button style={css.btn(G.muted, true)} onClick={() => { setRejectId(null); setRejectReason(""); }}>Cancel</button>
+              <button style={css.btn(T.danger)} onClick={() => handleReject(t.id)}>Confirm Rejection</button>
+              <button style={css.btn(T.muted, true)} onClick={() => { setRejectId(null); setRejectReason(""); }}>Cancel</button>
             </div>
           </div>
         )}
@@ -2112,16 +2130,16 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
     <div>
       {/* Summary stats */}
       <div style={{ ...css.grid4, gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 24 }}>
-        <div style={{ ...css.card, borderTop: `3px solid ${G.warning}`, cursor: "pointer" }} onClick={() => setFilter("pending")}>
-          <div style={{ ...css.statNum, color: G.warning }}>{pending.length}</div>
+        <div style={{ ...css.card, borderTop: `3px solid ${T.warning}`, cursor: "pointer" }} onClick={() => setFilter("pending")}>
+          <div style={{ ...css.statNum, color: T.warning }}>{pending.length}</div>
           <div style={css.statLabel}>Pending Approval</div>
         </div>
-        <div style={{ ...css.card, borderTop: `3px solid ${G.success}`, cursor: "pointer" }} onClick={() => setFilter("approved")}>
-          <div style={{ ...css.statNum, color: G.success }}>{approved.length}</div>
+        <div style={{ ...css.card, borderTop: `3px solid ${T.success}`, cursor: "pointer" }} onClick={() => setFilter("approved")}>
+          <div style={{ ...css.statNum, color: T.success }}>{approved.length}</div>
           <div style={css.statLabel}>Approved</div>
         </div>
-        <div style={{ ...css.card, borderTop: `3px solid ${G.danger}`, cursor: "pointer" }} onClick={() => setFilter("rejected")}>
-          <div style={{ ...css.statNum, color: G.danger }}>{rejected.length}</div>
+        <div style={{ ...css.card, borderTop: `3px solid ${T.danger}`, cursor: "pointer" }} onClick={() => setFilter("rejected")}>
+          <div style={{ ...css.statNum, color: T.danger }}>{rejected.length}</div>
           <div style={css.statLabel}>Rejected</div>
         </div>
       </div>
@@ -2129,12 +2147,12 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
       {/* Filter tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {[["pending","⏳ Pending"],["approved","✅ Approved"],["rejected","❌ Rejected"]].map(([f, label]) => (
-          <button key={f} style={{ ...css.btn(f === "pending" ? G.warning : f === "approved" ? G.success : G.danger, filter !== f), fontSize: 13 }} onClick={() => setFilter(f)}>{label}</button>
+          <button key={f} style={{ ...css.btn(f === "pending" ? T.warning : f === "approved" ? T.success : T.danger, filter !== f), fontSize: 13 }} onClick={() => setFilter(f)}>{label}</button>
         ))}
       </div>
 
       {displayTrips.length === 0
-        ? <div style={{ ...css.card, textAlign: "center", padding: 48, color: G.muted }}>No {filter} trip requests.</div>
+        ? <div style={{ ...css.card, textAlign: "center", padding: 48, color: T.muted }}>No {filter} trip requests.</div>
         : displayTrips.slice().reverse().map(t => <ApprovalCard key={t.id} t={t} />)
       }
     </div>
@@ -2142,7 +2160,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy }) {
 }
 
 // ── LIVE TRACKING ─────────────────────────────────────────────
-function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeTripForCar }) {
+function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeTripForCar, darkMode, T, css }) {
   const [selected, setSelected] = useState(null);
   const [linkInput, setLinkInput] = useState("");
   const [msg, setMsg] = useState("");
@@ -2193,7 +2211,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
 
   return (
     <div>
-      <div style={{ marginBottom: 16, padding: "12px 16px", background: "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe", fontSize: 13 }}>
+      <div style={{ marginBottom: 16, padding: "12px 16px", background: darkMode ? "#0c1e3c" : "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe", fontSize: 13 }}>
         <b>📱 How to share live location from Google Maps:</b>
         <ol style={{ marginTop: 8, paddingLeft: 20, lineHeight: 2 }}>
           <li>Driver opens <b>Google Maps</b> on their phone</li>
@@ -2213,22 +2231,22 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
             const hasLink = !!liveLocations[car.id];
             const isSelected = selected === car.id;
             return (
-              <div key={car.id} style={{ ...css.card, border: `2px solid ${isSelected ? car.color : G.border}`, cursor: "pointer", transition: "all 0.15s" }}
+              <div key={car.id} style={{ ...css.card, border: `2px solid ${isSelected ? car.color : T.border}`, cursor: "pointer", transition: "all 0.15s" }}
                 onClick={() => setSelected(isSelected ? null : car.id)}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: busy ? G.danger : G.success, flexShrink: 0 }} />
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: busy ? T.danger : T.success, flexShrink: 0 }} />
                   <div style={{ fontWeight: 700, fontSize: 14 }}>{car.name}</div>
                   <div style={{ marginLeft: "auto" }}>
                     {hasLink
                       ? <span style={css.badge("#0891b2")}>📍 Link Active</span>
-                      : <span style={css.badge(G.muted)}>No Link</span>}
+                      : <span style={css.badge(T.muted)}>No Link</span>}
                   </div>
                 </div>
-                <div style={{ fontSize: 12, color: G.muted }}>{car.plate}</div>
-                <div style={{ fontSize: 12, color: G.muted }}>🧑‍✈️ {car.driver} · <a href={`tel:${car.driverPhone}`} style={{ color: "#2563eb" }} onClick={e => e.stopPropagation()}>{car.driverPhone}</a></div>
-                {trip && <div style={{ marginTop: 6, fontSize: 12, color: G.warning, fontWeight: 600 }}>🔄 En route to {trip.destination}</div>}
+                <div style={{ fontSize: 12, color: T.muted }}>{car.plate}</div>
+                <div style={{ fontSize: 12, color: T.muted }}>🧑‍✈️ {car.driver} · <a href={`tel:${car.driverPhone}`} style={{ color: "#2563eb" }} onClick={e => e.stopPropagation()}>{car.driverPhone}</a></div>
+                {trip && <div style={{ marginTop: 6, fontSize: 12, color: T.warning, fontWeight: 600 }}>🔄 En route to {trip.destination}</div>}
                 {hasLink && liveLocations[car.id]?.updatedAt && (
-                  <div style={{ fontSize: 11, color: G.muted, marginTop: 4 }}>Updated: {liveLocations[car.id].updatedDate} at {liveLocations[car.id].updatedAt}</div>
+                  <div style={{ fontSize: 11, color: T.muted, marginTop: 4 }}>Updated: {liveLocations[car.id].updatedDate} at {liveLocations[car.id].updatedAt}</div>
                 )}
               </div>
             );
@@ -2237,14 +2255,14 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
 
         {/* Right panel — map + link input */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", fontSize: 13, fontWeight: 600 }}>{msg}</div>}
+          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? (darkMode ? "#052e16" : "#dcfce7") : (darkMode ? "#450a0a" : "#fee2e2"), fontSize: 13, fontWeight: 600 }}>{msg}</div>}
 
           {/* Link paste panel */}
           {selected && (
             <div style={css.card}>
               <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>
                 📍 {selectedCar?.name} — {selectedCar?.plate}
-                <span style={{ fontSize: 12, fontWeight: 400, color: G.muted, marginLeft: 8 }}>Driver: {selectedCar?.driver}</span>
+                <span style={{ fontSize: 12, fontWeight: 400, color: T.muted, marginLeft: 8 }}>Driver: {selectedCar?.driver}</span>
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 <input
@@ -2255,11 +2273,11 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
                 />
                 <button style={css.btn("#0891b2")} onClick={() => handleSaveLink(selected)}>Save Link</button>
                 {liveLocations[selected] && (
-                  <button style={css.btn(G.danger, true)} onClick={() => handleClear(selected)}>Clear</button>
+                  <button style={css.btn(T.danger, true)} onClick={() => handleClear(selected)}>Clear</button>
                 )}
               </div>
               {liveLocations[selected] && (
-                <div style={{ marginTop: 8, fontSize: 12, color: G.muted, wordBreak: "break-all" }}>
+                <div style={{ marginTop: 8, fontSize: 12, color: T.muted, wordBreak: "break-all" }}>
                   Current link: <a href={liveLocations[selected].url} target="_blank" rel="noreferrer" style={{ color: "#2563eb" }}>{liveLocations[selected].url}</a>
                 </div>
               )}
@@ -2269,7 +2287,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
           {/* Map embed */}
           {selected && embedUrl ? (
             <div style={{ ...css.card, padding: 0, overflow: "hidden", borderRadius: 10 }}>
-              <div style={{ padding: "12px 16px", background: G.light, borderBottom: `1px solid ${G.border}`, display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ padding: "12px 16px", background: T.light, borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 0 3px #bbf7d0", animation: "pulse 1.5s infinite" }} />
                 <span style={{ fontSize: 13, fontWeight: 700 }}>Live Location — {selectedCar?.name}</span>
                 <a href={liveLocations[selected]?.url} target="_blank" rel="noreferrer"
@@ -2290,13 +2308,13 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
               <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
             </div>
           ) : selected ? (
-            <div style={{ ...css.card, textAlign: "center", padding: 60, color: G.muted }}>
+            <div style={{ ...css.card, textAlign: "center", padding: 60, color: T.muted }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>📍</div>
               <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>No live location link yet</div>
               <div style={{ fontSize: 13 }}>Ask the driver to share their live location via Google Maps and paste the link above.</div>
             </div>
           ) : (
-            <div style={{ ...css.card, textAlign: "center", padding: 60, color: G.muted }}>
+            <div style={{ ...css.card, textAlign: "center", padding: 60, color: T.muted }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🗺️</div>
               <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Select a vehicle to view its location</div>
               <div style={{ fontSize: 13 }}>Click any vehicle card on the left to manage its live location link.</div>
@@ -2308,16 +2326,16 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
             <div style={css.card}>
               <div style={css.sectionTitle}>🔄 Vehicles Currently Out</div>
               {cars.filter(c => isCarBusy(c.id)).length === 0 ? (
-                <div style={{ color: G.muted, fontSize: 13 }}>All vehicles are currently at the office.</div>
+                <div style={{ color: T.muted, fontSize: 13 }}>All vehicles are currently at the office.</div>
               ) : cars.filter(c => isCarBusy(c.id)).map(car => {
                 const trip = activeTripForCar(car.id);
                 const hasLink = !!liveLocations[car.id];
                 return (
-                  <div key={car.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", background: G.light, borderRadius: 8, marginBottom: 8, border: `1px solid ${G.border}` }}>
+                  <div key={car.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", background: T.light, borderRadius: 8, marginBottom: 8, border: `1px solid ${T.border}` }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name} — {car.plate}</div>
-                      <div style={{ fontSize: 12, color: G.muted }}>🧑‍✈️ {car.driver} · {trip?.officerName} ({trip?.department})</div>
-                      <div style={{ fontSize: 12, color: G.muted }}>→ {trip?.destination} since {trip?.departureTime}</div>
+                      <div style={{ fontSize: 12, color: T.muted }}>🧑‍✈️ {car.driver} · {trip?.officerName} ({trip?.department})</div>
+                      <div style={{ fontSize: 12, color: T.muted }}>→ {trip?.destination} since {trip?.departureTime}</div>
                     </div>
                     {hasLink ? (
                       <a href={liveLocations[car.id].url} target="_blank" rel="noreferrer"
@@ -2325,7 +2343,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
                         📍 Track
                       </a>
                     ) : (
-                      <button style={css.btn(G.muted, true)} onClick={() => setSelected(car.id)}>+ Add Link</button>
+                      <button style={css.btn(T.muted, true)} onClick={() => setSelected(car.id)}>+ Add Link</button>
                     )}
                   </div>
                 );
@@ -2339,7 +2357,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
 }
 
 // ── TRIP LOG ──────────────────────────────────────────────────
-function TripLog({ cars, trips, currentUser }) {
+function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
   const [filter, setFilter] = useState({ car: "", dept: "", from: "", to: "" });
   const set = (k, v) => setFilter(f => ({ ...f, [k]: v }));
 
@@ -2402,7 +2420,7 @@ function TripLog({ cars, trips, currentUser }) {
       <div style={css.card}>
         <div style={{ ...css.row, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={css.sectionTitle}>📋 Trip Log{!currentUser?.isAdmin ? " (My Trips)" : ""}</div>
-          <div style={{ marginLeft: "auto", fontSize: 13, color: G.muted }}>{filtered.length} records · {totalKm.toFixed(0)} km total</div>
+          <div style={{ marginLeft: "auto", fontSize: 13, color: T.muted }}>{filtered.length} records · {totalKm.toFixed(0)} km total</div>
         </div>
         <div style={{ ...css.formGrid, marginBottom: 20 }}>
           <div>
@@ -2429,19 +2447,19 @@ function TripLog({ cars, trips, currentUser }) {
           </div>
         </div>
         {filtered.length === 0
-          ? <div style={{ textAlign: "center", padding: 40, color: G.muted }}>No trips found</div>
+          ? <div style={{ textAlign: "center", padding: 40, color: T.muted }}>No trips found</div>
           : logSortedDates.map(date => {
             const dayTripsLog = logDateMap[date];
             const isTodayLog = date === today();
             const isOpenLog = expandedLogDates[date] !== false && (expandedLogDates[date] === true || isTodayLog);
             return (
-              <div key={date} style={{ marginBottom: 10, borderRadius: 8, border: `1px solid ${isTodayLog ? G.info : G.border}`, overflow: "hidden" }}>
+              <div key={date} style={{ marginBottom: 10, borderRadius: 8, border: `1px solid ${isTodayLog ? T.info : T.border}`, overflow: "hidden" }}>
                 <div onClick={() => toggleLogDate(date)}
-                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: isTodayLog ? "#eff6ff" : G.light, cursor: "pointer", userSelect: "none", borderBottom: isOpenLog ? `1px solid ${G.border}` : "none" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: isTodayLog ? (darkMode ? "#0c1e3c" : "#eff6ff") : T.light, cursor: "pointer", userSelect: "none", borderBottom: isOpenLog ? `1px solid ${T.border}` : "none" }}>
                   <span style={{ fontSize: 13 }}>{isOpenLog ? "▾" : "▸"}</span>
-                  <span style={{ fontWeight: 800, fontSize: 13, color: isTodayLog ? G.info : G.text }}>{isTodayLog ? "Today — " : ""}{fmtDate(date)}</span>
-                  {isTodayLog && <span style={{ fontSize: 10, background: G.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
-                  <span style={{ marginLeft: "auto", fontSize: 12, color: G.muted }}>{dayTripsLog.length} trip{dayTripsLog.length !== 1 ? "s" : ""}</span>
+                  <span style={{ fontWeight: 800, fontSize: 13, color: isTodayLog ? T.info : T.text }}>{isTodayLog ? "Today — " : ""}{fmtDate(date)}</span>
+                  {isTodayLog && <span style={{ fontSize: 10, background: T.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
+                  <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{dayTripsLog.length} trip{dayTripsLog.length !== 1 ? "s" : ""}</span>
                 </div>
                 {isOpenLog && (
                   <div className="scroll-table"><table style={css.table}>
@@ -2457,30 +2475,30 @@ function TripLog({ cars, trips, currentUser }) {
                         const ret = splitReturn(t.returnTime);
                         return (
                           <tr key={t.id}>
-                            <td style={{ ...css.td, color: G.muted }}>{i + 1}</td>
+                            <td style={{ ...css.td, color: T.muted }}>{i + 1}</td>
                             <td style={css.td}>{t.carName}</td>
                             <td style={css.td}>{t.carPlate || "—"}</td>
                             <td style={{ ...css.td, fontWeight: 600 }}>{t.driver || "—"}</td>
                             <td style={{ ...css.td, fontWeight: 600 }}>{t.officerName}</td>
                             <td style={css.td}>{t.department}</td>
                             <td style={css.td}>{t.destination}</td>
-                            <td style={{ ...css.td, color: G.muted }}>{t.purpose || "—"}</td>
+                            <td style={{ ...css.td, color: T.muted }}>{t.purpose || "—"}</td>
                             <td style={{ ...css.td, whiteSpace: "nowrap", color: "#2563eb", fontWeight: 600 }}>{fmtTime(t.departureTime)}</td>
-                            <td style={{ ...css.td, whiteSpace: "nowrap" }}>{ret.date ? fmtDate(ret.date) : <span style={{ color: G.muted }}>—</span>}</td>
-                            <td style={{ ...css.td, whiteSpace: "nowrap", color: "#16a34a", fontWeight: 600 }}>{ret.time ? fmtTime(ret.time) : <span style={{ color: G.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap" }}>{ret.date ? fmtDate(ret.date) : <span style={{ color: T.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap", color: "#16a34a", fontWeight: 600 }}>{ret.time ? fmtTime(ret.time) : <span style={{ color: T.muted }}>—</span>}</td>
                             <td style={{ ...css.td, whiteSpace: "nowrap" }}>
-                              {duration ? <span style={{ fontWeight: 700, color: "#7c3aed", background: "#ede9fe", padding: "2px 8px", borderRadius: 6, fontSize: 12 }}>⏱ {duration}</span> : <span style={{ color: G.muted }}>—</span>}
+                              {duration ? <span style={{ fontWeight: 700, color: "#7c3aed", background: "#ede9fe", padding: "2px 8px", borderRadius: 6, fontSize: 12 }}>⏱ {duration}</span> : <span style={{ color: T.muted }}>—</span>}
                             </td>
                             <td style={css.td}>{t.startKm || "—"}</td>
                             <td style={css.td}>{t.endKm || "—"}</td>
                             <td style={{ ...css.td, fontWeight: 600 }}>{dist}</td>
                             <td style={css.td}>
                               {t.returnTime
-                                ? <span style={css.badge(G.success)}>✅ Done</span>
+                                ? <span style={css.badge(T.success)}>✅ Done</span>
                                 : t.approvalStatus === "rejected"
-                                  ? <span style={css.badge(G.danger)}>❌ Rejected</span>
+                                  ? <span style={css.badge(T.danger)}>❌ Rejected</span>
                                   : t.approvalStatus === "pending"
-                                    ? <span style={css.badge(G.warning)}>⏳ Pending</span>
+                                    ? <span style={css.badge(T.warning)}>⏳ Pending</span>
                                     : <span style={css.badge("#0891b2")}>🚗 Active</span>
                               }
                             </td>
@@ -2500,7 +2518,7 @@ function TripLog({ cars, trips, currentUser }) {
 }
 
 // ── CHARGING LOG ──────────────────────────────────────────────
-function FuelLog({ cars, fuelLogs, saveFuel }) {
+function FuelLog({ cars, fuelLogs, saveFuel, darkMode, T, css }) {
   const [form, setForm] = useState({ carId: "", date: today(), kwh: "", batteryBefore: "", batteryAfter: "", chargingCost: "", chargingDuration: "", chargerType: "AC Slow (15A)", chargedBy: "", location: "", odometer: "" });
   const [msg, setMsg] = useState("");
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -2524,7 +2542,7 @@ function FuelLog({ cars, fuelLogs, saveFuel }) {
     <div style={{ display: "grid", gridTemplateColumns: "380px 1fr", gap: 20 }}>
       <div style={css.card}>
         <div style={css.sectionTitle}>🔋 Log Charging Session</div>
-        {msg && <div style={{ padding: "8px 12px", borderRadius: 6, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13 }}>{msg}</div>}
+        {msg && <div style={{ padding: "8px 12px", borderRadius: 6, background: msg.startsWith("✅") ? (darkMode ? "#052e16" : "#dcfce7") : (darkMode ? "#450a0a" : "#fee2e2"), marginBottom: 14, fontSize: 13 }}>{msg}</div>}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div><label style={css.label}>Vehicle *</label>
             <select style={css.select} value={form.carId} onChange={e => set("carId", e.target.value)}>
@@ -2575,8 +2593,8 @@ function FuelLog({ cars, fuelLogs, saveFuel }) {
       <div>
         <div style={{ ...css.grid4, gridTemplateColumns: "1fr 1fr 1fr" }}>
           <div style={{ ...css.card, borderTop: "3px solid #0891b2" }}><div style={css.statNum}>{totalKwh} kWh</div><div style={css.statLabel}>Total Energy Charged</div></div>
-          <div style={{ ...css.card, borderTop: `3px solid ${G.info}` }}><div style={css.statNum}>₹{parseInt(totalCost).toLocaleString()}</div><div style={css.statLabel}>Total Charging Cost</div></div>
-          <div style={{ ...css.card, borderTop: `3px solid ${G.success}` }}><div style={css.statNum}>{fuelLogs.length}</div><div style={css.statLabel}>Sessions Logged</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${T.info}` }}><div style={css.statNum}>₹{parseInt(totalCost).toLocaleString()}</div><div style={css.statLabel}>Total Charging Cost</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${T.success}` }}><div style={css.statNum}>{fuelLogs.length}</div><div style={css.statLabel}>Sessions Logged</div></div>
         </div>
 
         <div style={{ ...css.card, marginBottom: 16 }}>
@@ -2587,13 +2605,13 @@ function FuelLog({ cars, fuelLogs, saveFuel }) {
               const pct = lastCharge?.batteryAfter ? parseInt(lastCharge.batteryAfter) : null;
               const barColor = pct === null ? "#e2e8f0" : pct > 60 ? "#16a34a" : pct > 25 ? "#d97706" : "#dc2626";
               return (
-                <div key={car.id} style={{ textAlign: "center", padding: "14px 10px", background: G.light, borderRadius: 8, border: `1px solid ${G.border}` }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: G.muted, marginBottom: 8 }}>{car.name}</div>
+                <div key={car.id} style={{ textAlign: "center", padding: "14px 10px", background: T.light, borderRadius: 8, border: `1px solid ${T.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8 }}>{car.name}</div>
                   <div style={{ height: 10, background: "#e2e8f0", borderRadius: 5, marginBottom: 8, overflow: "hidden" }}>
                     <div style={{ height: "100%", width: pct ? `${pct}%` : "0%", background: barColor, borderRadius: 5, transition: "width 0.4s" }} />
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: barColor }}>{pct !== null ? `${pct}%` : "—"}</div>
-                  <div style={{ fontSize: 10, color: G.muted, marginTop: 2 }}>{lastCharge ? fmtDate(lastCharge.date) : "No data yet"}</div>
+                  <div style={{ fontSize: 10, color: T.muted, marginTop: 2 }}>{lastCharge ? fmtDate(lastCharge.date) : "No data yet"}</div>
                 </div>
               );
             })}
@@ -2611,7 +2629,7 @@ function FuelLog({ cars, fuelLogs, saveFuel }) {
                     <td style={css.td}>{f.carName}</td>
                     <td style={css.td}>{fmtDate(f.date)}</td>
                     <td style={css.td}>{f.batteryBefore ? `${f.batteryBefore}%` : "—"}</td>
-                    <td style={{ ...css.td, fontWeight: 700, color: G.success }}>{f.batteryAfter ? `${f.batteryAfter}%` : "—"}</td>
+                    <td style={{ ...css.td, fontWeight: 700, color: T.success }}>{f.batteryAfter ? `${f.batteryAfter}%` : "—"}</td>
                     <td style={{ ...css.td, fontWeight: 700 }}>{f.kwh ? `${f.kwh} kWh` : "—"}</td>
                     <td style={css.td}>{f.chargingDuration ? `${f.chargingDuration} min` : "—"}</td>
                     <td style={css.td}>{f.chargerType || "—"}</td>
@@ -2621,7 +2639,7 @@ function FuelLog({ cars, fuelLogs, saveFuel }) {
                     <td style={css.td}>{f.chargedBy || "—"}</td>
                   </tr>
                 ))}
-                {fuelLogs.length === 0 && <tr><td colSpan={11} style={{ ...css.td, textAlign: "center", color: G.muted }}>No charging sessions logged yet</td></tr>}
+                {fuelLogs.length === 0 && <tr><td colSpan={11} style={{ ...css.td, textAlign: "center", color: T.muted }}>No charging sessions logged yet</td></tr>}
               </tbody>
             </table></div>
           </div>
@@ -2632,7 +2650,7 @@ function FuelLog({ cars, fuelLogs, saveFuel }) {
 }
 
 // ── MAINTENANCE ───────────────────────────────────────────────
-function Maintenance({ cars, maintenance, saveMaint }) {
+function Maintenance({ cars, maintenance, saveMaint, darkMode, T, css }) {
   const [form, setForm] = useState({ carId: "", type: "", description: "", date: today(), cost: "", vendor: "", nextDueDate: "", status: "Pending", loggedBy: "" });
   const [msg, setMsg] = useState("");
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -2661,7 +2679,7 @@ function Maintenance({ cars, maintenance, saveMaint }) {
     <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 20 }}>
       <div style={css.card}>
         <div style={css.sectionTitle}>🔧 Log Maintenance</div>
-        {msg && <div style={{ padding: "8px 12px", borderRadius: 6, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13 }}>{msg}</div>}
+        {msg && <div style={{ padding: "8px 12px", borderRadius: 6, background: msg.startsWith("✅") ? (darkMode ? "#052e16" : "#dcfce7") : (darkMode ? "#450a0a" : "#fee2e2"), marginBottom: 14, fontSize: 13 }}>{msg}</div>}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div><label style={css.label}>Vehicle *</label>
             <select style={css.select} value={form.carId} onChange={e => set("carId", e.target.value)}>
@@ -2700,15 +2718,15 @@ function Maintenance({ cars, maintenance, saveMaint }) {
           <div><label style={css.label}>Logged By</label>
             <input style={css.input} value={form.loggedBy} onChange={e => set("loggedBy", e.target.value)} />
           </div>
-          <button style={css.btn(G.danger)} onClick={handleAdd}>Log Maintenance 🔧</button>
+          <button style={css.btn(T.danger)} onClick={handleAdd}>Log Maintenance 🔧</button>
         </div>
       </div>
 
       <div>
         <div style={{ ...css.grid4, gridTemplateColumns: "1fr 1fr 1fr" }}>
-          <div style={{ ...css.card, borderTop: `3px solid ${G.danger}` }}><div style={css.statNum}>{pending}</div><div style={css.statLabel}>Pending</div></div>
-          <div style={{ ...css.card, borderTop: `3px solid ${G.success}` }}><div style={css.statNum}>{maintenance.length - pending}</div><div style={css.statLabel}>Completed</div></div>
-          <div style={{ ...css.card, borderTop: `3px solid ${G.info}` }}><div style={css.statNum}>₹{totalCost.toLocaleString()}</div><div style={css.statLabel}>Total Spent</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${T.danger}` }}><div style={css.statNum}>{pending}</div><div style={css.statLabel}>Pending</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${T.success}` }}><div style={css.statNum}>{maintenance.length - pending}</div><div style={css.statLabel}>Completed</div></div>
+          <div style={{ ...css.card, borderTop: `3px solid ${T.info}` }}><div style={css.statNum}>₹{totalCost.toLocaleString()}</div><div style={css.statLabel}>Total Spent</div></div>
         </div>
         <div style={css.card}>
           <div style={css.sectionTitle}>Maintenance Records</div>
@@ -2720,17 +2738,17 @@ function Maintenance({ cars, maintenance, saveMaint }) {
                   <tr key={m.id}>
                     <td style={css.td}>{m.carName}</td>
                     <td style={{ ...css.td, fontWeight: 600 }}>{m.type}</td>
-                    <td style={{ ...css.td, color: G.muted }}>{m.description || "—"}</td>
+                    <td style={{ ...css.td, color: T.muted }}>{m.description || "—"}</td>
                     <td style={css.td}>{fmtDate(m.date)}</td>
                     <td style={css.td}>{m.cost ? `₹${m.cost}` : "—"}</td>
                     <td style={css.td}>{m.vendor || "—"}</td>
                     <td style={css.td}>{fmtDate(m.nextDueDate)}</td>
                     <td style={css.td}>{m.loggedBy || "—"}</td>
-                    <td style={css.td}><span style={css.badge(m.status === "Completed" ? G.success : G.warning)}>{m.status}</span></td>
-                    <td style={css.td}><button style={css.btnSm(m.status === "Pending" ? G.success : G.muted)} onClick={() => toggleStatus(m.id)}>{m.status === "Pending" ? "✓ Done" : "↩ Reopen"}</button></td>
+                    <td style={css.td}><span style={css.badge(m.status === "Completed" ? T.success : T.warning)}>{m.status}</span></td>
+                    <td style={css.td}><button style={css.btnSm(m.status === "Pending" ? T.success : T.muted)} onClick={() => toggleStatus(m.id)}>{m.status === "Pending" ? "✓ Done" : "↩ Reopen"}</button></td>
                   </tr>
                 ))}
-                {maintenance.length === 0 && <tr><td colSpan={10} style={{ ...css.td, textAlign: "center", color: G.muted }}>No maintenance records yet</td></tr>}
+                {maintenance.length === 0 && <tr><td colSpan={10} style={{ ...css.td, textAlign: "center", color: T.muted }}>No maintenance records yet</td></tr>}
               </tbody>
             </table></div>
           </div>
@@ -2743,7 +2761,9 @@ function Maintenance({ cars, maintenance, saveMaint }) {
 
 
 // ── DRIVER EDIT CARD ─────────────────────────────────────────
-function DriverEditCard({ car, onSave }) {
+function DriverEditCard({ car, onSave, darkMode }) {
+  const css = makeCss(darkMode);
+  const T = makeG(darkMode);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(car.driver);
   const [phone, setPhone] = useState(car.driverPhone.replace("+91",""));
@@ -2755,15 +2775,15 @@ function DriverEditCard({ car, onSave }) {
   };
 
   return (
-    <div style={{ border: `1px solid ${G.border}`, borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ border: `1px solid ${T.border}`, borderRadius: 10, overflow: "hidden", background: T.card }}>
       <div style={{ background: car.color + "15", borderBottom: `3px solid ${car.color}`, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ width: 36, height: 36, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16 }}>{car.driver.charAt(0)}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name}</div>
-          <div style={{ fontSize: 11, color: G.muted }}>{car.plate}</div>
+          <div style={{ fontSize: 11, color: T.muted }}>{car.plate}</div>
         </div>
         <button onClick={() => { setEditing(e => !e); setName(car.driver); setPhone(car.driverPhone.replace("+91","")); }}
-          style={{ ...css.btnSm(editing ? G.muted : G.info), fontSize: 11 }}>{editing ? "Cancel" : "✏️ Edit"}</button>
+          style={{ ...css.btnSm(editing ? T.muted : T.info), fontSize: 11 }}>{editing ? "Cancel" : "✏️ Edit"}</button>
       </div>
       <div style={{ padding: "12px 14px" }}>
         {editing ? (
@@ -2776,12 +2796,12 @@ function DriverEditCard({ car, onSave }) {
               <label style={css.label}>Mobile Number *</label>
               <input style={css.input} value={phone} onChange={e => setPhone(e.target.value)} placeholder="10-digit mobile" maxLength={10} />
             </div>
-            <button style={css.btn(G.success)} onClick={handleSave}>💾 Save Changes</button>
+            <button style={css.btn(T.success)} onClick={handleSave}>💾 Save Changes</button>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13 }}>
             <div>🧑‍✈️ <b>{car.driver}</b></div>
-            <div>📞 <a href={`tel:${car.driverPhone}`} style={{ color: G.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
+            <div>📞 <a href={`tel:${car.driverPhone}`} style={{ color: T.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
           </div>
         )}
       </div>
@@ -2790,7 +2810,7 @@ function DriverEditCard({ car, onSave }) {
 }
 
 // ── USER MANAGEMENT ──────────────────────────────────────────
-function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword }) {
+function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword, darkMode, T, css }) {
   const users = allUsers;
   const saveUsers = saveAllUsers;
   const [search, setSearch] = useState("");
@@ -2900,10 +2920,10 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
 
       <div style={css.grid4}>
         {[
-          { icon: "👥", val: users.length, label: "Total Users", color: G.info },
-          { icon: "🏢", val: depts.length, label: "Departments", color: G.success },
-          { icon: "🔑", val: 2, label: "Admins", color: G.warning },
-          { icon: "👤", val: users.length - 2, label: "Regular Users", color: G.muted },
+          { icon: "👥", val: users.length, label: "Total Users", color: T.info },
+          { icon: "🏢", val: depts.length, label: "Departments", color: T.success },
+          { icon: "🔑", val: 2, label: "Admins", color: T.warning },
+          { icon: "👤", val: users.length - 2, label: "Regular Users", color: T.muted },
         ].map(s => (
           <div key={s.label} style={{ ...css.card, borderTop: `3px solid ${s.color}` }}>
             <div style={{ fontSize: 22, marginBottom: 4 }}>{s.icon}</div>
@@ -2916,7 +2936,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
       <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         <div style={css.card}>
           <div style={css.sectionTitle}>➕ Add New User</div>
-          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? "#dcfce7" : "#fee2e2", marginBottom: 14, fontSize: 13, fontWeight: 600, color: msg.startsWith("✅") ? "#166534" : "#991b1b" }}>{msg}</div>}
+          {msg && <div style={{ padding: "10px 14px", borderRadius: 8, background: msg.startsWith("✅") ? (darkMode ? "#052e16" : "#dcfce7") : (darkMode ? "#450a0a" : "#fee2e2"), marginBottom: 14, fontSize: 13, fontWeight: 600, color: msg.startsWith("✅") ? (darkMode ? "#4ade80" : "#166534") : (darkMode ? "#fca5a5" : "#991b1b") }}>{msg}</div>}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div><label style={css.label}>Full Name *</label>
               <input style={css.input} value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} placeholder="e.g. RAMESH KUMAR SINGH" /></div>
@@ -2925,25 +2945,25 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             <div><label style={css.label}>Department *</label>
               <input style={css.input} value={form.department} onChange={e => setForm(f => ({...f, department: e.target.value}))} placeholder="e.g. Human Resources" list="dept-list" />
               <datalist id="dept-list">{depts.map(d => <option key={d} value={d} />)}</datalist></div>
-            <button style={css.btn(G.info)} onClick={handleAdd}>➕ Add User</button>
+            <button style={css.btn(T.info)} onClick={handleAdd}>➕ Add User</button>
           </div>
         </div>
         <div style={css.card}>
           <div style={css.sectionTitle}>ℹ️ Instructions</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13, lineHeight: 1.6 }}>
-            <div style={{ padding: 12, background: "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe", color: "#1e40af" }}>
+            <div style={{ padding: 12, background: darkMode ? "#0c1e3c" : "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe", color: darkMode ? "#93c5fd" : "#1e40af" }}>
               <b>Adding:</b> Fill name, PF ID and department. The user can log in immediately with their PF ID.
             </div>
-            <div style={{ padding: 12, background: "#fef9c3", borderRadius: 8, border: "1px solid #fde68a", color: "#92400e" }}>
+            <div style={{ padding: 12, background: darkMode ? "#2d1f00" : "#fef9c3", borderRadius: 8, border: "1px solid #fde68a", color: darkMode ? "#fcd34d" : "#92400e" }}>
               <b>Editing:</b> Click ✏️ to update a user's name or department. PF ID cannot be changed.
             </div>
-            <div style={{ padding: 12, background: "#f5f3ff", borderRadius: 8, border: "1px solid #ddd6fe", color: "#5b21b6" }}>
+            <div style={{ padding: 12, background: darkMode ? "#1e1035" : "#f5f3ff", borderRadius: 8, border: "1px solid #ddd6fe", color: darkMode ? "#c4b5fd" : "#5b21b6" }}>
               <b>Assistant Role:</b> Click 🤝 to promote a user to Assistant — they get access to Tracking, Charging and Maintenance tabs (but not Approvals or Users).
             </div>
-            <div style={{ padding: 12, background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca", color: "#991b1b" }}>
+            <div style={{ padding: 12, background: darkMode ? "#450a0a" : "#fef2f2", borderRadius: 8, border: "1px solid #fecaca", color: darkMode ? "#fca5a5" : "#991b1b" }}>
               <b>Deleting:</b> Click 🗑️ — a confirmation will appear. Admin accounts cannot be deleted.
             </div>
-            <div style={{ padding: 12, background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0", color: "#166534" }}>
+            <div style={{ padding: 12, background: darkMode ? "#052e16" : "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0", color: darkMode ? "#4ade80" : "#166534" }}>
               <b>Note:</b> All changes sync instantly across all devices.
             </div>
           </div>
@@ -2954,10 +2974,10 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
       {/* ── DRIVER MANAGEMENT ── */}
       <div style={{ ...css.card, marginBottom: 20 }}>
         <div style={css.sectionTitle}>🧑‍✈️ Driver Details</div>
-        <div style={{ fontSize: 12, color: G.muted, marginBottom: 14 }}>Update driver name and contact number for any vehicle.</div>
+        <div style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>Update driver name and contact number for any vehicle.</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
           {(cars || []).map(car => (
-            <DriverEditCard key={car.id} car={car} onSave={updated => {
+            <DriverEditCard key={car.id} car={car} darkMode={darkMode} onSave={updated => {
               saveCars((cars || []).map(c => c.id === updated.id ? updated : c));
               showMsg("✅ Driver updated for " + updated.name + "!");
             }} />
@@ -2968,7 +2988,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
           <div style={css.sectionTitle}>👥 Authorised Users ({filtered.length})</div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            <button onClick={forceSaveToServer} style={{ ...css.btn(G.success), padding: "8px 16px", fontSize: 12 }}>💾 Force Save to Server</button>
+            <button onClick={forceSaveToServer} style={{ ...css.btn(T.success), padding: "8px 16px", fontSize: 12 }}>💾 Force Save to Server</button>
             <input style={{ ...css.input, maxWidth: 280 }} placeholder="Search name, PF ID or department…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
         </div>
@@ -2978,34 +2998,34 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             {filtered.map((u, i) => {
               const isAdmin = u.pfId === ADMIN_1.pfId || u.pfId === ADMIN_2.pfId;
               return (
-                <tr key={u.pfId} style={{ background: isAdmin ? "#eff6ff" : "transparent" }}>
-                  <td style={{ ...css.td, color: G.muted, fontSize: 11 }}>{i+1}</td>
+                <tr key={u.pfId} style={{ background: isAdmin ? (darkMode ? "#0c1e3c" : "#eff6ff") : "transparent" }}>
+                  <td style={{ ...css.td, color: T.muted, fontSize: 11 }}>{i+1}</td>
                   <td style={css.td}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: isAdmin ? G.info : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 11, flexShrink: 0 }}>{u.name.charAt(0)}</div>
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: isAdmin ? T.info : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 11, flexShrink: 0 }}>{u.name.charAt(0)}</div>
                       <div>
                         <div style={{ fontWeight: 600, fontSize: 13 }}>{u.name}</div>
-                        {u.designation && <div style={{ fontSize: 10, color: G.muted }}>{u.designation}</div>}
+                        {u.designation && <div style={{ fontSize: 10, color: T.muted }}>{u.designation}</div>}
                       </div>
                     </div>
                   </td>
                   <td style={{ ...css.td, fontFamily: "monospace" }}>{u.pfId}</td>
-                  <td style={{ ...css.td, fontSize: 12, color: G.muted }}>{u.department}</td>
-                  <td style={css.td}>{isAdmin ? <span style={css.badge(G.info)}>🔑 Admin</span> : u.isAssistant ? <span style={css.badge(G.warning)}>🤝 Assistant</span> : <span style={css.badge(G.muted)}>👤 Staff</span>}</td>
+                  <td style={{ ...css.td, fontSize: 12, color: T.muted }}>{u.department}</td>
+                  <td style={css.td}>{isAdmin ? <span style={css.badge(T.info)}>🔑 Admin</span> : u.isAssistant ? <span style={css.badge(T.warning)}>🤝 Assistant</span> : <span style={css.badge(T.muted)}>👤 Staff</span>}</td>
                   <td style={css.td}>
                     <div style={{ display: "flex", gap: 6 }}>
-                      <button onClick={() => setEditUser({...u})} style={{ ...css.btnSm(G.info), padding: "4px 10px" }}>✏️</button>
-                      <button onClick={() => setResetPwUser(u)} style={{ ...css.btnSm(G.warning), padding: "4px 10px" }} title="Reset Password">🔑</button>
+                      <button onClick={() => setEditUser({...u})} style={{ ...css.btnSm(T.info), padding: "4px 10px" }}>✏️</button>
+                      <button onClick={() => setResetPwUser(u)} style={{ ...css.btnSm(T.warning), padding: "4px 10px" }} title="Reset Password">🔑</button>
                       {!isAdmin && (
                         <button onClick={async () => {
                           const updated = users.map(x => x.pfId === u.pfId ? { ...x, isAssistant: !u.isAssistant } : x);
                           saveUsers(updated);
                           showMsg(u.isAssistant ? `✅ ${u.name} is now Staff` : `✅ ${u.name} is now Assistant`);
-                        }} style={{ ...css.btnSm(u.isAssistant ? G.muted : "#7c3aed"), padding: "4px 10px" }} title={u.isAssistant ? "Demote to Staff" : "Promote to Assistant"}>
+                        }} style={{ ...css.btnSm(u.isAssistant ? T.muted : "#7c3aed"), padding: "4px 10px" }} title={u.isAssistant ? "Demote to Staff" : "Promote to Assistant"}>
                           {u.isAssistant ? "👤" : "🤝"}
                         </button>
                       )}
-                      {!isAdmin && <button onClick={() => setConfirmDelete(u.pfId)} style={{ ...css.btnSm(G.danger), padding: "4px 10px" }}>🗑️</button>}
+                      {!isAdmin && <button onClick={() => setConfirmDelete(u.pfId)} style={{ ...css.btnSm(T.danger), padding: "4px 10px" }}>🗑️</button>}
                     </div>
                   </td>
                 </tr>
@@ -3021,15 +3041,15 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             <div style={{ ...css.sectionTitle, marginBottom: 16 }}>✏️ Edit User</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label style={css.label}>PF ID (cannot change)</label>
-                <input style={{ ...css.input, background: "#f8fafc", color: G.muted }} value={editUser.pfId} readOnly /></div>
+                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: T.muted }} value={editUser.pfId} readOnly /></div>
               <div><label style={css.label}>Full Name *</label>
                 <input style={css.input} value={editUser.name} onChange={e => setEditUser(u => ({...u, name: e.target.value}))} /></div>
               <div><label style={css.label}>Department *</label>
                 <input style={css.input} value={editUser.department} onChange={e => setEditUser(u => ({...u, department: e.target.value}))} list="dept-list2" />
                 <datalist id="dept-list2">{depts.map(d => <option key={d} value={d} />)}</datalist></div>
               <div style={{ display: "flex", gap: 10 }}>
-                <button style={css.btn(G.success)} onClick={handleEdit}>💾 Save Changes</button>
-                <button style={css.btn(G.muted, true)} onClick={() => setEditUser(null)}>Cancel</button>
+                <button style={css.btn(T.success)} onClick={handleEdit}>💾 Save Changes</button>
+                <button style={css.btn(T.muted, true)} onClick={() => setEditUser(null)}>Cancel</button>
               </div>
             </div>
           </div>
@@ -3043,13 +3063,13 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 8 }}>Confirm Deletion</div>
             {(() => {
               const u = users.find(x => x.pfId === confirmDelete);
-              return u ? <div style={{ textAlign: "center", marginBottom: 20, color: G.muted, fontSize: 13 }}>
-                Remove <b style={{ color: G.text }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
+              return u ? <div style={{ textAlign: "center", marginBottom: 20, color: T.muted, fontSize: 13 }}>
+                Remove <b style={{ color: T.text }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
               </div> : null;
             })()}
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button style={css.btn(G.danger)} onClick={() => handleDelete(confirmDelete)}>🗑️ Yes, Delete</button>
-              <button style={css.btn(G.muted, true)} onClick={() => setConfirmDelete(null)}>Cancel</button>
+              <button style={css.btn(T.danger)} onClick={() => handleDelete(confirmDelete)}>🗑️ Yes, Delete</button>
+              <button style={css.btn(T.muted, true)} onClick={() => setConfirmDelete(null)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -3060,24 +3080,24 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
           <div style={{ ...css.modalBox, maxWidth: 400 }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 32, textAlign: "center", marginBottom: 6 }}>🔑</div>
             <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 4 }}>Reset Password</div>
-            <div style={{ textAlign: "center", fontSize: 13, color: G.muted, marginBottom: 20 }}>
-              Reset password for <b style={{ color: G.text }}>{resetPwUser.name}</b><br/>PF ID: <span style={{ fontFamily: "monospace" }}>{resetPwUser.pfId}</span>
+            <div style={{ textAlign: "center", fontSize: 13, color: T.muted, marginBottom: 20 }}>
+              Reset password for <b style={{ color: T.text }}>{resetPwUser.name}</b><br/>PF ID: <span style={{ fontFamily: "monospace" }}>{resetPwUser.pfId}</span>
             </div>
-            <div style={{ padding: "12px 16px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, marginBottom: 20, fontSize: 12, color: "#92400e" }}>
+            <div style={{ padding: "12px 16px", background: darkMode ? "#2d1f00" : "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, marginBottom: 20, fontSize: 12, color: darkMode ? "#fcd34d" : "#92400e" }}>
               ⚠️ This will reset the user's password to their <b>PF ID</b> ({resetPwUser.pfId}). They can change it after logging in.
             </div>
             {resetPwMsg && (
-              <div style={{ padding: "10px 14px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, marginBottom: 16, fontSize: 13, color: G.success }}>
+              <div style={{ padding: "10px 14px", background: darkMode ? "#052e16" : "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, marginBottom: 16, fontSize: 13, color: T.success }}>
                 {resetPwMsg}
               </div>
             )}
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button style={css.btn(G.warning)} onClick={async () => {
+              <button style={css.btn(T.warning)} onClick={async () => {
                 await savePassword(resetPwUser.pfId, resetPwUser.pfId);
                 setResetPwMsg("✅ Password reset to PF ID successfully!");
                 setTimeout(() => { setResetPwUser(null); setResetPwMsg(""); }, 1500);
               }}>🔑 Yes, Reset</button>
-              <button style={css.btn(G.muted, true)} onClick={() => { setResetPwUser(null); setResetPwMsg(""); }}>Cancel</button>
+              <button style={css.btn(T.muted, true)} onClick={() => { setResetPwUser(null); setResetPwMsg(""); }}>Cancel</button>
             </div>
           </div>
         </div>
