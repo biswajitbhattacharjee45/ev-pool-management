@@ -679,7 +679,7 @@ function App() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={css.headerTitle}>⚡ Pool EV Management</div>
-            <span style={{ padding: '1px 7px', borderRadius: 20, background: 'rgba(168,85,247,0.25)', fontSize: 9, fontWeight: 800, color: '#c4b5fd', letterSpacing: '0.06em', whiteSpace: 'nowrap', border: '1px solid rgba(168,85,247,0.4)' }}>ver 3.0</span>
+            <span style={{ padding: '2px 8px', borderRadius: 20, background: 'linear-gradient(135deg,#5b21b6,#7c3aed)', fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', border: 'none', boxShadow: '0 2px 6px rgba(124,58,237,0.4)' }}>ver 3.0</span>
           </div>
           <div style={css.headerSub}>Tata Nexon EV Fleet · {currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
         </div>
@@ -924,7 +924,7 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 6 }}>
             <div style={S.appName}>Pool EV Management</div>
-            <span style={{ marginTop: 2, padding: '2px 8px', borderRadius: 20, background: 'rgba(124,58,237,0.25)', fontSize: 10, fontWeight: 800, color: '#c4b5fd', letterSpacing: '0.06em', whiteSpace: 'nowrap', border: '1px solid rgba(168,85,247,0.45)' }}>ver 3.0</span>
+            <span style={{ marginTop: 2, padding: '3px 10px', borderRadius: 20, background: 'linear-gradient(135deg,#5b21b6,#7c3aed)', fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.06em', whiteSpace: 'nowrap', border: 'none', boxShadow: '0 2px 8px rgba(124,58,237,0.5)' }}>ver 3.0</span>
           </div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.2)' }}>
@@ -1061,10 +1061,10 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
         </div>
 
         <div style={S.footer}>Pool EV Management · {new Date().getFullYear()}</div>
-        <div style={{ textAlign: "center", marginTop: 16, padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.9))", border: "1.5px solid rgba(59,130,246,0.5)", backdropFilter: "blur(12px)", boxShadow: "0 0 28px rgba(59,130,246,0.18), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
-          <div style={{ fontSize: 9, color: "#64748b", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 6 }}>✦ Designed &amp; Developed by ✦</div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd", letterSpacing: "0.03em", textShadow: "0 0 16px rgba(147,197,253,0.8), 0 0 32px rgba(59,130,246,0.5), 0 0 60px rgba(59,130,246,0.25)" }}>Biswajit Bhattacharjee</div>
-          <div style={{ fontSize: 10, color: "#7dd3fc", marginTop: 5, letterSpacing: "0.06em", fontWeight: 500 }}>Chief Manager · Liaison · Guwahati</div>
+        <div style={{ textAlign: "center", marginTop: 16, padding: "14px 24px", borderRadius: 14, background: "linear-gradient(160deg,#12002e,#1e0050,#2d0075,#3d0d90)", border: "1px solid rgba(140,80,255,0.4)", borderTop: "1px solid rgba(180,140,255,0.55)", boxShadow: "0 6px 24px rgba(20,0,60,0.35), inset 0 1px 0 rgba(180,120,255,0.2)" }}>
+          <div style={{ fontSize: 9, color: "rgba(220,190,255,0.65)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 6, fontWeight: 700 }}>✦ Designed &amp; Developed by ✦</div>
+          <div style={{ fontSize: 15, fontWeight: 800, background: "linear-gradient(90deg,#e9d5ff,#fff,#f0abfc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: "0.03em" }}>Biswajit Bhattacharjee</div>
+          <div style={{ fontSize: 10, color: "rgba(220,190,255,0.75)", marginTop: 5, letterSpacing: "0.06em", fontWeight: 600 }}>Chief Manager · Liaison · Guwahati</div>
         </div>
       </div>
     </div>
