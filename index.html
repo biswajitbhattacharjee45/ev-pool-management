@@ -407,7 +407,7 @@ const makeG = (dark) => ({
   borderTop: "rgba(180,140,255,0.6)",
   text:    "#ffffff",
   textOnWhite: "#1a0035",
-  muted:   "rgba(210,180,255,0.75)",
+  muted:   "rgba(225,200,255,0.95)",
   mutedOnWhite: "rgba(109,40,217,0.6)",
   light:   "rgba(124,58,237,0.08)",
   success: "#34d399", danger: "#f97066", warning: "#fde68a", info: "#a855f7",
@@ -425,7 +425,7 @@ const makeCss = (dark) => {
     app: { minHeight: "100vh", background: "#f8f5ff", fontFamily: "'DM Sans', sans-serif", fontSize: 14 },
     header: { background: T.headerBg, color: "#fff", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, boxShadow: "0 4px 20px rgba(20,0,60,0.3)", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid rgba(140,80,255,0.3)" },
     headerTitle: { fontSize: 16, fontWeight: 700, letterSpacing: "-0.3px", fontFamily: "'Playfair Display', serif", color: "#fff" },
-    headerSub: { fontSize: 10, color: "rgba(210,180,255,0.65)", marginTop: 1 },
+    headerSub: { fontSize: 11, color: "rgba(230,210,255,0.95)", marginTop: 1, fontWeight: 600 },
     body: { padding: "16px", maxWidth: 1100, margin: "0 auto", paddingBottom: 80, background: "#f8f5ff" },
     grid4: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
     card: { background: "#ffffff", borderRadius: 14, padding: 16, boxShadow: "0 2px 12px rgba(109,40,217,0.1)", border: "1px solid rgba(109,40,217,0.15)", borderTop: "3px solid rgba(124,58,237,0.5)", transition: "transform 0.2s" },
@@ -435,17 +435,17 @@ const makeCss = (dark) => {
     btnSm: (color = T.info) => ({ padding: "4px 12px", borderRadius: 7, border: "none", background: `linear-gradient(180deg,${color}ee,${color}bb)`, color: "#fff", fontWeight: 700, fontSize: 12, cursor: "pointer", boxShadow: `0 3px 0 ${color}66, inset 0 1px 0 rgba(255,255,255,0.2)` }),
     input: { width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid rgba(109,40,217,0.25)", fontSize: 14, outline: "none", background: "#f5f3ff", color: "#1a0035", boxSizing: "border-box" },
     select: { width: "100%", padding: "10px 12px", borderRadius: 9, border: "1.5px solid rgba(109,40,217,0.25)", fontSize: 14, outline: "none", background: "#f5f3ff", color: "#1a0035", boxSizing: "border-box" },
-    label: { fontSize: 11, fontWeight: 700, color: "rgba(109,40,217,0.7)", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: "0.07em" },
+    label: { fontSize: 11, fontWeight: 800, color: "rgba(80,40,140,0.95)", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: "0.07em" },
     formGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 },
     table: { width: "100%", borderCollapse: "collapse" },
     th: { textAlign: "left", padding: "11px 13px", fontSize: 11, fontWeight: 800, color: "#fff", textTransform: "uppercase", letterSpacing: "0.06em", borderBottom: "1px solid rgba(140,80,255,0.35)", background: "linear-gradient(135deg,#0d0025,#1a0045,#280060)", whiteSpace: "nowrap" },
     td: { padding: "10px 12px", borderBottom: "1px solid rgba(109,40,217,0.12)", fontSize: 13, color: "#1a0035", background: "#ffffff" },
     modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 },
     modalBox: { background: T.purpleGrad, borderRadius: 18, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 60px rgba(20,0,60,0.5)", border: "1px solid rgba(140,80,255,0.45)", borderTop: "1px solid rgba(180,140,255,0.6)" },
-    sectionTitle: { fontSize: 16, fontWeight: 700, color: "#2d0060", marginBottom: 14, fontFamily: "'Playfair Display', serif" },
+    sectionTitle: { fontSize: 17, fontWeight: 900, color: "#1a0035", marginBottom: 14, fontFamily: "'Playfair Display', serif" },
     row: { display: "flex", alignItems: "center", gap: 10 },
-    statNum: { fontSize: 26, fontWeight: 700, color: "#2d0060", fontFamily: "'Playfair Display', serif" },
-    statLabel: { fontSize: 10, color: "rgba(109,40,217,0.55)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" },
+    statNum: { fontSize: 28, fontWeight: 900, color: "#0d0020", fontFamily: "'Playfair Display', serif" },
+    statLabel: { fontSize: 11, color: "rgba(80,40,140,0.9)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" },
     bottomNav: { position: "fixed", bottom: 0, left: 0, right: 0, background: T.bottomNavBg, display: "flex", zIndex: 200, borderTop: "1px solid rgba(140,80,255,0.25)", boxShadow: "0 -4px 20px rgba(20,0,60,0.3)" },
     bottomNavBtn: (active) => ({ flex: 1, padding: "8px 4px 10px", border: "none", background: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: active ? "#fff" : "rgba(210,180,255,0.4)", fontSize: 9, fontWeight: active ? 800 : 500, transition: "color 0.15s", minWidth: 0 }),
   };
@@ -625,7 +625,7 @@ function App() {
   // Block vehicle as soon as any pending OR approved trip exists (first-come-first-serve)
   const isCarBusy = (carId) => trips.some(t => t.carId === carId && !t.returnTime && (t.approvalStatus === "approved" || t.approvalStatus === "pending"));
 
-  if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: T.bg, fontFamily: "sans-serif", color: T.muted, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
+  if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: T.bg, fontFamily: "sans-serif", color: "#fff", fontWeight: 700, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
 
   if (!currentUser) return <LoginScreen onLogin={handleLogin} allUsers={allUsers} checkPassword={checkPassword} />;
 
@@ -692,12 +692,12 @@ function App() {
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8 }}>
           <div style={{ textAlign: "right" }} className="hide-mobile">
             <div style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''}</div>
-            <div style={{ fontSize: 10, color: "#94a3b8" }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
+            <div style={{ fontSize: 11, color: "rgba(220,195,255,0.95)", fontWeight: 600 }}>{currentUser.department || (currentUser.isAdmin ? "Admin" : "Staff")}</div>
           </div>
           {/* Dark / Light mode toggle */}
-          <button onClick={toggleDark} title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 13, cursor: "pointer", lineHeight: 1, whiteSpace: "nowrap" }}>{darkMode ? "☀️" : "🌙"}</button>
-          <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑</button>
-          <button onClick={handleLogout} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid #475569", background: "transparent", color: "#94a3b8", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>⏻</button>
+          <button onClick={toggleDark} title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid rgba(168,85,247,0.4)", background: "rgba(255,255,255,0.08)", color: "#fff", fontSize: 13, cursor: "pointer", lineHeight: 1, whiteSpace: "nowrap" }}>{darkMode ? "☀️" : "🌙"}</button>
+          <button onClick={() => setShowChangePw(true)} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid rgba(168,85,247,0.4)", background: "rgba(255,255,255,0.08)", color: "#fff", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>🔑</button>
+          <button onClick={handleLogout} style={{ padding: "5px 8px", borderRadius: 6, border: "1.5px solid rgba(168,85,247,0.4)", background: "rgba(255,255,255,0.08)", color: "#fff", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>⏻</button>
         </div>
       </header>
 
@@ -718,7 +718,7 @@ function App() {
         {NAV_ITEMS.map(({ id, label, icon }) => (
           <button key={id} style={css.bottomNavBtn(tab === id)} onClick={() => setTab(id)}>
             <span style={{ fontSize: 18 }}>{icon}</span>
-            <span style={{ fontSize: 9, lineHeight: 1 }}>{label}</span>
+            <span style={{ fontSize: 10, lineHeight: 1, fontWeight: 700 }}>{label}</span>
             {id === "approvals" && pendingCount > 0 && (
               <span style={{ position: "absolute", top: 4, background: T.danger, color: "#fff", borderRadius: 10, fontSize: 8, fontWeight: 800, padding: "1px 4px" }}>{pendingCount}</span>
             )}
@@ -772,7 +772,7 @@ function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose
       <div style={{ ...css.modalBox, maxWidth: 420 }} onClick={e => e.stopPropagation()}>
         <div style={{ fontSize: 28, textAlign: "center", marginBottom: 6 }}>🔑</div>
         <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 4 }}>Change Password</div>
-        <div style={{ fontSize: 12, color: T.muted, textAlign: "center", marginBottom: 20 }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''} · PF: {currentUser.pfId}</div>
+        <div style={{ fontSize: 13, color: "#fff", fontWeight: 600, textAlign: "center", marginBottom: 20 }}>{currentUser.name}{currentUser.designation ? `, ${currentUser.designation}` : ''} · PF: {currentUser.pfId}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
             <label style={css.label}>Current Password</label>
@@ -780,7 +780,7 @@ function ChangePasswordModal({ currentUser, checkPassword, savePassword, onClose
               <input style={{ ...css.input, paddingRight: 40 }} type={showOld ? "text" : "password"} value={oldPw} onChange={e => setOldPw(e.target.value)} placeholder="Enter current password" autoFocus />
               <button onClick={() => setShowOld(v => !v)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 15 }}>{showOld ? "🙈" : "👁️"}</button>
             </div>
-            <div style={{ fontSize: 10, color: T.muted, marginTop: 3 }}>Default is your PF ID if you haven't changed it.</div>
+            <div style={{ fontSize: 11, color: "rgba(220,195,255,0.85)", fontWeight: 600, marginTop: 3 }}>Default is your PF ID if you haven't changed it.</div>
           </div>
           <div>
             <label style={css.label}>New Password</label>
@@ -870,22 +870,22 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
     iconRingWrap: { position: "relative", width: 72, height: 72, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" },
     iconRing: { width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(160deg,#12002e,#1e0050,#2d0075,#3d0d90)", border: "2.5px solid rgba(168,85,247,0.95)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, boxShadow: "0 0 16px rgba(124,58,237,0.7), 0 0 32px rgba(124,58,237,0.35), inset 0 1px 0 rgba(180,120,255,0.3)", animation: "iconPulse 3s ease-in-out infinite", position: "relative", zIndex: 1 },
     iconRingOuter: { position: "absolute", inset: -10, borderRadius: "50%", border: "1.5px solid rgba(168,85,247,0.4)", boxShadow: "0 0 20px rgba(124,58,237,0.2)", animation: "iconPulse 3s ease-in-out infinite 0.7s" },
-    appName: { fontSize: 22, fontWeight: 900, color: "#1a0035", letterSpacing: "-0.5px", marginBottom: 4, fontFamily: "'Playfair Display', serif" },
-    appSub: { fontSize: 12, color: "rgba(109,40,217,0.65)", letterSpacing: "0.05em", fontWeight: 600 },
+    appName: { fontSize: 23, fontWeight: 900, color: "#0d0020", letterSpacing: "-0.5px", marginBottom: 4, fontFamily: "'Playfair Display', serif" },
+    appSub: { fontSize: 12.5, color: "rgba(80,40,140,0.9)", letterSpacing: "0.05em", fontWeight: 700 },
     card: { background: "linear-gradient(160deg,#12002e,#1e0050,#2d0075,#3d0d90,#4c1aaa)", borderRadius: 18, padding: "28px 28px", border: "1px solid rgba(140,80,255,0.45)", borderTop: "1px solid rgba(180,140,255,0.65)", boxShadow: "0 20px 60px rgba(20,0,60,0.35),0 8px 24px rgba(124,58,237,0.2),inset 0 1px 0 rgba(180,120,255,0.25)" },
-    roleTitle: { fontSize: 11, fontWeight: 700, color: "rgba(210,180,255,0.7)", textAlign: "center", marginBottom: 18, textTransform: "uppercase", letterSpacing: "0.1em" },
+    roleTitle: { fontSize: 11, fontWeight: 800, color: "rgba(230,210,255,0.95)", textAlign: "center", marginBottom: 18, textTransform: "uppercase", letterSpacing: "0.1em" },
     roleGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 },
     roleBtn: (col) => ({ padding: "26px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.18)", background: "linear-gradient(180deg,rgba(255,255,255,0.12) 0%,rgba(255,255,255,0.05) 100%)", color: "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.2s", position: "relative", overflow: "hidden", boxShadow: "0 4px 0 rgba(0,0,0,0.25), 0 6px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)" }),
     formBack: { background: "none", border: "none", color: "rgba(210,180,255,0.7)", cursor: "pointer", fontSize: 20, padding: "0 4px", lineHeight: 1, transition: "color 0.2s" },
     formTitle: { fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "'Playfair Display', serif" },
-    formSub: { fontSize: 11, color: "rgba(210,180,255,0.6)", marginTop: 2 },
-    label: { fontSize: 10, fontWeight: 700, color: "rgba(210,180,255,0.75)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 6 },
+    formSub: { fontSize: 12, color: "rgba(230,210,255,0.9)", marginTop: 2, fontWeight: 600 },
+    label: { fontSize: 11, fontWeight: 800, color: "rgba(230,210,255,0.95)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 6 },
     inp: (border) => ({ width: "100%", padding: "11px 14px", borderRadius: 9, border: `1.5px solid ${border}`, background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 15, outline: "none", letterSpacing: "0.05em", boxSizing: "border-box", transition: "border-color 0.2s, box-shadow 0.2s" }),
     matchCard: { padding: "10px 14px", background: "rgba(5,46,22,0.8)", border: "1px solid rgba(22,163,74,0.4)", borderRadius: 9, marginBottom: 14, display: "flex", alignItems: "center", gap: 10, boxShadow: "0 0 16px rgba(22,163,74,0.1)" },
     matchAvatar: { width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#16a34a,#4ade80)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0 },
     errCard: { padding: "10px 14px", background: "rgba(69,10,10,0.8)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 9, marginBottom: 14, fontSize: 12, color: "#fca5a5", boxShadow: "0 0 16px rgba(239,68,68,0.1)" },
     submitBtn: (active, col) => ({ width: "100%", padding: "13px", borderRadius: 10, border: "none", background: active ? "linear-gradient(180deg,#a855f7 0%,#7c3aed 50%,#6d28d9 100%)" : "rgba(255,255,255,0.07)", color: active ? "#fff" : "rgba(210,180,255,0.3)", fontWeight: 700, fontSize: 14, cursor: active ? "pointer" : "not-allowed", transition: "all 0.25s", boxShadow: active ? "0 6px 0 #4c1d9566, 0 10px 24px rgba(124,58,237,0.45), inset 0 1px 0 rgba(255,255,255,0.25)" : "none", letterSpacing: "0.02em", fontFamily: "'Playfair Display',serif" }),
-    footer: { textAlign: "center", marginTop: 20, fontSize: 11, color: "rgba(109,40,217,0.4)" },
+    footer: { textAlign: "center", marginTop: 20, fontSize: 11, color: "rgba(80,40,140,0.75)", fontWeight: 600 },
     credit: { textAlign: "center", marginTop: 12, padding: "9px 18px 8px", borderTop: "1px solid rgba(255,255,255,0.08)" },
   };
 
@@ -928,10 +928,10 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
           </div>
           <div style={S.appSub}>Tata Nexon EV · Fleet System</div>
           <div style={{ marginTop: 14, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 20px', borderRadius: 10, background: 'rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.2)' }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#5b21b6', letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums', fontFamily: "'JetBrains Mono',monospace" }}>
+            <div style={{ fontSize: 23, fontWeight: 800, color: '#3b0082', letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums', fontFamily: "'JetBrains Mono',monospace" }}>
               {clock.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(109,40,217,0.55)', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 600 }}>
+            <div style={{ fontSize: 11, color: 'rgba(80,40,140,0.85)', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700 }}>
               {clock.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
             </div>
           </div>
@@ -948,14 +948,14 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
                   style={S.roleBtn("#3b82f6")}>
                   <div style={{ fontSize: 30, marginBottom: 10 }}>👤</div>
                   <div style={{ fontWeight: 700, fontSize: 13, color: "#f1f5f9" }}>Staff / Officer</div>
-                  <div style={{ fontSize: 10, color: "#475569", marginTop: 4 }}>Login with PF ID</div>
+                  <div style={{ fontSize: 11, color: "rgba(210,190,255,0.9)", marginTop: 4, fontWeight: 600 }}>Login with PF ID</div>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, rgba(59,130,246,0.6), transparent)", borderRadius: "12px 12px 0 0" }}></div>
                 </button>
                 <button className="ev-role-btn ev-role-driver" onClick={() => setPortal("driver")}
                   style={S.roleBtn("#10b981")}>
                   <div style={{ fontSize: 30, marginBottom: 10 }}>🧑‍✈️</div>
                   <div style={{ fontWeight: 700, fontSize: 13, color: "#f1f5f9" }}>Driver</div>
-                  <div style={{ fontSize: 10, color: "#475569", marginTop: 4 }}>Login with phone</div>
+                  <div style={{ fontSize: 11, color: "rgba(210,190,255,0.9)", marginTop: 4, fontWeight: 600 }}>Login with phone</div>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.6), transparent)", borderRadius: "12px 12px 0 0" }}></div>
                 </button>
               </div>
@@ -1000,9 +1000,9 @@ function LoginScreen({ onLogin, allUsers, checkPassword }) {
                       type={showPw ? "text" : "password"}
                       value={password} onChange={e => { setPassword(e.target.value); setError(""); }}
                       placeholder="Enter password" onKeyDown={e => e.key === "Enter" && handleStaffLogin()} autoFocus />
-                    <button onClick={() => setShowPw(v => !v)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 15 }}>{showPw ? "🙈" : "👁️"}</button>
+                    <button onClick={() => setShowPw(v => !v)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(200,175,255,0.9)", cursor: "pointer", fontSize: 15 }}>{showPw ? "🙈" : "👁️"}</button>
                   </div>
-                  <div style={{ fontSize: 10, color: "#334155", marginTop: 5 }}>Default password is your PF ID</div>
+                  <div style={{ fontSize: 11, color: "rgba(200,180,255,0.9)", marginTop: 5, fontWeight: 600 }}>Default password is your PF ID</div>
                 </div>
               )}
 
@@ -1125,7 +1125,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
 
         {/* Current status card */}
         <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, marginBottom: 16, border: `2px solid ${activeTrip ? T.success : "#334155"}` }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Current Vehicle Status</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(210,190,255,0.9)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Current Vehicle Status</div>
           {activeTrip ? (
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -1133,25 +1133,25 @@ function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
                 <span style={{ fontSize: 16, fontWeight: 800, color: "#4ade80" }}>ON DUTY</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px", fontSize: 14 }}>
-                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>OFFICER</div><div style={{ color: "#fff", fontWeight: 700 }}>{activeTrip.officerName}</div></div>
-                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>DEPARTMENT</div><div style={{ color: "#fff", fontWeight: 600 }}>{activeTrip.department}</div></div>
-                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>DESTINATION</div><div style={{ color: "#fff", fontWeight: 700 }}>{activeTrip.destination}</div></div>
-                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>PURPOSE</div><div style={{ color: "#94a3b8" }}>{activeTrip.purpose || "—"}</div></div>
-                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>DEPARTURE</div><div style={{ color: "#fff" }}>{fmtDate(activeTrip.date)} at {activeTrip.departureTime}</div></div>
-                <div><div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>START KM</div><div style={{ color: "#fff" }}>{activeTrip.startKm || "—"}</div></div>
+                <div><div style={{ fontSize: 11, color: "rgba(200,180,255,0.85)", marginBottom: 2, fontWeight: 700 }}>OFFICER</div><div style={{ color: "#fff", fontWeight: 700 }}>{activeTrip.officerName}</div></div>
+                <div><div style={{ fontSize: 11, color: "rgba(200,180,255,0.85)", marginBottom: 2, fontWeight: 700 }}>DEPARTMENT</div><div style={{ color: "#fff", fontWeight: 600 }}>{activeTrip.department}</div></div>
+                <div><div style={{ fontSize: 11, color: "rgba(200,180,255,0.85)", marginBottom: 2, fontWeight: 700 }}>DESTINATION</div><div style={{ color: "#fff", fontWeight: 700 }}>{activeTrip.destination}</div></div>
+                <div><div style={{ fontSize: 11, color: "rgba(200,180,255,0.85)", marginBottom: 2, fontWeight: 700 }}>PURPOSE</div><div style={{ color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{activeTrip.purpose || "—"}</div></div>
+                <div><div style={{ fontSize: 11, color: "rgba(200,180,255,0.85)", marginBottom: 2, fontWeight: 700 }}>DEPARTURE</div><div style={{ color: "#fff" }}>{fmtDate(activeTrip.date)} at {activeTrip.departureTime}</div></div>
+                <div><div style={{ fontSize: 11, color: "rgba(200,180,255,0.85)", marginBottom: 2, fontWeight: 700 }}>START KM</div><div style={{ color: "#fff" }}>{activeTrip.startKm || "—"}</div></div>
               </div>
             </div>
           ) : pendingTrips.length > 0 ? (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>⏳</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#fbbf24" }}>Approval Pending</div>
-              <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>{pendingTrips.length} trip request(s) awaiting admin approval</div>
+              <div style={{ fontSize: 13, color: "rgba(200,180,255,0.9)", marginTop: 4, fontWeight: 600 }}>{pendingTrips.length} trip request(s) awaiting admin approval</div>
             </div>
           ) : (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>🅿️</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#4ade80" }}>Vehicle Available</div>
-              <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>No active trips assigned to your vehicle</div>
+              <div style={{ fontSize: 13, color: "rgba(200,180,255,0.9)", marginTop: 4, fontWeight: 600 }}>No active trips assigned to your vehicle</div>
             </div>
           )}
           <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
@@ -1166,7 +1166,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showReturn ? 16 : 0 }}>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em" }}>🔄 Mark Vehicle Return</div>
-                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{activeTrip.officerName} hasn't returned yet — record it here</div>
+                <div style={{ fontSize: 12, color: "rgba(220,195,255,0.9)", marginTop: 4, fontWeight: 600 }}>{activeTrip.officerName} hasn't returned yet — record it here</div>
               </div>
               <button
                 onClick={() => setShowReturn(s => !s)}
@@ -1176,32 +1176,32 @@ function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
             </div>
             {showReturn && (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <div style={{ padding: "10px 14px", background: "#0f172a", borderRadius: 8, fontSize: 13, color: "#94a3b8" }}>
+                <div style={{ padding: "10px 14px", background: "rgba(255,255,255,0.06)", borderRadius: 8, fontSize: 13, color: "rgba(220,195,255,0.95)", fontWeight: 500 }}>
                   🚗 <b style={{ color: "#fff" }}>{activeTrip.carName}</b> · Officer: <b style={{ color: "#fff" }}>{activeTrip.officerName}</b> · To: {activeTrip.destination}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   <div>
-                    <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Return Date *</label>
+                    <label style={{ fontSize: 11, fontWeight: 800, color: "rgba(210,190,255,0.9)", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Return Date *</label>
                     <input type="date" value={returnForm.returnDate}
                       onChange={e => setReturnForm(f => ({ ...f, returnDate: e.target.value }))}
                       style={{ width: "100%", padding: "10px 12px", borderRadius: 7, border: "1.5px solid #334155", fontSize: 14, background: "#0f172a", color: "#fff", boxSizing: "border-box" }} />
                   </div>
                   <div>
-                    <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Return Time *</label>
+                    <label style={{ fontSize: 11, fontWeight: 800, color: "rgba(210,190,255,0.9)", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Return Time *</label>
                     <input type="time" value={returnForm.returnTime}
                       onChange={e => setReturnForm(f => ({ ...f, returnTime: e.target.value }))}
                       style={{ width: "100%", padding: "10px 12px", borderRadius: 7, border: "1.5px solid #334155", fontSize: 14, background: "#0f172a", color: "#fff", boxSizing: "border-box" }} />
                   </div>
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>End Odometer (km)</label>
+                  <label style={{ fontSize: 11, fontWeight: 800, color: "rgba(210,190,255,0.9)", marginBottom: 4, display: "block", textTransform: "uppercase" }}>End Odometer (km)</label>
                   <input type="number" value={returnForm.endKm}
                     onChange={e => setReturnForm(f => ({ ...f, endKm: e.target.value }))}
                     placeholder="e.g. 45310"
                     style={{ width: "100%", padding: "10px 12px", borderRadius: 7, border: "1.5px solid #334155", fontSize: 14, background: "#0f172a", color: "#fff", boxSizing: "border-box" }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Remarks (optional)</label>
+                  <label style={{ fontSize: 11, fontWeight: 800, color: "rgba(210,190,255,0.9)", marginBottom: 4, display: "block", textTransform: "uppercase" }}>Remarks (optional)</label>
                   <input value={returnForm.remarks}
                     onChange={e => setReturnForm(f => ({ ...f, remarks: e.target.value }))}
                     placeholder="Any notes about the trip..."
@@ -1218,20 +1218,20 @@ function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
 
         {/* Today's trips */}
         <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, marginBottom: 16, border: "1px solid #334155" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(210,190,255,0.9)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
             Today's Schedule — {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
           </div>
           {todayTrips.length === 0 ? (
-            <div style={{ fontSize: 13, color: "#475569", textAlign: "center", padding: "12px 0" }}>No trips scheduled for today</div>
+            <div style={{ fontSize: 13, color: "rgba(200,180,255,0.9)", textAlign: "center", padding: "12px 0", fontWeight: 600 }}>No trips scheduled for today</div>
           ) : todayTrips.map(t => (
-            <div key={t.id} style={{ padding: "14px", background: "#0f172a", borderRadius: 10, marginBottom: 10, borderLeft: `3px solid ${statusColor[t.approvalStatus] || T.muted}` }}>
+            <div key={t.id} style={{ padding: "14px", background: "rgba(255,255,255,0.07)", borderRadius: 10, marginBottom: 10, borderLeft: `3px solid ${statusColor[t.approvalStatus] || T.muted}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                 <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{t.officerName}</div>
                 <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: (statusColor[t.approvalStatus] || T.muted) + "25", color: statusColor[t.approvalStatus] || T.muted }}>
                   {statusLabel[t.approvalStatus] || t.approvalStatus}
                 </span>
               </div>
-              <div style={{ fontSize: 12, color: "#64748b", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 12px" }}>
+              <div style={{ fontSize: 12, color: "rgba(200,180,255,0.9)", fontWeight: 600, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 12px" }}>
                 <div>📍 {t.destination}</div>
                 <div>🕐 {t.departureTime}</div>
                 <div>🏢 {t.department}</div>
@@ -1244,16 +1244,16 @@ function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
 
         {/* Recent trip history */}
         <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, border: "1px solid #334155" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>Recent Trip History</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(210,190,255,0.9)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>Recent Trip History</div>
           {myTrips.length === 0 ? (
-            <div style={{ fontSize: 13, color: "#475569", textAlign: "center", padding: "12px 0" }}>No trips recorded yet</div>
+            <div style={{ fontSize: 13, color: "rgba(200,180,255,0.9)", textAlign: "center", padding: "12px 0", fontWeight: 600 }}>No trips recorded yet</div>
           ) : myTrips.slice(0, 10).map(t => (
             <div key={t.id} style={{ display: "flex", gap: 12, padding: "10px 0", borderBottom: "1px solid #0f172a", alignItems: "flex-start" }}>
-              <div style={{ width: 8, height: 8, borderRadius: "50%", background: statusColor[t.approvalStatus] || T.muted, marginTop: 5, flexShrink: 0 }} />
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: statusColor[t.approvalStatus] || "rgba(200,175,255,0.7)", marginTop: 5, flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{t.officerName} → {t.destination}</div>
-                <div style={{ fontSize: 12, color: "#64748b" }}>{fmtDate(t.date)} · {t.department} · {t.departureTime}{t.returnTime ? ` – ${t.returnTime}` : ""}</div>
-                {t.startKm && t.endKm && <div style={{ fontSize: 11, color: "#475569" }}>Distance: {parseInt(t.endKm) - parseInt(t.startKm)} km</div>}
+                <div style={{ fontSize: 12, color: "rgba(200,180,255,0.85)", fontWeight: 600 }}>{fmtDate(t.date)} · {t.department} · {t.departureTime}{t.returnTime ? ` – ${t.returnTime}` : ""}</div>
+                {t.startKm && t.endKm && <div style={{ fontSize: 11, color: "rgba(200,180,255,0.85)", fontWeight: 600 }}>Distance: {parseInt(t.endKm) - parseInt(t.startKm)} km</div>}
               </div>
               <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: (statusColor[t.approvalStatus] || T.muted) + "20", color: statusColor[t.approvalStatus] || T.muted, flexShrink: 0 }}>
                 {t.approvalStatus?.toUpperCase()}
@@ -1340,7 +1340,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
             {[["pf","👤 PF ID Wise"],["driver","🧑‍✈️ Driver Wise"]].map(([v, label]) => (
               <button key={v} onClick={() => { setView(v); setSearch(""); }}
                 style={{ padding: "7px 20px", borderRadius: 6, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13,
-                  background: view === v ? "#1e293b" : "transparent", color: view === v ? "#fff" : T.muted, transition: "all 0.15s" }}>
+                  background: view === v ? "#1e293b" : "transparent", color: view === v ? "#fff" : "rgba(200,175,255,0.8)", fontWeight: 700, transition: "all 0.15s" }}>
                 {label}
               </button>
             ))}
@@ -1360,7 +1360,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         <div style={{ marginBottom: 16, borderRadius: 14, background: "linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)", border: "1.5px solid rgba(59,130,246,0.45)", padding: "22px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, boxShadow: "0 4px 24px rgba(59,130,246,0.12)" }}>
           <div>
             <div style={{ fontSize: 17, fontWeight: 800, color: "#f1f5f9", marginBottom: 4 }}>🚗 Need a Pool Vehicle?</div>
-            <div style={{ fontSize: 12, color: "#94a3b8" }}>Book your trip in a few clicks — select vehicle, destination & time.</div>
+            <div style={{ fontSize: 13, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>Book your trip in a few clicks — select vehicle, destination & time.</div>
           </div>
           <button
             className="ev-book-cta"
@@ -1374,7 +1374,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
           <div style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 8 }}>
             {cars.length - activeTrips.length} of {cars.length} vehicles available
           </div>
-          <div style={{ fontSize: 13, color: T.muted, marginBottom: 20 }}>
+          <div style={{ fontSize: 13, color: "rgba(220,195,255,0.9)", marginBottom: 20, fontWeight: 600 }}>
             {activeTrips.length > 0 ? `${activeTrips.length} vehicle${activeTrips.length > 1 ? "s" : ""} currently on duty` : "All vehicles are available for booking"}
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
@@ -1384,7 +1384,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                 <div key={car.id} style={{ padding: "12px 20px", borderRadius: 10, border: `2px solid ${busy ? T.danger : T.success}`, background: busy ? (darkMode ? "#450a0a" : "#fef2f2") : (darkMode ? "#052e16" : "#f0fdf4"), minWidth: 140 }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>🚙</div>
                   <div style={{ fontWeight: 700, fontSize: 13, color: T.text }}>{car.name}</div>
-                  <div style={{ fontSize: 11, color: T.muted }}>{car.plate}</div>
+                  <div style={{ fontSize: 11, color: "rgba(220,195,255,0.85)", fontWeight: 600 }}>{car.plate}</div>
                   <div style={{ marginTop: 6 }}>
                     {(() => {
                     const isPending = busy && trips.some(t => t.carId === car.id && !t.returnTime && t.approvalStatus === "pending");
@@ -1411,7 +1411,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         const sortedDates = Object.keys(dateMap).sort((a, b) => b.localeCompare(a));
         if (sortedDates.length === 0) return (
           <div style={css.card}>
-            <div style={{ textAlign: "center", padding: 40, color: T.muted }}>No trips recorded yet{search ? ` for "${search}"` : ""}.</div>
+            <div style={{ textAlign: "center", padding: 40, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>No trips recorded yet{search ? ` for "${search}"` : ""}.</div>
           </div>
         );
         return (
@@ -1435,7 +1435,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                       {isToday && <span style={{ marginLeft: 8, fontSize: 11, background: T.info, color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>TODAY</span>}
                     </div>
                     <div style={{ display: "flex", gap: 14, fontSize: 12 }}>
-                      <span style={{ color: T.muted }}><b style={{ color: T.text }}>{dayTrips.length}</b> trips</span>
+                      <span style={{ color: "rgba(220,195,255,0.9)", fontWeight: 600 }}><b style={{ color: "#fff" }}>{dayTrips.length}</b> trips</span>
                       {activeCount > 0 && <span style={{ color: T.success, fontWeight: 700 }}>● {activeCount} active</span>}
                       {pendingCount2 > 0 && <span style={{ color: T.warning, fontWeight: 700 }}>⏳ {pendingCount2} pending</span>}
                     </div>
@@ -1449,15 +1449,15 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                       <tbody>
                         {dayTrips.map((t, i) => (
                           <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
-                            <td style={{ ...css.td, color: T.muted, fontSize: 11 }}>{i + 1}</td>
+                            <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
                             <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
-                            <td style={{ ...css.td, fontSize: 12, color: T.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
-                            <td style={css.td}><div style={{ fontWeight: 600 }}>{t.carName}</div><div style={{ fontSize: 11, color: T.muted }}>{t.carPlate}</div></td>
+                            <td style={{ ...css.td, fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                            <td style={css.td}><div style={{ fontWeight: 600 }}>{t.carName}</div><div style={{ fontSize: 11, color: "rgba(220,195,255,0.85)", fontWeight: 600 }}>{t.carPlate}</div></td>
                             <td style={css.td}>{t.driver}</td>
                             <td style={css.td}>{t.destination}</td>
-                            <td style={{ ...css.td, color: T.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
+                            <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
                             <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
-                            <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: T.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
                             <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
                             <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
                             <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
@@ -1478,7 +1478,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         <div style={css.card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div style={css.sectionTitle}>Trip Entries — Driver Wise</div>
-            <div style={{ fontSize: 12, color: T.muted }}>{cars.length} vehicles · {trips.length} total entries</div>
+            <div style={{ fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{cars.length} vehicles · {trips.length} total entries</div>
           </div>
           {filteredDriver.map(({ car, trips: carTrips }) => {
             const dateMap2 = {};
@@ -1497,8 +1497,8 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>🧑‍✈️ {car.driver}</div>
-                    <div style={{ fontSize: 12, color: T.muted }}>{car.name} · <b>{car.plate}</b> · {car.model}</div>
-                    <div style={{ fontSize: 12, color: T.muted }}>📞 <a href={`tel:${car.driverPhone}`} style={{ color: T.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
+                    <div style={{ fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{car.name} · <b>{car.plate}</b> · {car.model}</div>
+                    <div style={{ fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>📞 <a href={`tel:${car.driverPhone}`} style={{ color: T.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
                   </div>
                   <div style={{ display: "flex", gap: 16, fontSize: 12, textAlign: "center" }}>
                     <div><div style={{ fontWeight: 800, fontSize: 20, color: T.text }}>{carTrips.length}</div><div style={{ color: T.muted }}>Trips</div></div>
@@ -1542,14 +1542,14 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                             <tbody>
                               {dayT.map((t, i) => (
                                 <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
-                                  <td style={{ ...css.td, color: T.muted, fontSize: 11 }}>{i + 1}</td>
+                                  <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
                                   <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
-                                  <td style={{ ...css.td, fontSize: 12, color: T.muted }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                                  <td style={{ ...css.td, fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
                                   <td style={{ ...css.td, fontSize: 12 }}>{t.department}</td>
                                   <td style={css.td}>{t.destination}</td>
-                                  <td style={{ ...css.td, color: T.muted, fontSize: 12 }}>{t.purpose || "—"}</td>
+                                  <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
                                   <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
-                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: T.muted }}>—</span>}</td>
+                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
                                   <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
                                   <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
                                   <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
@@ -2492,10 +2492,10 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                             <td style={css.td}>{t.destination}</td>
                             <td style={{ ...css.td, color: T.muted }}>{t.purpose || "—"}</td>
                             <td style={{ ...css.td, whiteSpace: "nowrap", color: "#2563eb", fontWeight: 600 }}>{fmtTime(t.departureTime)}</td>
-                            <td style={{ ...css.td, whiteSpace: "nowrap" }}>{ret.date ? fmtDate(ret.date) : <span style={{ color: T.muted }}>—</span>}</td>
-                            <td style={{ ...css.td, whiteSpace: "nowrap", color: "#16a34a", fontWeight: 600 }}>{ret.time ? fmtTime(ret.time) : <span style={{ color: T.muted }}>—</span>}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap" }}>{ret.date ? fmtDate(ret.date) : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
+                            <td style={{ ...css.td, whiteSpace: "nowrap", color: "#16a34a", fontWeight: 600 }}>{ret.time ? fmtTime(ret.time) : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
                             <td style={{ ...css.td, whiteSpace: "nowrap" }}>
-                              {duration ? <span style={{ fontWeight: 700, color: "#7c3aed", background: "#ede9fe", padding: "2px 8px", borderRadius: 6, fontSize: 12 }}>⏱ {duration}</span> : <span style={{ color: T.muted }}>—</span>}
+                              {duration ? <span style={{ fontWeight: 700, color: "#7c3aed", background: "#ede9fe", padding: "2px 8px", borderRadius: 6, fontSize: 12 }}>⏱ {duration}</span> : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}
                             </td>
                             <td style={css.td}>{t.startKm || "—"}</td>
                             <td style={css.td}>{t.endKm || "—"}</td>
@@ -2788,7 +2788,7 @@ function DriverEditCard({ car, onSave, darkMode }) {
         <div style={{ width: 36, height: 36, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16 }}>{car.driver.charAt(0)}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name}</div>
-          <div style={{ fontSize: 11, color: T.muted }}>{car.plate}</div>
+          <div style={{ fontSize: 11, color: "rgba(220,195,255,0.85)", fontWeight: 600 }}>{car.plate}</div>
         </div>
         <button onClick={() => { setEditing(e => !e); setName(car.driver); setPhone(car.driverPhone.replace("+91","")); }}
           style={{ ...css.btnSm(editing ? T.muted : T.info), fontSize: 11 }}>{editing ? "Cancel" : "✏️ Edit"}</button>
