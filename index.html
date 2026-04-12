@@ -2187,21 +2187,21 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <div style={{ fontWeight: 800, fontSize: 15 }}>{t.officerName}</div>
-              <span style={{ fontSize: 11, color: T.muted }}>PF: {t.bookedByPfId}</span>
+              <span style={{ fontSize: 11, color: T.mutedCard }}>PF: {t.bookedByPfId}</span>
               {t.approvalStatus === "pending" && <span style={css.badge(T.warning)}>⏳ Pending</span>}
               {t.approvalStatus === "approved" && <span style={css.badge(T.success)}>✅ Approved</span>}
               {t.approvalStatus === "rejected" && <span style={css.badge(T.danger)}>❌ Rejected</span>}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", fontSize: 13 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span><span style={{ color: T.muted }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</span>
+                <span><span style={{ color: T.mutedCard }}>Vehicle:</span> <b>{t.carName}</b> ({t.carPlate})</span>
                 {t.vehicleChangedBy && <span style={{ fontSize: 10, color: T.info, fontStyle: "italic" }}>Changed by {t.vehicleChangedBy}</span>}
               </div>
-              <div><span style={{ color: T.muted }}>Driver:</span> {t.driver}</div>
-              <div><span style={{ color: T.muted }}>Department:</span> {t.department}</div>
-              <div><span style={{ color: T.muted }}>Date:</span> {fmtDate(t.date)} at {t.departureTime}</div>
-              <div><span style={{ color: T.muted }}>Destination:</span> <b>{t.destination}</b></div>
-              <div><span style={{ color: T.muted }}>Purpose:</span> {t.purpose || "—"}</div>
+              <div><span style={{ color: T.mutedCard }}>Driver:</span> {t.driver}</div>
+              <div><span style={{ color: T.mutedCard }}>Department:</span> {t.department}</div>
+              <div><span style={{ color: T.mutedCard }}>Date:</span> {fmtDate(t.date)} at {t.departureTime}</div>
+              <div><span style={{ color: T.mutedCard }}>Destination:</span> <b>{t.destination}</b></div>
+              <div><span style={{ color: T.mutedCard }}>Purpose:</span> {t.purpose || "—"}</div>
             </div>
             {t.approvalStatus === "rejected" && (
               <div style={{ marginTop: 8, padding: "6px 10px", background: darkMode ? "#450a0a" : "#fee2e2", borderRadius: 6, fontSize: 12, color: T.danger }}>
@@ -2218,7 +2218,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
                 <div style={{ fontSize: 16 }}>{t.approvedBy?.includes(admin.pfId) ? "✅" : "⏳"}</div>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700 }}>{admin.name}</div>
-                  <div style={{ fontSize: 11, color: T.muted }}>{t.approvedBy?.includes(admin.pfId) ? "Approved" : "Awaiting"}</div>
+                  <div style={{ fontSize: 11, color: T.mutedCard }}>{t.approvedBy?.includes(admin.pfId) ? "Approved" : "Awaiting"}</div>
                 </div>
               </div>
             ))}
@@ -2320,7 +2320,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
       </div>
 
       {displayTrips.length === 0
-        ? <div style={{ ...css.card, textAlign: "center", padding: 48, color: T.muted }}>No {filter} trip requests.</div>
+        ? <div style={{ ...css.card, textAlign: "center", padding: 48, color: T.mutedCard }}>No {filter} trip requests.</div>
         : displayTrips.slice().reverse().map(t => <ApprovalCard key={t.id} t={t} />)
       }
     </div>
@@ -2410,8 +2410,8 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
                       : <span style={css.badge(T.muted)}>No Link</span>}
                   </div>
                 </div>
-                <div style={{ fontSize: 12, color: T.muted }}>{car.plate}</div>
-                <div style={{ fontSize: 12, color: T.muted }}>🧑‍✈️ {car.driver} · <a href={`tel:${car.driverPhone}`} style={{ color: "#2563eb" }} onClick={e => e.stopPropagation()}>{car.driverPhone}</a></div>
+                <div style={{ fontSize: 12, color: T.mutedCard }}>{car.plate}</div>
+                <div style={{ fontSize: 12, color: T.mutedCard }}>🧑‍✈️ {car.driver} · <a href={`tel:${car.driverPhone}`} style={{ color: "#2563eb" }} onClick={e => e.stopPropagation()}>{car.driverPhone}</a></div>
                 {trip && <div style={{ marginTop: 6, fontSize: 12, color: T.warning, fontWeight: 600 }}>🔄 En route to {trip.destination}</div>}
                 {hasLink && liveLocations[car.id]?.updatedAt && (
                   <div style={{ fontSize: 11, color: T.mutedCard, marginTop: 4 }}>Updated: {liveLocations[car.id].updatedDate} at {liveLocations[car.id].updatedAt}</div>
@@ -2476,13 +2476,13 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
               <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
             </div>
           ) : selected ? (
-            <div style={{ ...css.card, textAlign: "center", padding: 60, color: T.muted }}>
+            <div style={{ ...css.card, textAlign: "center", padding: 60, color: T.mutedCard }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>📍</div>
               <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>No live location link yet</div>
               <div style={{ fontSize: 13 }}>Ask the driver to share their live location via Google Maps and paste the link above.</div>
             </div>
           ) : (
-            <div style={{ ...css.card, textAlign: "center", padding: 60, color: T.muted }}>
+            <div style={{ ...css.card, textAlign: "center", padding: 60, color: T.mutedCard }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🗺️</div>
               <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Select a vehicle to view its location</div>
               <div style={{ fontSize: 13 }}>Click any vehicle card on the left to manage its live location link.</div>
@@ -2502,8 +2502,8 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
                   <div key={car.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", background: T.light, borderRadius: 8, marginBottom: 8, border: `1px solid ${T.border}` }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name} — {car.plate}</div>
-                      <div style={{ fontSize: 12, color: T.muted }}>🧑‍✈️ {car.driver} · {trip?.officerName} ({trip?.department})</div>
-                      <div style={{ fontSize: 12, color: T.muted }}>→ {trip?.destination} since {trip?.departureTime}</div>
+                      <div style={{ fontSize: 12, color: T.mutedCard }}>🧑‍✈️ {car.driver} · {trip?.officerName} ({trip?.department})</div>
+                      <div style={{ fontSize: 12, color: T.mutedCard }}>→ {trip?.destination} since {trip?.departureTime}</div>
                     </div>
                     {hasLink ? (
                       <a href={liveLocations[car.id].url} target="_blank" rel="noreferrer"
@@ -2595,7 +2595,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
       <div style={css.card}>
         <div style={{ ...css.row, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={css.sectionTitle}>📋 Trip Log{!currentUser?.isAdmin ? " (My Trips)" : ""}</div>
-          <div style={{ marginLeft: "auto", fontSize: 13, color: T.muted }}>{filtered.length} records · {totalKm.toFixed(0)} km total</div>
+          <div style={{ marginLeft: "auto", fontSize: 13, color: T.mutedCard }}>{filtered.length} records · {totalKm.toFixed(0)} km total</div>
         </div>
         <div style={{ ...css.formGrid, marginBottom: 20 }}>
           <div>
@@ -2622,7 +2622,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
           </div>
         </div>
         {filtered.length === 0
-          ? <div style={{ textAlign: "center", padding: 40, color: T.muted }}>No trips found</div>
+          ? <div style={{ textAlign: "center", padding: 40, color: T.mutedCard }}>No trips found</div>
           : (() => {
             // Renders a single date row with its trip table
             const renderDateBlock = (date) => {
@@ -2652,7 +2652,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                           const ret = splitReturn(t.returnTime);
                           return (
                             <tr key={t.id}>
-                              <td style={{ ...css.td, color: T.muted }}>{i + 1}</td>
+                              <td style={{ ...css.td, color: T.mutedCard }}>{i + 1}</td>
                               <td style={css.td}>{t.carName}</td>
                               <td style={css.td}>{t.carPlate || "—"}</td>
                               <td style={{ ...css.td, fontWeight: 600 }}>{t.driver || "—"}</td>
@@ -2739,7 +2739,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                   <div style={{ marginBottom: 8 }}>
                     {!showOlderYears
                       ? <button onClick={() => setShowOlderYears(true)}
-                          style={{ width: "100%", padding: "12px", borderRadius: 10, border: `1.5px dashed ${T.border}`, background: "transparent", color: T.muted, fontWeight: 700, fontSize: 13, cursor: "pointer", letterSpacing: "0.02em" }}>
+                          style={{ width: "100%", padding: "12px", borderRadius: 10, border: `1.5px dashed ${T.lightBorder}`, background: "transparent", color: T.mutedCard, fontWeight: 700, fontSize: 13, cursor: "pointer", letterSpacing: "0.02em" }}>
                           🗂 View Older Records ({logOldYearKeys.join(", ")})
                         </button>
                       : logOldYearKeys.map(yk => {
@@ -2896,7 +2896,7 @@ function FuelLog({ cars, fuelLogs, saveFuel, darkMode, T, css }) {
                     <td style={css.td}>{f.chargedBy || "—"}</td>
                   </tr>
                 ))}
-                {fuelLogs.length === 0 && <tr><td colSpan={11} style={{ ...css.td, textAlign: "center", color: T.muted }}>No charging sessions logged yet</td></tr>}
+                {fuelLogs.length === 0 && <tr><td colSpan={11} style={{ ...css.td, textAlign: "center", color: T.mutedCard }}>No charging sessions logged yet</td></tr>}
               </tbody>
             </table></div>
           </div>
@@ -2995,7 +2995,7 @@ function Maintenance({ cars, maintenance, saveMaint, darkMode, T, css }) {
                   <tr key={m.id}>
                     <td style={css.td}>{m.carName}</td>
                     <td style={{ ...css.td, fontWeight: 600 }}>{m.type}</td>
-                    <td style={{ ...css.td, color: T.muted }}>{m.description || "—"}</td>
+                    <td style={{ ...css.td, color: T.mutedCard }}>{m.description || "—"}</td>
                     <td style={css.td}>{fmtDate(m.date)}</td>
                     <td style={css.td}>{m.cost ? `₹${m.cost}` : "—"}</td>
                     <td style={css.td}>{m.vendor || "—"}</td>
@@ -3005,7 +3005,7 @@ function Maintenance({ cars, maintenance, saveMaint, darkMode, T, css }) {
                     <td style={css.td}><button style={css.btnSm(m.status === "Pending" ? T.success : T.muted)} onClick={() => toggleStatus(m.id)}>{m.status === "Pending" ? "✓ Done" : "↩ Reopen"}</button></td>
                   </tr>
                 ))}
-                {maintenance.length === 0 && <tr><td colSpan={10} style={{ ...css.td, textAlign: "center", color: T.muted }}>No maintenance records yet</td></tr>}
+                {maintenance.length === 0 && <tr><td colSpan={10} style={{ ...css.td, textAlign: "center", color: T.mutedCard }}>No maintenance records yet</td></tr>}
               </tbody>
             </table></div>
           </div>
@@ -3180,7 +3180,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
           { icon: "👥", val: users.length, label: "Total Users", color: T.info },
           { icon: "🏢", val: depts.length, label: "Departments", color: T.success },
           { icon: "🔑", val: 2, label: "Admins", color: T.warning },
-          { icon: "👤", val: users.length - 2, label: "Regular Users", color: T.muted },
+          { icon: "👤", val: users.length - 2, label: "Regular Users", color: T.mutedCard },
         ].map(s => (
           <div key={s.label} style={{ ...css.card, borderTop: `3px solid ${s.color}` }}>
             <div style={{ fontSize: 22, marginBottom: 4 }}>{s.icon}</div>
@@ -3262,12 +3262,12 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
                       <div style={{ width: 28, height: 28, borderRadius: "50%", background: isAdmin ? T.info : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 11, flexShrink: 0 }}>{u.name.charAt(0)}</div>
                       <div>
                         <div style={{ fontWeight: 600, fontSize: 13 }}>{u.name}</div>
-                        {u.designation && <div style={{ fontSize: 10, color: T.muted }}>{u.designation}</div>}
+                        {u.designation && <div style={{ fontSize: 10, color: T.mutedCard }}>{u.designation}</div>}
                       </div>
                     </div>
                   </td>
                   <td style={{ ...css.td, fontFamily: "monospace" }}>{u.pfId}</td>
-                  <td style={{ ...css.td, fontSize: 12, color: T.muted }}>{u.department}</td>
+                  <td style={{ ...css.td, fontSize: 12, color: T.mutedCard }}>{u.department}</td>
                   <td style={css.td}>{isAdmin ? <span style={css.badge(T.info)}>🔑 Admin</span> : u.isAssistant ? <span style={css.badge(T.warning)}>🤝 Assistant</span> : <span style={css.badge(T.muted)}>👤 Staff</span>}</td>
                   <td style={css.td}>
                     <div style={{ display: "flex", gap: 6 }}>
@@ -3298,7 +3298,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             <div style={{ ...css.sectionTitle, marginBottom: 16 }}>✏️ Edit User</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label style={css.label}>PF ID (cannot change)</label>
-                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: T.muted }} value={editUser.pfId} readOnly /></div>
+                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: T.mutedCard }} value={editUser.pfId} readOnly /></div>
               <div><label style={css.label}>Full Name *</label>
                 <input style={css.input} value={editUser.name} onChange={e => setEditUser(u => ({...u, name: e.target.value}))} /></div>
               <div><label style={css.label}>Department *</label>
@@ -3321,7 +3321,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             {(() => {
               const u = users.find(x => x.pfId === confirmDelete);
               return u ? <div style={{ textAlign: "center", marginBottom: 20, color: T.mutedCard, fontSize: 13 }}>
-                Remove <b style={{ color: T.text }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
+                Remove <b style={{ color: T.textCard }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
               </div> : null;
             })()}
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
