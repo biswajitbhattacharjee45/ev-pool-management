@@ -480,12 +480,12 @@ const makeG = (dark) => ({
   text:    "#ffffff",
   textOnWhite: "#1a0035",
   // Use these inside white card/table backgrounds:
-  textCard:  dark ? "#e2d9ff" : "#1a0035",
-  mutedCard: dark ? "#a78bfa" : "#6d28d9",
+  textCard:  dark ? "#e2d9ff" : "#1e0050",
+  mutedCard: dark ? "#a78bfa" : "#3b0f7a",
   subCard:   dark ? "#c4b5fd" : "#4c1d95",
   muted:   "rgba(225,200,255,0.95)",
   mutedOnWhite: "rgba(109,40,217,0.6)",
-  light:   dark ? "rgba(124,58,237,0.18)" : "#f0ebff",
+  light:   dark ? "rgba(124,58,237,0.18)" : "#e9e0ff",
   lightBorder: dark ? "rgba(140,80,255,0.4)" : "rgba(109,40,217,0.2)",
   success: "#34d399", danger: "#f97066", warning: "#fde68a", info: "#a855f7",
   successCard: dark ? "#34d399" : "#15803d",
@@ -506,7 +506,7 @@ const makeCss = (dark) => {
     headerSub: { fontSize: 11, color: "rgba(230,210,255,0.95)", marginTop: 1, fontWeight: 600 },
     body: { padding: "16px", maxWidth: 1100, margin: "0 auto", paddingBottom: 80, background: "#f8f5ff" },
     grid4: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
-    card: { background: "#ffffff", borderRadius: 14, padding: 16, boxShadow: "0 2px 12px rgba(109,40,217,0.1)", border: "1px solid rgba(109,40,217,0.15)", borderTop: "3px solid rgba(124,58,237,0.5)", transition: "transform 0.2s" },
+    card: { background: "#ffffff", borderRadius: 14, padding: 16, boxShadow: "0 2px 12px rgba(109,40,217,0.12)", border: "1px solid rgba(109,40,217,0.25)", borderTop: "3px solid rgba(109,40,217,0.7)", transition: "transform 0.2s" },
     carCard: (color, busy) => ({ background: T.purpleGrad, borderRadius: 14, padding: 16, boxShadow: "0 6px 24px rgba(20,0,60,0.3),inset 0 1px 0 rgba(180,120,255,0.25)", border: `1px solid ${busy ? "rgba(249,112,102,0.5)" : "rgba(52,211,153,0.45)"}`, borderTop: `1px solid ${busy ? "rgba(249,112,102,0.7)" : "rgba(52,211,153,0.65)"}`, position: "relative", overflow: "hidden" }),
     badge: (color) => ({ display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: color + "30", color: color, border: `1px solid ${color}60` }),
     btn: (color = T.info, outline = false) => ({ padding: "9px 18px", borderRadius: 9, border: outline ? `1.5px solid ${color}` : "none", background: outline ? "transparent" : `linear-gradient(180deg,${color}ee 0%,${color} 50%,${color}bb 100%)`, color: outline ? color : "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.15s", boxShadow: outline ? "none" : `0 6px 0 ${color}66, 0 8px 16px ${color}44, inset 0 1px 0 rgba(255,255,255,0.25)`, fontFamily: "'DM Sans',sans-serif", letterSpacing: "0.02em" }),
@@ -517,7 +517,7 @@ const makeCss = (dark) => {
     formGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 },
     table: { width: "100%", borderCollapse: "collapse" },
     th: { textAlign: "left", padding: "11px 13px", fontSize: 11, fontWeight: 800, color: "#fff", textTransform: "uppercase", letterSpacing: "0.06em", borderBottom: "1px solid rgba(140,80,255,0.35)", background: "linear-gradient(135deg,#0d0025,#1a0045,#280060)", whiteSpace: "nowrap" },
-    td: { padding: "10px 12px", borderBottom: "1px solid rgba(109,40,217,0.12)", fontSize: 13, color: "#1a0035", background: "#ffffff" },
+    td: { padding: "10px 12px", borderBottom: "1px solid rgba(109,40,217,0.18)", fontSize: 13, color: "#1e0050", background: "#ffffff" },
     modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 },
     modalBox: { background: T.purpleGrad, borderRadius: 18, padding: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 60px rgba(20,0,60,0.5)", border: "1px solid rgba(140,80,255,0.45)", borderTop: "1px solid rgba(180,140,255,0.6)" },
     sectionTitle: { fontSize: 17, fontWeight: 900, color: "#1a0035", marginBottom: 14, fontFamily: "'Playfair Display', serif" },
@@ -1513,7 +1513,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
           return (
             <div key={date} style={{ marginBottom: 8, borderRadius: 10, border: `1px solid ${isToday ? T.info : T.border}`, overflow: "hidden" }}>
               <div onClick={() => toggleDate(date)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isToday ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e1040" : "#f3f0ff"), cursor: "pointer", userSelect: "none", borderBottom: isOpen ? `1px solid ${T.border}` : "none" }}>
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isToday ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e1040" : "#ede8ff"), cursor: "pointer", userSelect: "none", borderBottom: isOpen ? `1px solid ${T.border}` : "none" }}>
                 <span style={{ fontSize: 16 }}>{isOpen ? "▾" : "▸"}</span>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontWeight: 800, fontSize: 14, color: isToday ? T.info : T.text }}>
@@ -1563,7 +1563,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
           return (
             <div key={mk} style={{ marginBottom: 8, borderRadius: 10, border: `1px solid ${T.border}`, overflow: "hidden" }}>
               <div onClick={() => toggleMonth(mk)}
-                style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: darkMode ? "#1a2540" : "#f1f5f9", cursor: "pointer", userSelect: "none" }}>
+                style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: darkMode ? "#1a2540" : "#ede8ff", cursor: "pointer", userSelect: "none" }}>
                 <span style={{ fontSize: 14 }}>{isOpen ? "▾" : "▸"}</span>
                 <span style={{ fontSize: 13, fontWeight: 800, color: T.textCard }}>📅 {fmtMonthKey(mk)}</span>
                 <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{dates.length} day{dates.length !== 1 ? "s" : ""} · {totalTrips} trip{totalTrips !== 1 ? "s" : ""}</span>
@@ -1614,7 +1614,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                       return (
                         <div key={yk} style={{ marginBottom: 10, borderRadius: 10, border: `1.5px solid ${T.border}`, overflow: "hidden" }}>
                           <div onClick={() => toggleYear(yk)}
-                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: darkMode ? "#1a2540" : "#f8fafc", cursor: "pointer", userSelect: "none" }}>
+                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: darkMode ? "#1a2540" : "#e0d8ff", cursor: "pointer", userSelect: "none" }}>
                             <span style={{ fontSize: 16 }}>{isYearOpen ? "▾" : "▸"}</span>
                             <span style={{ fontSize: 14, fontWeight: 800, color: T.textCard }}>🗂 {yk}</span>
                             <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{monthKeys.length} month{monthKeys.length !== 1 ? "s" : ""} · {totalTrips} trips</span>
@@ -1688,7 +1688,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                     return (
                       <div key={date}>
                         <div onClick={() => toggleDate("drv_"+car.id+"_"+date)}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", background: isTodayD ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e293b" : "#fafafa"), cursor: "pointer", borderBottom: `1px solid ${T.border}`, userSelect: "none" }}>
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", background: isTodayD ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e293b" : "#ede8ff"), cursor: "pointer", borderBottom: `1px solid ${T.border}`, userSelect: "none" }}>
                           <span style={{ fontSize: 13 }}>{isOpenD ? "▾" : "▸"}</span>
                           <span style={{ fontWeight: 700, fontSize: 13, color: isTodayD ? T.info : T.textCard }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
                           {isTodayD && <span style={{ fontSize: 10, background: T.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
@@ -1938,11 +1938,11 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
             <div style={css.formGrid}>
               <div>
                 <label style={css.label}>Officer Name</label>
-                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: matchedUser ? T.text : T.muted }} value={form.officerName} readOnly placeholder="Auto-filled from PF ID" />
+                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: matchedUser ? T.textCard : T.mutedCard }} value={form.officerName} readOnly placeholder="Auto-filled from PF ID" />
               </div>
               <div>
                 <label style={css.label}>Department</label>
-                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: matchedUser ? T.text : T.muted }} value={form.department} readOnly placeholder="Auto-filled from PF ID" />
+                <input style={{ ...css.input, background: darkMode ? "#1e293b" : "#f8fafc", color: matchedUser ? T.textCard : T.mutedCard }} value={form.department} readOnly placeholder="Auto-filled from PF ID" />
               </div>
             </div>
             <div>
@@ -2632,7 +2632,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
               return (
                 <div key={date} style={{ marginBottom: 6, borderRadius: 8, border: `1px solid ${isTodayLog ? T.info : T.border}`, overflow: "hidden" }}>
                   <div onClick={() => toggleLogDate(date)}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: isTodayLog ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e1040" : "#f3f0ff"), cursor: "pointer", userSelect: "none", borderBottom: isOpenLog ? `1px solid ${T.border}` : "none" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: isTodayLog ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e1040" : "#ede8ff"), cursor: "pointer", userSelect: "none", borderBottom: isOpenLog ? `1px solid ${T.border}` : "none" }}>
                     <span style={{ fontSize: 13 }}>{isOpenLog ? "▾" : "▸"}</span>
                     <span style={{ fontWeight: 800, fontSize: 13, color: isTodayLog ? T.info : T.textCard }}>{isTodayLog ? "Today — " : ""}{fmtDate(date)}</span>
                     {isTodayLog && <span style={{ fontSize: 10, background: T.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
@@ -2696,7 +2696,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
               return (
                 <div key={mk} style={{ marginBottom: 8, borderRadius: 10, border: `1px solid ${T.border}`, overflow: "hidden" }}>
                   <div onClick={() => toggleLogMonth(mk)}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: darkMode ? "#1a2540" : "#f1f5f9", cursor: "pointer", userSelect: "none" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: darkMode ? "#1a2540" : "#ede8ff", cursor: "pointer", userSelect: "none" }}>
                     <span style={{ fontSize: 14 }}>{isOpen ? "▾" : "▸"}</span>
                     <span style={{ fontSize: 13, fontWeight: 800, color: T.textCard }}>📅 {fmtMonthKey(mk)}</span>
                     <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{dates.length} day{dates.length !== 1 ? "s" : ""} · {totalTrips} trip{totalTrips !== 1 ? "s" : ""}</span>
@@ -2749,7 +2749,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                           return (
                             <div key={yk} style={{ marginBottom: 10, borderRadius: 10, border: `1.5px solid ${T.border}`, overflow: "hidden" }}>
                               <div onClick={() => toggleLogYear(yk)}
-                                style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: darkMode ? "#1a2540" : "#f8fafc", cursor: "pointer", userSelect: "none" }}>
+                                style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: darkMode ? "#1a2540" : "#e0d8ff", cursor: "pointer", userSelect: "none" }}>
                                 <span style={{ fontSize: 16 }}>{isYearOpen ? "▾" : "▸"}</span>
                                 <span style={{ fontSize: 14, fontWeight: 800, color: T.textCard }}>🗂 {yk}</span>
                                 <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{monthKeys.length} month{monthKeys.length !== 1 ? "s" : ""} · {totalTrips} trips</span>
