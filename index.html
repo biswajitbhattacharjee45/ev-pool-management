@@ -479,10 +479,16 @@ const makeG = (dark) => ({
   borderTop: "rgba(180,140,255,0.6)",
   text:    "#ffffff",
   textOnWhite: "#1a0035",
+  // Use these inside white card/table backgrounds:
+  textCard:  dark ? "#e2d9ff" : "#1a0035",
+  mutedCard: dark ? "#a78bfa" : "#6d28d9",
+  subCard:   dark ? "#c4b5fd" : "#4c1d95",
   muted:   "rgba(225,200,255,0.95)",
   mutedOnWhite: "rgba(109,40,217,0.6)",
-  light:   "rgba(124,58,237,0.08)",
+  light:   dark ? "rgba(124,58,237,0.18)" : "#f0ebff",
+  lightBorder: dark ? "rgba(140,80,255,0.4)" : "rgba(109,40,217,0.2)",
   success: "#34d399", danger: "#f97066", warning: "#fde68a", info: "#a855f7",
+  successCard: dark ? "#34d399" : "#15803d",
   purpleGrad: "linear-gradient(160deg,#12002e,#1e0050,#2d0075,#3d0d90,#4c1aaa)",
   headerBg: "linear-gradient(135deg,#0d0025,#1a0045,#2d0070,#3b0082)",
   navBg:   "linear-gradient(135deg,#110030,#1e0050,#2a0068)",
@@ -697,7 +703,10 @@ function App() {
   // Block vehicle as soon as any pending OR approved trip exists (first-come-first-serve)
   const isCarBusy = (carId) => trips.some(t => t.carId === carId && !t.returnTime && (t.approvalStatus === "approved" || t.approvalStatus === "pending"));
 
-  if (!loaded || !usersLoaded) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: T.bg, fontFamily: "sans-serif", color: "#fff", fontWeight: 700, flexDirection: "column", gap: 12 }}><div style={{ fontSize: 36 }}>⚡</div><div>Loading...</div></div>;
+  if (!loaded || !usersLoaded) return null; // keep loader overlay visible while data fetches
+
+  // Data ready — hide the loading overlay now
+  if (typeof window.__hideLoader === "function") { window.__hideLoader(); window.__hideLoader = null; }
 
   if (!currentUser) return <LoginScreen onLogin={handleLogin} allUsers={allUsers} checkPassword={checkPassword} />;
 
@@ -1448,10 +1457,10 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         {/* ── Vehicle availability card ── */}
         <div style={{ ...css.card, textAlign: "center", padding: 40 }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🚗</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 8 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: T.textCard, marginBottom: 8 }}>
             {cars.length - activeTrips.length} of {cars.length} vehicles available
           </div>
-          <div style={{ fontSize: 13, color: "rgba(220,195,255,0.9)", marginBottom: 20, fontWeight: 600 }}>
+          <div style={{ fontSize: 13, color: T.mutedCard, marginBottom: 20, fontWeight: 600 }}>
             {activeTrips.length > 0 ? `${activeTrips.length} vehicle${activeTrips.length > 1 ? "s" : ""} currently on duty` : "All vehicles are available for booking"}
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
@@ -1460,8 +1469,8 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
               return (
                 <div key={car.id} style={{ padding: "12px 20px", borderRadius: 10, border: `2px solid ${busy ? T.danger : T.success}`, background: busy ? (darkMode ? "#450a0a" : "#fef2f2") : (darkMode ? "#052e16" : "#f0fdf4"), minWidth: 140 }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>🚙</div>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: T.text }}>{car.name}</div>
-                  <div style={{ fontSize: 11, color: "rgba(220,195,255,0.85)", fontWeight: 600 }}>{car.plate}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: T.textCard }}>{car.name}</div>
+                  <div style={{ fontSize: 11, color: T.subCard, fontWeight: 600 }}>{car.plate}</div>
                   <div style={{ marginTop: 6 }}>
                     {(() => {
                     const isPending = busy && trips.some(t => t.carId === car.id && !t.returnTime && t.approvalStatus === "pending");
@@ -1488,7 +1497,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         const sortedDates = Object.keys(dateMap).sort((a, b) => b.localeCompare(a));
         if (sortedDates.length === 0) return (
           <div style={css.card}>
-            <div style={{ textAlign: "center", padding: 40, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>No trips recorded yet{search ? ` for "${search}"` : ""}.</div>
+            <div style={{ textAlign: "center", padding: 40, color: T.mutedCard, fontWeight: 600 }}>No trips recorded yet{search ? ` for "${search}"` : ""}.</div>
           </div>
         );
 
@@ -1504,7 +1513,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
           return (
             <div key={date} style={{ marginBottom: 8, borderRadius: 10, border: `1px solid ${isToday ? T.info : T.border}`, overflow: "hidden" }}>
               <div onClick={() => toggleDate(date)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isToday ? (darkMode ? "#0c1e3c" : "#eff6ff") : T.light, cursor: "pointer", userSelect: "none", borderBottom: isOpen ? `1px solid ${T.border}` : "none" }}>
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isToday ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e1040" : "#f3f0ff"), cursor: "pointer", userSelect: "none", borderBottom: isOpen ? `1px solid ${T.border}` : "none" }}>
                 <span style={{ fontSize: 16 }}>{isOpen ? "▾" : "▸"}</span>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontWeight: 800, fontSize: 14, color: isToday ? T.info : T.text }}>
@@ -1513,7 +1522,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                   {isToday && <span style={{ marginLeft: 8, fontSize: 11, background: T.info, color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>TODAY</span>}
                 </div>
                 <div style={{ display: "flex", gap: 14, fontSize: 12 }}>
-                  <span style={{ color: "rgba(220,195,255,0.9)", fontWeight: 600 }}><b style={{ color: "#fff" }}>{dayTrips.length}</b> trips</span>
+                  <span style={{ color: T.mutedCard, fontWeight: 600 }}><b style={{ color: T.textCard }}>{dayTrips.length}</b> trips</span>
                   {activeCount > 0 && <span style={{ color: T.success, fontWeight: 700 }}>● {activeCount} active</span>}
                   {pendingCount2 > 0 && <span style={{ color: T.warning, fontWeight: 700 }}>⏳ {pendingCount2} pending</span>}
                 </div>
@@ -1526,15 +1535,15 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                   <tbody>
                     {dayTrips.map((t, i) => (
                       <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
-                        <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
+                        <td style={{ ...css.td, color: "#6b21a8", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
                         <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
-                        <td style={{ ...css.td, fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
-                        <td style={css.td}><div style={{ fontWeight: 600 }}>{t.carName}</div><div style={{ fontSize: 11, color: "rgba(220,195,255,0.85)", fontWeight: 600 }}>{t.carPlate}</div></td>
+                        <td style={{ ...css.td, fontSize: 12, color: "#4c1d95", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                        <td style={css.td}><div style={{ fontWeight: 600 }}>{t.carName}</div><div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 600 }}>{t.carPlate}</div></td>
                         <td style={css.td}>{t.driver}</td>
                         <td style={css.td}>{t.destination}</td>
-                        <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
+                        <td style={{ ...css.td, color: "#4c1d95", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
                         <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
-                        <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
+                        <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "#94a3b8" }}>—</span>}</td>
                         <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
                         <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
                         <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
@@ -1556,8 +1565,8 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
               <div onClick={() => toggleMonth(mk)}
                 style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: darkMode ? "#1a2540" : "#f1f5f9", cursor: "pointer", userSelect: "none" }}>
                 <span style={{ fontSize: 14 }}>{isOpen ? "▾" : "▸"}</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: T.text }}>📅 {fmtMonthKey(mk)}</span>
-                <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{dates.length} day{dates.length !== 1 ? "s" : ""} · {totalTrips} trip{totalTrips !== 1 ? "s" : ""}</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: T.textCard }}>📅 {fmtMonthKey(mk)}</span>
+                <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{dates.length} day{dates.length !== 1 ? "s" : ""} · {totalTrips} trip{totalTrips !== 1 ? "s" : ""}</span>
               </div>
               {isOpen && (
                 <div style={{ padding: "8px 10px", borderTop: `1px solid ${T.border}` }}>
@@ -1583,7 +1592,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
             {/* Past months this year */}
             {Object.keys(dmPast).sort((a,b) => b.localeCompare(a)).length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: T.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: T.mutedCard, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
                   Earlier This Year — Click to Expand
                 </div>
                 {Object.keys(dmPast).sort((a,b) => b.localeCompare(a)).map(mk => renderDashMonthAccordion(mk, dmPast[mk]))}
@@ -1595,7 +1604,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
               <div style={{ marginBottom: 8 }}>
                 {!showOlderDash
                   ? <button onClick={() => setShowOlderDash(true)}
-                      style={{ width: "100%", padding: "12px", borderRadius: 10, border: `1.5px dashed ${T.border}`, background: "transparent", color: T.muted, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+                      style={{ width: "100%", padding: "12px", borderRadius: 10, border: `1.5px dashed ${T.lightBorder}`, background: "transparent", color: T.mutedCard, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
                       🗂 View Older Records ({dmOldYearKeys.join(", ")})
                     </button>
                   : dmOldYearKeys.map(yk => {
@@ -1607,8 +1616,8 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                           <div onClick={() => toggleYear(yk)}
                             style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: darkMode ? "#1a2540" : "#f8fafc", cursor: "pointer", userSelect: "none" }}>
                             <span style={{ fontSize: 16 }}>{isYearOpen ? "▾" : "▸"}</span>
-                            <span style={{ fontSize: 14, fontWeight: 800, color: T.text }}>🗂 {yk}</span>
-                            <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{monthKeys.length} month{monthKeys.length !== 1 ? "s" : ""} · {totalTrips} trips</span>
+                            <span style={{ fontSize: 14, fontWeight: 800, color: T.textCard }}>🗂 {yk}</span>
+                            <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{monthKeys.length} month{monthKeys.length !== 1 ? "s" : ""} · {totalTrips} trips</span>
                           </div>
                           {isYearOpen && (
                             <div style={{ padding: "10px 12px", borderTop: `1px solid ${T.border}` }}>
@@ -1629,7 +1638,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
         <div style={css.card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div style={css.sectionTitle}>Trip Entries — Driver Wise</div>
-            <div style={{ fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{cars.length} vehicles · {trips.length} total entries</div>
+            <div style={{ fontSize: 12, color: T.mutedCard, fontWeight: 600 }}>{cars.length} vehicles · {trips.length} total entries</div>
           </div>
           {filteredDriver.map(({ car, trips: carTrips }) => {
             const dateMap2 = {};
@@ -1647,14 +1656,14 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                     {car.driver.charAt(0)}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>🧑‍✈️ {car.driver}</div>
-                    <div style={{ fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{car.name} · <b>{car.plate}</b> · {car.model}</div>
-                    <div style={{ fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>📞 <a href={`tel:${car.driverPhone}`} style={{ color: T.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: T.textCard }}>🧑‍✈️ {car.driver}</div>
+                    <div style={{ fontSize: 12, color: T.subCard, fontWeight: 600 }}>{car.name} · <b>{car.plate}</b> · {car.model}</div>
+                    <div style={{ fontSize: 12, color: T.subCard, fontWeight: 600 }}>📞 <a href={`tel:${car.driverPhone}`} style={{ color: T.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
                   </div>
                   <div style={{ display: "flex", gap: 16, fontSize: 12, textAlign: "center" }}>
-                    <div><div style={{ fontWeight: 800, fontSize: 20, color: T.text }}>{carTrips.length}</div><div style={{ color: T.muted }}>Trips</div></div>
-                    <div><div style={{ fontWeight: 800, fontSize: 20, color: T.success }}>{completed}</div><div style={{ color: T.muted }}>Done</div></div>
-                    {totalKm > 0 && <div><div style={{ fontWeight: 800, fontSize: 20, color: T.info }}>{totalKm}</div><div style={{ color: T.muted }}>km</div></div>}
+                    <div><div style={{ fontWeight: 800, fontSize: 20, color: T.textCard }}>{carTrips.length}</div><div style={{ color: T.mutedCard }}>Trips</div></div>
+                    <div><div style={{ fontWeight: 800, fontSize: 20, color: T.successCard }}>{completed}</div><div style={{ color: T.mutedCard }}>Done</div></div>
+                    {totalKm > 0 && <div><div style={{ fontWeight: 800, fontSize: 20, color: T.mutedCard }}>{totalKm}</div><div style={{ color: T.mutedCard }}>km</div></div>}
                     <span style={{ ...css.badge(busy ? T.danger : T.success), alignSelf: "center", fontSize: 12 }}>{busy ? "● On Duty" : "● Available"}</span>
                   </div>
                 </div>
@@ -1671,7 +1680,7 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                 )}
 
                 {carTrips.length === 0
-                  ? <div style={{ padding: "20px 16px", color: T.muted, fontSize: 13 }}>No trips recorded for this vehicle yet.</div>
+                  ? <div style={{ padding: "20px 16px", color: T.mutedCard, fontSize: 13 }}>No trips recorded for this vehicle yet.</div>
                   : sortedDates2.map(date => {
                     const dayT = dateMap2[date];
                     const isTodayD = date === today();
@@ -1681,9 +1690,9 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                         <div onClick={() => toggleDate("drv_"+car.id+"_"+date)}
                           style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", background: isTodayD ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e293b" : "#fafafa"), cursor: "pointer", borderBottom: `1px solid ${T.border}`, userSelect: "none" }}>
                           <span style={{ fontSize: 13 }}>{isOpenD ? "▾" : "▸"}</span>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: isTodayD ? T.info : T.text }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: isTodayD ? T.info : T.textCard }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
                           {isTodayD && <span style={{ fontSize: 10, background: T.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
-                          <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{dayT.length} trip{dayT.length !== 1 ? "s" : ""}</span>
+                          <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{dayT.length} trip{dayT.length !== 1 ? "s" : ""}</span>
                         </div>
                         {isOpenD && (
                           <div className="scroll-table"><table style={css.table}>
@@ -1693,14 +1702,14 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
                             <tbody>
                               {dayT.map((t, i) => (
                                 <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
-                                  <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
+                                  <td style={{ ...css.td, color: "#6b21a8", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
                                   <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
-                                  <td style={{ ...css.td, fontSize: 12, color: "rgba(220,195,255,0.9)", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                                  <td style={{ ...css.td, fontSize: 12, color: "#4c1d95", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
                                   <td style={{ ...css.td, fontSize: 12 }}>{t.department}</td>
                                   <td style={css.td}>{t.destination}</td>
-                                  <td style={{ ...css.td, color: "rgba(220,195,255,0.9)", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
+                                  <td style={{ ...css.td, color: "#4c1d95", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
                                   <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
-                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
+                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "#94a3b8" }}>—</span>}</td>
                                   <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
                                   <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
                                   <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
@@ -1946,11 +1955,11 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
             </div>
             <div style={css.formGrid}>
               <div>
-                <label style={css.label}>Date * <span style={{ fontSize: 10, color: T.muted, fontWeight: 400 }}>(today only)</span></label>
+                <label style={css.label}>Date * <span style={{ fontSize: 10, color: T.mutedCard, fontWeight: 400 }}>(today only)</span></label>
                 <input type="date" style={{ ...css.input, opacity: 0.7, cursor: "not-allowed" }} value={today()} readOnly min={today()} max={today()} />
               </div>
               <div>
-                <label style={css.label}>Departure Time * <span style={{ fontSize: 10, color: T.muted, fontWeight: 400 }}>(within 30 min)</span></label>
+                <label style={css.label}>Departure Time * <span style={{ fontSize: 10, color: T.mutedCard, fontWeight: 400 }}>(within 30 min)</span></label>
                 <input type="time" style={css.input} value={form.departureTime} onChange={e => set("departureTime", e.target.value)} />
               </div>
             </div>
@@ -1972,7 +1981,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               : activeTrips.filter(t => t.bookedByPfId === currentUser.pfId || t.officerPfId === currentUser.pfId);
 
             return myActiveTrips.length === 0 ? (
-              <div style={{ textAlign: "center", color: T.muted, padding: 40 }}>
+              <div style={{ textAlign: "center", color: T.mutedCard, padding: 40 }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
                 <div>{currentUser.isAdmin ? "No approved active trips to return" : "You have no active trip to release"}</div>
               </div>
@@ -1999,8 +2008,8 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                   return t ? (
                     <div style={{ background: darkMode ? "#052e16" : "#f0fdf4", borderRadius: 8, padding: 14, fontSize: 13, border: "1px solid #bbf7d0" }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: "#166534", marginBottom: 8 }}>🚙 {t.carName} — {t.carPlate}</div>
-                      <div style={{ color: T.muted }}><b>Destination:</b> {t.destination}</div>
-                      {t.startKm && <div style={{ color: T.muted }}><b>Start KM:</b> {t.startKm}</div>}
+                      <div style={{ color: T.mutedCard }}><b>Destination:</b> {t.destination}</div>
+                      {t.startKm && <div style={{ color: T.mutedCard }}><b>Start KM:</b> {t.startKm}</div>}
                       {t.driver && t.driverPhone && (
                         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10, padding: "10px 12px", background: darkMode ? "#0c1e3c" : "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
                           <div style={{ flex: 1 }}>
@@ -2048,12 +2057,12 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
           {/* Admin: show all currently out vehicles */}
           {currentUser.isAdmin && activeTrips.length > 0 && (
             <div style={{ marginTop: 24 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: T.muted, marginBottom: 10 }}>CURRENTLY OUT (APPROVED)</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.mutedCard, marginBottom: 10 }}>CURRENTLY OUT (APPROVED)</div>
               {activeTrips.map(t => (
                 <div key={t.id} style={{ padding: "10px 12px", background: darkMode ? "#052e16" : "#f0fdf4", borderRadius: 8, marginBottom: 8, borderLeft: "3px solid #16a34a" }}>
                   <div style={{ fontWeight: 700, fontSize: 13 }}>{t.carName} — {t.carPlate}</div>
-                  <div style={{ fontSize: 12, color: T.muted }}>🧑‍✈️ {t.driver} | {t.officerName} ({t.department})</div>
-                  <div style={{ fontSize: 12, color: T.muted }}>→ {t.destination} · Left at {t.departureTime}</div>
+                  <div style={{ fontSize: 12, color: T.mutedCard }}>🧑‍✈️ {t.driver} | {t.officerName} ({t.department})</div>
+                  <div style={{ fontSize: 12, color: T.mutedCard }}>→ {t.destination} · Left at {t.departureTime}</div>
                 </div>
               ))}
             </div>
@@ -2072,14 +2081,14 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                 <tr key={t.id}>
                   <td style={css.td}>{t.carName}</td>
                   <td style={css.td}>{t.destination}</td>
-                  <td style={{ ...css.td, color: T.muted }}>{t.purpose || "—"}</td>
+                  <td style={{ ...css.td, color: T.mutedCard }}>{t.purpose || "—"}</td>
                   <td style={css.td}>{fmtDate(t.date)}</td>
                   <td style={css.td}>{t.departureTime}</td>
                   <td style={css.td}>{approvalBadge(t)}</td>
                   <td style={css.td}>
                     {t.approvalStatus === "rejected"
                       ? <span style={{ color: T.danger, fontSize: 12 }}>Reason: {t.rejectionReason || "—"}</span>
-                      : <span style={{ fontSize: 12, color: T.muted }}>
+                      : <span style={{ fontSize: 12, color: T.mutedCard }}>
                           {ADMIN_1.name}: {t.approvedBy?.includes(ADMIN_1.pfId) ? "✅" : "⏳"} &nbsp;
                           {ADMIN_2.name}: {t.approvedBy?.includes(ADMIN_2.pfId) ? "✅" : "⏳"}
                         </span>
@@ -2099,7 +2108,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                           style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #fca5a5", background: "#fef2f2", color: "#dc2626", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                         >✕ Cancel</button>
                       ) : (
-                        <span style={{ fontSize: 12, color: T.muted }}>—</span>
+                        <span style={{ fontSize: 12, color: T.mutedCard }}>—</span>
                       )}
                       {!t.returnTime && t.driverPhone && (
                         <a href={`tel:${t.driverPhone}`}
@@ -2203,7 +2212,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
 
           {/* Approval status indicators */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 200 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: "uppercase", letterSpacing: "0.05em" }}>Approval Status</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.mutedCard, textTransform: "uppercase", letterSpacing: "0.05em" }}>Approval Status</div>
             {[ADMIN_1, ADMIN_2].map(admin => (
               <div key={admin.pfId} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: t.approvedBy?.includes(admin.pfId) ? (darkMode ? "#052e16" : "#f0fdf4") : (darkMode ? "#1e293b" : "#fafafa"), borderRadius: 6, border: `1px solid ${t.approvedBy?.includes(admin.pfId) ? "#bbf7d0" : T.border}` }}>
                 <div style={{ fontSize: 16 }}>{t.approvedBy?.includes(admin.pfId) ? "✅" : "⏳"}</div>
@@ -2240,7 +2249,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
         {changeVehicleId === t.id && (
           <div style={{ marginTop: 14, padding: 14, background: darkMode ? "#0c1e3c" : "#eff6ff", borderRadius: 8, border: "1px solid #bfdbfe" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: T.info, marginBottom: 10 }}>🔄 Change Assigned Vehicle</div>
-            <div style={{ fontSize: 12, color: T.muted, marginBottom: 10 }}>
+            <div style={{ fontSize: 12, color: T.mutedCard, marginBottom: 10 }}>
               Currently: <b>{t.carName}</b> ({t.carPlate}) · Driver: {t.driver}
             </div>
             <select
@@ -2405,7 +2414,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
                 <div style={{ fontSize: 12, color: T.muted }}>🧑‍✈️ {car.driver} · <a href={`tel:${car.driverPhone}`} style={{ color: "#2563eb" }} onClick={e => e.stopPropagation()}>{car.driverPhone}</a></div>
                 {trip && <div style={{ marginTop: 6, fontSize: 12, color: T.warning, fontWeight: 600 }}>🔄 En route to {trip.destination}</div>}
                 {hasLink && liveLocations[car.id]?.updatedAt && (
-                  <div style={{ fontSize: 11, color: T.muted, marginTop: 4 }}>Updated: {liveLocations[car.id].updatedDate} at {liveLocations[car.id].updatedAt}</div>
+                  <div style={{ fontSize: 11, color: T.mutedCard, marginTop: 4 }}>Updated: {liveLocations[car.id].updatedDate} at {liveLocations[car.id].updatedAt}</div>
                 )}
               </div>
             );
@@ -2421,7 +2430,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
             <div style={css.card}>
               <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>
                 📍 {selectedCar?.name} — {selectedCar?.plate}
-                <span style={{ fontSize: 12, fontWeight: 400, color: T.muted, marginLeft: 8 }}>Driver: {selectedCar?.driver}</span>
+                <span style={{ fontSize: 12, fontWeight: 400, color: T.mutedCard, marginLeft: 8 }}>Driver: {selectedCar?.driver}</span>
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 <input
@@ -2436,7 +2445,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
                 )}
               </div>
               {liveLocations[selected] && (
-                <div style={{ marginTop: 8, fontSize: 12, color: T.muted, wordBreak: "break-all" }}>
+                <div style={{ marginTop: 8, fontSize: 12, color: T.mutedCard, wordBreak: "break-all" }}>
                   Current link: <a href={liveLocations[selected].url} target="_blank" rel="noreferrer" style={{ color: "#2563eb" }}>{liveLocations[selected].url}</a>
                 </div>
               )}
@@ -2485,7 +2494,7 @@ function LiveTracking({ cars, trips, liveLocations, saveLive, isCarBusy, activeT
             <div style={css.card}>
               <div style={css.sectionTitle}>🔄 Vehicles Currently Out</div>
               {cars.filter(c => isCarBusy(c.id)).length === 0 ? (
-                <div style={{ color: T.muted, fontSize: 13 }}>All vehicles are currently at the office.</div>
+                <div style={{ color: T.mutedCard, fontSize: 13 }}>All vehicles are currently at the office.</div>
               ) : cars.filter(c => isCarBusy(c.id)).map(car => {
                 const trip = activeTripForCar(car.id);
                 const hasLink = !!liveLocations[car.id];
@@ -2623,11 +2632,11 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
               return (
                 <div key={date} style={{ marginBottom: 6, borderRadius: 8, border: `1px solid ${isTodayLog ? T.info : T.border}`, overflow: "hidden" }}>
                   <div onClick={() => toggleLogDate(date)}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: isTodayLog ? (darkMode ? "#0c1e3c" : "#eff6ff") : T.light, cursor: "pointer", userSelect: "none", borderBottom: isOpenLog ? `1px solid ${T.border}` : "none" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: isTodayLog ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e1040" : "#f3f0ff"), cursor: "pointer", userSelect: "none", borderBottom: isOpenLog ? `1px solid ${T.border}` : "none" }}>
                     <span style={{ fontSize: 13 }}>{isOpenLog ? "▾" : "▸"}</span>
-                    <span style={{ fontWeight: 800, fontSize: 13, color: isTodayLog ? T.info : T.text }}>{isTodayLog ? "Today — " : ""}{fmtDate(date)}</span>
+                    <span style={{ fontWeight: 800, fontSize: 13, color: isTodayLog ? T.info : T.textCard }}>{isTodayLog ? "Today — " : ""}{fmtDate(date)}</span>
                     {isTodayLog && <span style={{ fontSize: 10, background: T.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
-                    <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{dayTripsLog.length} trip{dayTripsLog.length !== 1 ? "s" : ""}</span>
+                    <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{dayTripsLog.length} trip{dayTripsLog.length !== 1 ? "s" : ""}</span>
                   </div>
                   {isOpenLog && (
                     <div className="scroll-table"><table style={css.table}>
@@ -2650,12 +2659,12 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                               <td style={{ ...css.td, fontWeight: 600 }}>{t.officerName}</td>
                               <td style={css.td}>{t.department}</td>
                               <td style={css.td}>{t.destination}</td>
-                              <td style={{ ...css.td, color: T.muted }}>{t.purpose || "—"}</td>
+                              <td style={{ ...css.td, color: T.mutedCard }}>{t.purpose || "—"}</td>
                               <td style={{ ...css.td, whiteSpace: "nowrap", color: "#2563eb", fontWeight: 600 }}>{fmtTime(t.departureTime)}</td>
-                              <td style={{ ...css.td, whiteSpace: "nowrap" }}>{ret.date ? fmtDate(ret.date) : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
-                              <td style={{ ...css.td, whiteSpace: "nowrap", color: "#16a34a", fontWeight: 600 }}>{ret.time ? fmtTime(ret.time) : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}</td>
+                              <td style={{ ...css.td, whiteSpace: "nowrap" }}>{ret.date ? fmtDate(ret.date) : <span style={{ color: "#94a3b8" }}>—</span>}</td>
+                              <td style={{ ...css.td, whiteSpace: "nowrap", color: "#16a34a", fontWeight: 600 }}>{ret.time ? fmtTime(ret.time) : <span style={{ color: "#94a3b8" }}>—</span>}</td>
                               <td style={{ ...css.td, whiteSpace: "nowrap" }}>
-                                {duration ? <span style={{ fontWeight: 700, color: "#7c3aed", background: "#ede9fe", padding: "2px 8px", borderRadius: 6, fontSize: 12 }}>⏱ {duration}</span> : <span style={{ color: "rgba(220,195,255,0.7)" }}>—</span>}
+                                {duration ? <span style={{ fontWeight: 700, color: "#7c3aed", background: "#ede9fe", padding: "2px 8px", borderRadius: 6, fontSize: 12 }}>⏱ {duration}</span> : <span style={{ color: "#94a3b8" }}>—</span>}
                               </td>
                               <td style={css.td}>{t.startKm || "—"}</td>
                               <td style={css.td}>{t.endKm || "—"}</td>
@@ -2689,8 +2698,8 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                   <div onClick={() => toggleLogMonth(mk)}
                     style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", background: darkMode ? "#1a2540" : "#f1f5f9", cursor: "pointer", userSelect: "none" }}>
                     <span style={{ fontSize: 14 }}>{isOpen ? "▾" : "▸"}</span>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: T.text }}>📅 {fmtMonthKey(mk)}</span>
-                    <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{dates.length} day{dates.length !== 1 ? "s" : ""} · {totalTrips} trip{totalTrips !== 1 ? "s" : ""}</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: T.textCard }}>📅 {fmtMonthKey(mk)}</span>
+                    <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{dates.length} day{dates.length !== 1 ? "s" : ""} · {totalTrips} trip{totalTrips !== 1 ? "s" : ""}</span>
                   </div>
                   {isOpen && (
                     <div style={{ padding: "8px 10px", borderTop: `1px solid ${T.border}` }}>
@@ -2716,7 +2725,7 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                 {/* ── Past months this year: collapsed accordions ── */}
                 {Object.keys(logPastMonths).sort((a,b) => b.localeCompare(a)).length > 0 && (
                   <div style={{ marginBottom: 16 }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: T.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: T.mutedCard, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
                       Earlier This Year — Click to Expand
                     </div>
                     {Object.keys(logPastMonths).sort((a,b) => b.localeCompare(a)).map(mk =>
@@ -2742,8 +2751,8 @@ function TripLog({ cars, trips, currentUser, darkMode, T, css }) {
                               <div onClick={() => toggleLogYear(yk)}
                                 style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: darkMode ? "#1a2540" : "#f8fafc", cursor: "pointer", userSelect: "none" }}>
                                 <span style={{ fontSize: 16 }}>{isYearOpen ? "▾" : "▸"}</span>
-                                <span style={{ fontSize: 14, fontWeight: 800, color: T.text }}>🗂 {yk}</span>
-                                <span style={{ marginLeft: "auto", fontSize: 12, color: T.muted }}>{monthKeys.length} month{monthKeys.length !== 1 ? "s" : ""} · {totalTrips} trips</span>
+                                <span style={{ fontSize: 14, fontWeight: 800, color: T.textCard }}>🗂 {yk}</span>
+                                <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{monthKeys.length} month{monthKeys.length !== 1 ? "s" : ""} · {totalTrips} trips</span>
                               </div>
                               {isYearOpen && (
                                 <div style={{ padding: "10px 12px", borderTop: `1px solid ${T.border}` }}>
@@ -2854,12 +2863,12 @@ function FuelLog({ cars, fuelLogs, saveFuel, darkMode, T, css }) {
               const barColor = pct === null ? "#e2e8f0" : pct > 60 ? "#16a34a" : pct > 25 ? "#d97706" : "#dc2626";
               return (
                 <div key={car.id} style={{ textAlign: "center", padding: "14px 10px", background: T.light, borderRadius: 8, border: `1px solid ${T.border}` }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8 }}>{car.name}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.mutedCard, marginBottom: 8 }}>{car.name}</div>
                   <div style={{ height: 10, background: "#e2e8f0", borderRadius: 5, marginBottom: 8, overflow: "hidden" }}>
                     <div style={{ height: "100%", width: pct ? `${pct}%` : "0%", background: barColor, borderRadius: 5, transition: "width 0.4s" }} />
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: barColor }}>{pct !== null ? `${pct}%` : "—"}</div>
-                  <div style={{ fontSize: 10, color: T.muted, marginTop: 2 }}>{lastCharge ? fmtDate(lastCharge.date) : "No data yet"}</div>
+                  <div style={{ fontSize: 10, color: T.mutedCard, marginTop: 2 }}>{lastCharge ? fmtDate(lastCharge.date) : "No data yet"}</div>
                 </div>
               );
             })}
@@ -3028,7 +3037,7 @@ function DriverEditCard({ car, onSave, darkMode }) {
         <div style={{ width: 36, height: 36, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16 }}>{car.driver.charAt(0)}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name}</div>
-          <div style={{ fontSize: 11, color: "rgba(220,195,255,0.85)", fontWeight: 600 }}>{car.plate}</div>
+          <div style={{ fontSize: 11, color: T.subCard, fontWeight: 600 }}>{car.plate}</div>
         </div>
         <button onClick={() => { setEditing(e => !e); setName(car.driver); setPhone(car.driverPhone.replace("+91","")); }}
           style={{ ...css.btnSm(editing ? T.muted : T.info), fontSize: 11 }}>{editing ? "Cancel" : "✏️ Edit"}</button>
@@ -3222,7 +3231,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
       {/* ── DRIVER MANAGEMENT ── */}
       <div style={{ ...css.card, marginBottom: 20 }}>
         <div style={css.sectionTitle}>🧑‍✈️ Driver Details</div>
-        <div style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>Update driver name and contact number for any vehicle.</div>
+        <div style={{ fontSize: 12, color: T.mutedCard, marginBottom: 14 }}>Update driver name and contact number for any vehicle.</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
           {(cars || []).map(car => (
             <DriverEditCard key={car.id} car={car} darkMode={darkMode} onSave={updated => {
@@ -3247,7 +3256,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
               const isAdmin = u.pfId === ADMIN_1.pfId || u.pfId === ADMIN_2.pfId;
               return (
                 <tr key={u.pfId} style={{ background: isAdmin ? (darkMode ? "#0c1e3c" : "#eff6ff") : "transparent" }}>
-                  <td style={{ ...css.td, color: T.muted, fontSize: 11 }}>{i+1}</td>
+                  <td style={{ ...css.td, color: T.mutedCard, fontSize: 11 }}>{i+1}</td>
                   <td style={css.td}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ width: 28, height: 28, borderRadius: "50%", background: isAdmin ? T.info : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 11, flexShrink: 0 }}>{u.name.charAt(0)}</div>
@@ -3311,7 +3320,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
             <div style={{ ...css.sectionTitle, textAlign: "center", marginBottom: 8 }}>Confirm Deletion</div>
             {(() => {
               const u = users.find(x => x.pfId === confirmDelete);
-              return u ? <div style={{ textAlign: "center", marginBottom: 20, color: T.muted, fontSize: 13 }}>
+              return u ? <div style={{ textAlign: "center", marginBottom: 20, color: T.mutedCard, fontSize: 13 }}>
                 Remove <b style={{ color: T.text }}>{u.name}</b> (PF: {u.pfId}) from authorised users? They will no longer be able to log in.
               </div> : null;
             })()}
@@ -3357,16 +3366,15 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
 
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(React.createElement(App));
-    // Hide loader once React has painted
-    const hideLoader = () => {
+    // Loader is hidden by React itself once data is ready (see window.__hideLoader)
+    window.__hideLoader = () => {
       const el = document.getElementById("ev-loader");
-      if (!el) return;
-      el.style.transition = "opacity 0.5s ease";
+      if (!el || el._hiding) return;
+      el._hiding = true;
+      el.style.transition = "opacity 0.55s ease";
       el.style.opacity = "0";
-      setTimeout(() => { el.style.display = "none"; }, 520);
+      setTimeout(() => { el.style.display = "none"; }, 580);
     };
-    // Wait for first paint + a brief settle
-    requestAnimationFrame(() => setTimeout(hideLoader, 600));
   </script>
 </body>
 </html>
