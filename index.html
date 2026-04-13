@@ -1915,26 +1915,6 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               </select>
             </div>
 
-            {/* Driver info + Call button — shown when a vehicle is selected */}
-            {form.carId && (() => {
-              const selCar = cars.find(c => c.id === form.carId);
-              if (!selCar) return null;
-              return (
-                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: darkMode ? "#0c1e3c" : "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: selCar.color || T.info, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
-                    {selCar.driver.charAt(0)}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: "#0c4a6e" }}>🧑‍✈️ {selCar.driver}</div>
-                    <div style={{ fontSize: 12, color: "#0369a1" }}>{selCar.driverPhone}</div>
-                  </div>
-                  <a href={`tel:${selCar.driverPhone}`}
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", flexShrink: 0 }}>
-                    📞 Call Driver
-                  </a>
-                </div>
-              );
-            })()}
             <div style={css.formGrid}>
               <div>
                 <label style={css.label}>Officer Name</label>
@@ -1968,6 +1948,27 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
               <input type="number" style={css.input} value={form.startKm} onChange={e => set("startKm", e.target.value)} placeholder="e.g. 45230" />
             </div>
             <button style={css.btn(T.info)} onClick={handleBook}>Submit Trip Request →</button>
+
+            {/* Driver info + Call button — shown when a vehicle is selected */}
+            {form.carId && (() => {
+              const selCar = cars.find(c => c.id === form.carId);
+              if (!selCar) return null;
+              return (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: darkMode ? "#0c1e3c" : "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: selCar.color || T.info, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
+                    {selCar.driver.charAt(0)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: "#0c4a6e" }}>🧑‍✈️ {selCar.driver}</div>
+                    <div style={{ fontSize: 12, color: "#0369a1" }}>{selCar.driverPhone}</div>
+                  </div>
+                  <a href={`tel:${selCar.driverPhone}`}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", flexShrink: 0 }}>
+                    📞 Call Driver
+                  </a>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
