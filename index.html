@@ -1681,47 +1681,97 @@ function Dashboard({ cars, trips, maintenance, fuelLogs, liveLocations, isCarBus
 
                 {carTrips.length === 0
                   ? <div style={{ padding: "20px 16px", color: T.mutedCard, fontSize: 13 }}>No trips recorded for this vehicle yet.</div>
-                  : sortedDates2.map(date => {
-                    const dayT = dateMap2[date];
-                    const isTodayD = date === today();
-                    const isOpenD = expandedDates["drv_"+car.id+"_"+date] !== false && (expandedDates["drv_"+car.id+"_"+date] === true || isTodayD);
-                    return (
-                      <div key={date}>
-                        <div onClick={() => toggleDate("drv_"+car.id+"_"+date)}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", background: isTodayD ? (darkMode ? "#0c1e3c" : "#eff6ff") : (darkMode ? "#1e293b" : "#ede8ff"), cursor: "pointer", borderBottom: `1px solid ${T.border}`, userSelect: "none" }}>
-                          <span style={{ fontSize: 13 }}>{isOpenD ? "▾" : "▸"}</span>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: isTodayD ? T.info : T.textCard }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
-                          {isTodayD && <span style={{ fontSize: 10, background: T.info, color: "#fff", padding: "1px 7px", borderRadius: 8, fontWeight: 700 }}>TODAY</span>}
-                          <span style={{ marginLeft: "auto", fontSize: 12, color: T.mutedCard }}>{dayT.length} trip{dayT.length !== 1 ? "s" : ""}</span>
+                  : (() => {
+                    // Group by Year → Month → Date
+                    const yearMonthMap = {};
+                    sortedDates2.forEach(date => {
+                      const parts = date.split("-"); // YYYY-MM-DD
+                      const yr = parts[0] || "Unknown";
+                      const mo = parts.length >= 2 ? yr+"-"+parts[1] : "Unknown";
+                      if (!yearMonthMap[yr]) yearMonthMap[yr] = {};
+                      if (!yearMonthMap[yr][mo]) yearMonthMap[yr][mo] = [];
+                      yearMonthMap[yr][mo].push(date);
+                    });
+                    const sortedYears = Object.keys(yearMonthMap).sort((a,b) => b.localeCompare(a));
+                    const monthNames = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                    return sortedYears.map(yr => {
+                      const isYrOpen = expandedDates["drvy_"+car.id+"_"+yr] === true;
+                      const sortedMonths = Object.keys(yearMonthMap[yr]).sort((a,b) => b.localeCompare(a));
+                      const yrTrips = sortedMonths.reduce((s,mo) => s + yearMonthMap[yr][mo].reduce((ss,d) => ss + (dateMap2[d]||[]).length, 0), 0);
+                      return (
+                        <div key={yr}>
+                          {/* Year row */}
+                          <div onClick={() => toggleDate("drvy_"+car.id+"_"+yr)}
+                            style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 16px", background: darkMode?"#1a103a":"#ede9fe", cursor:"pointer", borderBottom:`1px solid ${T.border}`, userSelect:"none" }}>
+                            <span style={{ fontSize:13 }}>{isYrOpen ? "▾" : "▸"}</span>
+                            <span style={{ fontWeight:800, fontSize:14, color:"#6d28d9" }}>📅 {yr}</span>
+                            <span style={{ marginLeft:"auto", fontSize:12, color:T.mutedCard }}>{yrTrips} trip{yrTrips!==1?"s":""}</span>
+                          </div>
+                          {isYrOpen && sortedMonths.map(mo => {
+                            const moParts = mo.split("-");
+                            const moNum = parseInt(moParts[1]||0);
+                            const moLabel = monthNames[moNum] || mo;
+                            const isMonthOpen = expandedDates["drvm_"+car.id+"_"+mo] === true;
+                            const moDates = yearMonthMap[yr][mo];
+                            const moTrips = moDates.reduce((s,d) => s + (dateMap2[d]||[]).length, 0);
+                            return (
+                              <div key={mo}>
+                                {/* Month row */}
+                                <div onClick={() => toggleDate("drvm_"+car.id+"_"+mo)}
+                                  style={{ display:"flex", alignItems:"center", gap:10, padding:"9px 16px 9px 28px", background: darkMode?"#1e1040":"#f5f3ff", cursor:"pointer", borderBottom:`1px solid ${T.border}`, userSelect:"none" }}>
+                                  <span style={{ fontSize:13 }}>{isMonthOpen ? "▾" : "▸"}</span>
+                                  <span style={{ fontWeight:700, fontSize:13, color:"#7c3aed" }}>🗓 {moLabel} {yr}</span>
+                                  <span style={{ marginLeft:"auto", fontSize:12, color:T.mutedCard }}>{moTrips} trip{moTrips!==1?"s":""}</span>
+                                </div>
+                                {isMonthOpen && moDates.map(date => {
+                                  const dayT = dateMap2[date];
+                                  const isTodayD = date === today();
+                                  const isOpenD = expandedDates["drv_"+car.id+"_"+date] === true || (isTodayD && expandedDates["drv_"+car.id+"_"+date] !== false);
+                                  return (
+                                    <div key={date}>
+                                      {/* Date row */}
+                                      <div onClick={() => toggleDate("drv_"+car.id+"_"+date)}
+                                        style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 16px 8px 44px", background: isTodayD ? (darkMode?"#0c1e3c":"#eff6ff") : (darkMode?"#1e293b":"#f8f7ff"), cursor:"pointer", borderBottom:`1px solid ${T.border}`, userSelect:"none" }}>
+                                        <span style={{ fontSize:12 }}>{isOpenD ? "▾" : "▸"}</span>
+                                        <span style={{ fontWeight:600, fontSize:12, color: isTodayD ? T.info : T.textCard }}>{isTodayD ? "Today — " : ""}{fmtDate(date)}</span>
+                                        {isTodayD && <span style={{ fontSize:10, background:T.info, color:"#fff", padding:"1px 7px", borderRadius:8, fontWeight:700 }}>TODAY</span>}
+                                        <span style={{ marginLeft:"auto", fontSize:12, color:T.mutedCard }}>{dayT.length} trip{dayT.length!==1?"s":""}</span>
+                                      </div>
+                                      {isOpenD && (
+                                        <div className="scroll-table"><table style={css.table}>
+                                          <thead><tr>
+                                            {["#","Officer","PF ID","Department","Destination","Purpose","Depart","Return","Start KM","End KM","Dist","Status"].map(h => <th key={h} style={css.th}>{h}</th>)}
+                                          </tr></thead>
+                                          <tbody>
+                                            {dayT.map((t, i) => (
+                                              <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
+                                                <td style={{ ...css.td, color: "#6b21a8", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
+                                                <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
+                                                <td style={{ ...css.td, fontSize: 12, color: "#4c1d95", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
+                                                <td style={{ ...css.td, fontSize: 12 }}>{t.department}</td>
+                                                <td style={css.td}>{t.destination}</td>
+                                                <td style={{ ...css.td, color: "#4c1d95", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
+                                                <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
+                                                <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "#94a3b8" }}>—</span>}</td>
+                                                <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
+                                                <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
+                                                <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
+                                                <td style={css.td}>{statusBadge(t)}</td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table></div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })}
                         </div>
-                        {isOpenD && (
-                          <div className="scroll-table"><table style={css.table}>
-                            <thead><tr>
-                              {["#","Officer","PF ID","Department","Destination","Purpose","Depart","Return","Start KM","End KM","Dist","Status"].map(h => <th key={h} style={css.th}>{h}</th>)}
-                            </tr></thead>
-                            <tbody>
-                              {dayT.map((t, i) => (
-                                <tr key={t.id} style={{ background: !t.returnTime && t.approvalStatus === "approved" ? (darkMode ? "#052e16" : "#f0fdf4") : "transparent" }}>
-                                  <td style={{ ...css.td, color: "#6b21a8", fontSize: 11, fontWeight: 600 }}>{i + 1}</td>
-                                  <td style={{ ...css.td, fontWeight: 700 }}>{t.officerName}</td>
-                                  <td style={{ ...css.td, fontSize: 12, color: "#4c1d95", fontWeight: 600 }}>{t.officerPfId || t.bookedByPfId || "—"}</td>
-                                  <td style={{ ...css.td, fontSize: 12 }}>{t.department}</td>
-                                  <td style={css.td}>{t.destination}</td>
-                                  <td style={{ ...css.td, color: "#4c1d95", fontSize: 12, fontWeight: 600 }}>{t.purpose || "—"}</td>
-                                  <td style={{ ...css.td, color: "#2563eb", fontWeight: 600 }}>{t.departureTime}</td>
-                                  <td style={{ ...css.td, color: "#16a34a", fontWeight: 600 }}>{t.returnTime ? t.returnTime.split(" ")[1] || t.returnTime : <span style={{ color: "#94a3b8" }}>—</span>}</td>
-                                  <td style={{ ...css.td, textAlign: "right" }}>{t.startKm || "—"}</td>
-                                  <td style={{ ...css.td, textAlign: "right" }}>{t.endKm || "—"}</td>
-                                  <td style={{ ...css.td, textAlign: "right", fontWeight: 600 }}>{t.startKm && t.endKm ? `${parseInt(t.endKm) - parseInt(t.startKm)} km` : "—"}</td>
-                                  <td style={css.td}>{statusBadge(t)}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table></div>
-                        )}
-                      </div>
-                    );
-                  })
+                      );
+                    });
+                  })()
                 }
               </div>
             );
