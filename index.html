@@ -667,12 +667,26 @@ function App() {
     return () => unsubs.forEach(u => { try { u(); } catch {} });
   }, []);
 
+  // ── FIXED: write only the single changed record (prevents race condition where
+  //    a bulk rewrite of all docs collides with onSnapshot / other sessions and
+  //    reverts an approval or return back to its old status) ──
+  const _fsWriteOne = async (colName, record) => {
+    const db = window.__db; if (!db) return false;
+    try {
+      await db.collection(colName).doc(String(record.id)).set(record);
+      return true;
+    } catch(e) { console.error("_fsWriteOne error:", e); alert("⚠️ Could not save to server. Please check your internet connection and try again."); return false; }
+  };
+  const _fsDeleteOne = async (colName, id) => {
+    const db = window.__db; if (!db) return false;
+    try { await db.collection(colName).doc(String(id)).delete(); return true; }
+    catch(e) { console.error("_fsDeleteOne error:", e); alert("⚠️ Could not delete from server. Please check your internet connection and try again."); return false; }
+  };
+  // Legacy bulk write — kept ONLY as a fallback when no changedId is given (e.g. data migration)
   const _fsWrite = async (colName, data) => {
     const db = window.__db; if (!db) return;
     try {
-      // Step 1: Write/update all current records (safe — no deletes yet)
       await Promise.all(data.map(t => db.collection(colName).doc(String(t.id)).set(t)));
-      // Step 2: Delete only records that are no longer in the data array
       const snap = await db.collection(colName).get({ source: 'server' });
       const currentIds = new Set(data.map(t => String(t.id)));
       const toDelete = snap.docs.filter(d => !currentIds.has(d.id));
@@ -681,9 +695,38 @@ function App() {
       }
     } catch(e) { console.error("_fsWrite error:", e); }
   };
-  const saveTrips = async (data) => { setTrips(data); _fsWrite("trips", data); };
-  const saveMaint = async (data) => { setMaintenance(data); _fsWrite("maintenance", data); };
-  const saveFuel  = async (data) => { setFuelLogs(data); _fsWrite("fuel", data); };
+  // saveTrips / saveMaint / saveFuel now accept an optional changedId.
+  // When given, only that one document is written — fast & collision-free.
+  const saveTrips = async (data, changedId) => {
+    setTrips(data);
+    if (changedId !== undefined && changedId !== null) {
+      const rec = data.find(t => String(t.id) === String(changedId));
+      if (rec) await _fsWriteOne("trips", rec);
+      else await _fsDeleteOne("trips", changedId);
+    } else {
+      await _fsWrite("trips", data);
+    }
+  };
+  const saveMaint = async (data, changedId) => {
+    setMaintenance(data);
+    if (changedId !== undefined && changedId !== null) {
+      const rec = data.find(t => String(t.id) === String(changedId));
+      if (rec) await _fsWriteOne("maintenance", rec);
+      else await _fsDeleteOne("maintenance", changedId);
+    } else {
+      await _fsWrite("maintenance", data);
+    }
+  };
+  const saveFuel  = async (data, changedId) => {
+    setFuelLogs(data);
+    if (changedId !== undefined && changedId !== null) {
+      const rec = data.find(t => String(t.id) === String(changedId));
+      if (rec) await _fsWriteOne("fuel", rec);
+      else await _fsDeleteOne("fuel", changedId);
+    } else {
+      await _fsWrite("fuel", data);
+    }
+  };
   const saveLive  = async (data) => {
     setLiveLocations(data);
     try { const db = window.__db; if (db) await db.collection("config").doc("live").set(data); } catch(e){}
@@ -1173,7 +1216,7 @@ function DriverPortal({ driver, trips, saveTrips, onLogout, darkMode }) {
       ? { ...t, returnTime: returnDateTime, endKm: returnForm.endKm, remarks: returnForm.remarks }
       : t
     );
-    saveTrips(updated);
+    saveTrips(updated, activeTrip.id);
     setReturnMsg("✅ Return recorded successfully!");
     setShowReturn(false);
     setReturnForm({ returnDate: today(), returnTime: now(), endKm: "", remarks: "" });
@@ -1873,7 +1916,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
       returnTime: "", endKm: "", remarks: "",
       bookedAt: new Date().toISOString(),
     };
-    saveTrips([...trips, newTrip]);
+    saveTrips([...trips, newTrip], newTrip.id);
     // Reset form — re-lookup current user's fresh data from merged list
     const fresh = currentUser?.pfId ? allUsers.find(u => u.pfId === currentUser.pfId) : null;
     setPfInput(currentUser?.pfId || "");
@@ -1889,7 +1932,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
     const returnDate = returnForm.returnDate || today();
     const returnDateTime = returnDate + " " + returnForm.returnTime;
     const updated = trips.map(t => t.id === tripId ? { ...t, returnTime: returnDateTime, endKm: returnForm.endKm, remarks: returnForm.remarks } : t);
-    saveTrips(updated);
+    saveTrips(updated, tripId);
     setReturnForm({ tripId: "", returnTime: now(), returnDate: today(), endKm: "", remarks: "" });
     setMsg("✅ Vehicle released successfully!");
     setTimeout(() => { setMsg(""); setTab("dashboard"); }, 1500);
@@ -2151,7 +2194,7 @@ function BookTrip({ cars, trips, saveTrips, isCarBusy, activeTripForCar, setTab,
                         <button
                           onClick={() => {
                             if (window.confirm("Cancel this trip request for " + t.carName + " to " + t.destination + "?")) {
-                              saveTrips(trips.filter(x => x.id !== t.id));
+                              saveTrips(trips.filter(x => x.id !== t.id), t.id);
                               setMsg("✅ Trip request cancelled.");
                               setTimeout(() => setMsg(""), 3000);
                             }
@@ -2199,7 +2242,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
       const fullyApproved = newApprovedBy.includes(ADMIN_1.pfId) || newApprovedBy.includes(ADMIN_2.pfId);
       return { ...t, approvedBy: newApprovedBy, approvalStatus: fullyApproved ? "approved" : "pending" };
     });
-    saveTrips(updated);
+    saveTrips(updated, tripId);
   };
 
   const handleReject = (tripId) => {
@@ -2207,7 +2250,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
       ...t, approvalStatus: "rejected", rejectedBy: currentUser.pfId,
       rejectedByName: currentUser.name, rejectionReason: rejectReason, rejectedAt: new Date().toISOString()
     });
-    saveTrips(updated);
+    saveTrips(updated, tripId);
     setRejectId(null);
     setRejectReason("");
   };
@@ -2221,7 +2264,7 @@ function Approvals({ trips, saveTrips, currentUser, cars, isCarBusy, darkMode, T
       driver: car.driver, driverPhone: car.driverPhone,
       vehicleChangedBy: currentUser.name, vehicleChangedAt: new Date().toISOString()
     });
-    saveTrips(updated);
+    saveTrips(updated, tripId);
     setChangeVehicleId(null);
     setSelectedNewCar("");
   };
@@ -2841,7 +2884,7 @@ function FuelLog({ cars, fuelLogs, saveFuel, darkMode, T, css }) {
     if (!form.carId || !form.date) { setMsg("❌ Car and date are required."); return; }
     const car = cars.find(c => c.id === form.carId);
     const entry = { id: Date.now().toString(), ...form, carName: car.name };
-    saveFuel([...fuelLogs, entry]);
+    saveFuel([...fuelLogs, entry], entry.id);
     setForm({ carId: "", date: today(), kwh: "", batteryBefore: "", batteryAfter: "", chargingCost: "", chargingDuration: "", chargerType: "AC Slow (15A)", chargedBy: "", location: "", odometer: "" });
     setMsg("✅ Charging session logged!");
     setTimeout(() => setMsg(""), 2000);
@@ -2973,7 +3016,7 @@ function Maintenance({ cars, maintenance, saveMaint, darkMode, T, css }) {
     if (!form.carId || !form.type || !form.date) { setMsg("❌ Car, type and date required."); return; }
     const car = cars.find(c => c.id === form.carId);
     const entry = { id: Date.now().toString(), ...form, carName: car.name };
-    saveMaint([...maintenance, entry]);
+    saveMaint([...maintenance, entry], entry.id);
     setForm({ carId: "", type: "", description: "", date: today(), cost: "", vendor: "", nextDueDate: "", status: "Pending", loggedBy: "" });
     setMsg("✅ Maintenance record added!");
     setTimeout(() => setMsg(""), 2000);
@@ -2981,7 +3024,7 @@ function Maintenance({ cars, maintenance, saveMaint, darkMode, T, css }) {
 
   const toggleStatus = (id) => {
     const updated = maintenance.map(m => m.id === id ? { ...m, status: m.status === "Pending" ? "Completed" : "Pending" } : m);
-    saveMaint(updated);
+    saveMaint(updated, id);
   };
 
   const pending = maintenance.filter(m => m.status === "Pending").length;
