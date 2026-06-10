@@ -70,7 +70,12 @@
       appId: "1:420704956913:web:30935786b294645680d450"
     });
     const db = firebase.firestore();
-    firebase.firestore().clearPersistence().catch(() => {});
+    // FIXED: enable offline persistence so that if the app is closed while a
+    // write (approval / return) is still uploading, Firebase stores it locally
+    // and automatically re-sends it the next time the app opens.
+    // (Previously clearPersistence() was wiping these queued writes on startup,
+    //  which made approvals/returns "revert" to their old status.)
+    db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
     window.__db = db;
   </script>
   <script type="text/babel" data-presets="react">
