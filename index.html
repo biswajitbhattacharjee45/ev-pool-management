@@ -649,22 +649,20 @@ function App() {
 
     const unsubs = [];
     try {
-      // { includeMetadataChanges: false } — only fire on server-confirmed changes, not cache
-      const snapOpts = { includeMetadataChanges: false };
-      unsubs.push(db.collection("trips").onSnapshot(snapOpts, snap => {
-        if (snap.metadata.fromCache) return; // ignore stale cache snapshots
+      // FIXED: with offline persistence enabled, the local cache is trustworthy —
+      // it includes pending writes. We now render ALL snapshots (cache + server).
+      // Previously cache snapshots were ignored, which showed zero records when
+      // the cache was already in sync with the server.
+      unsubs.push(db.collection("trips").onSnapshot(snap => {
         setTrips(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
-      unsubs.push(db.collection("maintenance").onSnapshot(snapOpts, snap => {
-        if (snap.metadata.fromCache) return;
+      unsubs.push(db.collection("maintenance").onSnapshot(snap => {
         setMaintenance(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
-      unsubs.push(db.collection("fuel").onSnapshot(snapOpts, snap => {
-        if (snap.metadata.fromCache) return;
+      unsubs.push(db.collection("fuel").onSnapshot(snap => {
         setFuelLogs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }));
-      unsubs.push(db.collection("config").doc("live").onSnapshot(snapOpts, snap => {
-        if (snap.metadata.fromCache) return;
+      unsubs.push(db.collection("config").doc("live").onSnapshot(snap => {
         if (snap.exists) setLiveLocations(snap.data());
       }));
     } catch(e) { console.error("Firebase listener error:", e); }
