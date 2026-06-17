@@ -600,11 +600,19 @@ function App() {
     setLoaded(true);
 
     const db = window.__db;
-    if (!db) return;
+    if (!db) { setUsersLoaded(true); return; }
 
-    // Load users from Firebase (preserves isAssistant and other flags), fallback to hardcoded
-    db.collection("config").doc("users").get({ source: 'server' }).then(snap => {
-      if (snap.exists) {
+    // SAFETY NET: never let the app hang on the loading screen.
+    // If Firebase hasn't responded within 8 seconds, fall back and show login anyway.
+    let usersDone = false;
+    const markUsersLoaded = () => { if (!usersDone) { usersDone = true; setUsersLoaded(true); } };
+    setTimeout(() => {
+      if (!usersDone) { setAllUsers(prev => (prev && prev.length ? prev : [...AUTHORISED_USERS])); markUsersLoaded(); }
+    }, 8000);
+
+    // Apply a users snapshot (shared by server and cache responses)
+    const applyUsers = (snap) => {
+      if (snap && snap.exists) {
         const d = snap.data();
         if (Array.isArray(d.list) && d.list.length > 0) {
           setAllUsers(d.list);
@@ -627,19 +635,25 @@ function App() {
       } else {
         setAllUsers([...AUTHORISED_USERS]);
       }
-      setUsersLoaded(true);
-    }).catch(e => {
-      setAllUsers([...AUTHORISED_USERS]);
-      setUsersLoaded(true);
-    });
+      markUsersLoaded();
+    };
 
-    // Passwords: load once from server
-    db.collection("config").doc("passwords").get({ source: 'server' }).then(snap => {
+    // Try server first; if it fails OR hangs, fall back to local cache, then built-in list.
+    db.collection("config").doc("users").get({ source: 'server' })
+      .then(applyUsers)
+      .catch(() => {
+        db.collection("config").doc("users").get({ source: 'cache' })
+          .then(applyUsers)
+          .catch(() => { setAllUsers([...AUTHORISED_USERS]); markUsersLoaded(); });
+      });
+
+    // Passwords: server, silent fallback to cache (never blocks startup)
+    db.collection("config").doc("passwords").get().then(snap => {
       if (snap.exists) setPasswords(snap.data() || {});
     }).catch(e => {});
 
-    // Cars: load once from server
-    db.collection("config").doc("cars").get({ source: 'server' }).then(snap => {
+    // Cars: server, silent fallback to cache (never blocks startup)
+    db.collection("config").doc("cars").get().then(snap => {
       if (snap.exists) {
         const d = snap.data();
         if (Array.isArray(d.list) && d.list.length > 0) setCars(d.list);
