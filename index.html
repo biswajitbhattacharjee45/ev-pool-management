@@ -852,7 +852,7 @@ function App() {
         {tab === "fuel"        && (currentUser.isAdmin || currentUser.isAssistant) && <FuelLog {...props} />}
         {tab === "maintenance" && (currentUser.isAdmin || currentUser.isAssistant) && <Maintenance {...props} />}
         {tab === "approvals"   && currentUser.isAdmin && <Approvals {...props} cars={cars} isCarBusy={isCarBusy} />}
-        {tab === "users"       && currentUser.isAdmin && <UserManagement {...props} cars={cars} saveCars={saveCars} />}
+        {tab === "users"       && currentUser.isAdmin && <UserManagement {...props} cars={cars} saveCars={saveCars} trips={trips} maintenance={maintenance} fuelLogs={fuelLogs} saveTrips={saveTrips} saveMaint={saveMaint} saveFuel={saveFuel} />}
       </div>
 
       {/* ── MOBILE BOTTOM NAV ── */}
@@ -3194,45 +3194,89 @@ function Maintenance({ cars, maintenance, saveMaint, darkMode, T, css }) {
 
 
 // ── DRIVER EDIT CARD ─────────────────────────────────────────
-function DriverEditCard({ car, onSave, darkMode }) {
+function VehicleEditCard({ car, onSave, onDelete, darkMode }) {
   const css = makeCss(darkMode);
   const T = makeG(darkMode);
   const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(car.driver);
-  const [phone, setPhone] = useState(car.driverPhone.replace("+91",""));
+  const [name, setName] = useState(car.name);
+  const [plate, setPlate] = useState(car.plate);
+  const [model, setModel] = useState(car.model || "");
+  const [driver, setDriver] = useState(car.driver);
+  const [phone, setPhone] = useState((car.driverPhone || "").replace("+91",""));
+  const [confirmDel, setConfirmDel] = useState(false);
+
+  const reset = () => {
+    setName(car.name); setPlate(car.plate); setModel(car.model || "");
+    setDriver(car.driver); setPhone((car.driverPhone || "").replace("+91",""));
+    setConfirmDel(false);
+  };
 
   const handleSave = () => {
-    if (!name.trim() || !phone.trim()) return;
-    onSave({ ...car, driver: name.trim(), driverPhone: "+91" + phone.trim().slice(-10) });
+    if (!name.trim() || !plate.trim() || !driver.trim() || !phone.trim()) {
+      alert("Vehicle name, registration number, driver name and mobile number are all required.");
+      return;
+    }
+    onSave({
+      ...car,
+      name: name.trim(),
+      plate: plate.trim().toUpperCase(),
+      model: model.trim(),
+      driver: driver.trim(),
+      driverPhone: "+91" + phone.trim().slice(-10),
+    });
     setEditing(false);
   };
 
   return (
     <div style={{ border: `1px solid ${T.border}`, borderRadius: 10, overflow: "hidden", background: T.card }}>
       <div style={{ background: car.color + "15", borderBottom: `3px solid ${car.color}`, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 36, height: 36, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16 }}>{car.driver.charAt(0)}</div>
+        <div style={{ width: 36, height: 36, borderRadius: "50%", background: car.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16 }}>{(car.name || "V").charAt(0)}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{car.name}</div>
           <div style={{ fontSize: 11, color: T.subCard, fontWeight: 600 }}>{car.plate}</div>
         </div>
-        <button onClick={() => { setEditing(e => !e); setName(car.driver); setPhone(car.driverPhone.replace("+91","")); }}
+        <button onClick={() => { setEditing(e => !e); reset(); }}
           style={{ ...css.btnSm(editing ? T.muted : T.info), fontSize: 11 }}>{editing ? "Cancel" : "✏️ Edit"}</button>
       </div>
       <div style={{ padding: "12px 14px" }}>
         {editing ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div>
+              <label style={css.label}>Vehicle Sl. No. / Name *</label>
+              <input style={css.input} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Vehicle 1" />
+            </div>
+            <div>
+              <label style={css.label}>Registration Number *</label>
+              <input style={css.input} value={plate} onChange={e => setPlate(e.target.value)} placeholder="e.g. AS 01 FF 9417" />
+            </div>
+            <div>
+              <label style={css.label}>Model</label>
+              <input style={css.input} value={model} onChange={e => setModel(e.target.value)} placeholder="e.g. Tata Nexon EV Max" />
+            </div>
+            <div>
               <label style={css.label}>Driver Name *</label>
-              <input style={css.input} value={name} onChange={e => setName(e.target.value)} placeholder="Driver name" />
+              <input style={css.input} value={driver} onChange={e => setDriver(e.target.value)} placeholder="Driver name" />
             </div>
             <div>
               <label style={css.label}>Mobile Number *</label>
               <input style={css.input} value={phone} onChange={e => setPhone(e.target.value)} placeholder="10-digit mobile" maxLength={10} />
             </div>
             <button style={css.btn(T.success)} onClick={handleSave}>💾 Save Changes</button>
+            {!confirmDel ? (
+              <button style={{ ...css.btnSm(T.danger), width: "100%", padding: "9px" }} onClick={() => setConfirmDel(true)}>🗑️ Delete Vehicle</button>
+            ) : (
+              <div style={{ border: `1px solid ${T.danger}`, borderRadius: 8, padding: 10, background: T.danger + "10" }}>
+                <div style={{ fontSize: 12, color: T.danger, fontWeight: 700, marginBottom: 8 }}>Delete {car.name} ({car.plate})? This cannot be undone.</div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button style={{ ...css.btnSm(T.danger), flex: 1 }} onClick={() => onDelete(car)}>Yes, delete</button>
+                  <button style={{ ...css.btnSm(T.muted), flex: 1 }} onClick={() => setConfirmDel(false)}>Keep</button>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13 }}>
+            <div>🚗 <b>{car.model || "—"}</b></div>
             <div>🧑‍✈️ <b>{car.driver}</b></div>
             <div>📞 <a href={`tel:${car.driverPhone}`} style={{ color: T.info, textDecoration: "none" }}>{car.driverPhone}</a></div>
           </div>
@@ -3243,7 +3287,7 @@ function DriverEditCard({ car, onSave, darkMode }) {
 }
 
 // ── USER MANAGEMENT ──────────────────────────────────────────
-function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword, darkMode, T, css }) {
+function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, savePassword, trips, maintenance, fuelLogs, saveTrips, saveMaint, saveFuel, darkMode, T, css }) {
   const users = allUsers;
   const saveUsers = saveAllUsers;
   const [search, setSearch] = useState("");
@@ -3404,17 +3448,118 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
       </div>
 
       <div style={css.card}>
-      {/* ── DRIVER MANAGEMENT ── */}
+      {/* ── VEHICLE MANAGEMENT ── */}
       <div style={{ ...css.card, marginBottom: 20 }}>
-        <div style={css.sectionTitle}>🧑‍✈️ Driver Details</div>
-        <div style={{ fontSize: 12, color: T.mutedCard, marginBottom: 14 }}>Update driver name and contact number for any vehicle.</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 6 }}>
+          <div style={css.sectionTitle}>🚗 Vehicle Management ({(cars || []).length})</div>
+          <button style={{ ...css.btn(T.success), padding: "8px 16px", fontSize: 12, width: "auto" }} onClick={() => {
+            const palette = ["#2563eb","#16a34a","#0891b2","#9333ea","#dc2626","#ea580c","#0d9488","#7c3aed","#c026d3","#475569"];
+            const existing = cars || [];
+            const usedNums = existing.map(c => parseInt(String(c.id).replace(/\D/g,""),10)).filter(n => !isNaN(n));
+            const nextNum = (usedNums.length ? Math.max(...usedNums) : 0) + 1;
+            const newCar = {
+              id: "CAR" + nextNum + "_" + Date.now(),
+              name: "Vehicle " + nextNum,
+              plate: "NEW " + nextNum,
+              model: "Tata Nexon EV Max",
+              color: palette[existing.length % palette.length],
+              batteryCapacity: 40.5,
+              driver: "New Driver",
+              driverPhone: "+910000000000",
+            };
+            saveCars([...existing, newCar]);
+            showMsg("✅ Vehicle added — tap ✏️ Edit on the new card to fill in its details.");
+          }}>➕ Add Vehicle</button>
+        </div>
+        <div style={{ fontSize: 12, color: T.mutedCard, marginBottom: 14 }}>Edit any vehicle's Sl. No., registration number, model, driver and mobile — or add / remove vehicles. Changes sync to all devices instantly.</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
           {(cars || []).map(car => (
-            <DriverEditCard key={car.id} car={car} darkMode={darkMode} onSave={updated => {
-              saveCars((cars || []).map(c => c.id === updated.id ? updated : c));
-              showMsg("✅ Driver updated for " + updated.name + "!");
-            }} />
+            <VehicleEditCard key={car.id} car={car} darkMode={darkMode}
+              onSave={updated => {
+                saveCars((cars || []).map(c => c.id === updated.id ? updated : c));
+                showMsg("✅ Vehicle updated: " + updated.name + "!");
+              }}
+              onDelete={target => {
+                if ((cars || []).length <= 1) { showMsg("⚠️ Cannot delete the last vehicle."); return; }
+                saveCars((cars || []).filter(c => c.id !== target.id));
+                showMsg("🗑️ Vehicle removed: " + target.name);
+              }} />
           ))}
+        </div>
+      </div>
+
+      {/* ── BACKUP & RESTORE ── */}
+      <div style={{ ...css.card, marginBottom: 20 }}>
+        <div style={css.sectionTitle}>💾 Backup &amp; Restore</div>
+        <div style={{ fontSize: 12, color: T.mutedCard, marginBottom: 14 }}>Download a complete copy of all data (vehicles, users, trips, fuel, maintenance) as one file, or restore from a previous backup. Keep a weekly backup for safety.</div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button style={{ ...css.btn(T.info), width: "auto", padding: "10px 18px" }} onClick={() => {
+            try {
+              const payload = {
+                _app: "EV Pool Management",
+                _type: "ev-pool-backup",
+                _version: 1,
+                exportedAt: new Date().toISOString(),
+                exportedBy: (currentUser && (currentUser.name || currentUser.pfId)) || "admin",
+                data: {
+                  cars: cars || [],
+                  users: allUsers || [],
+                  trips: trips || [],
+                  fuel: fuelLogs || [],
+                  maintenance: maintenance || [],
+                },
+              };
+              const counts = "Cars " + payload.data.cars.length + " · Users " + payload.data.users.length + " · Trips " + payload.data.trips.length + " · Fuel " + payload.data.fuel.length + " · Maint " + payload.data.maintenance.length;
+              const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              const d = new Date();
+              const pad = n => String(n).padStart(2, "0");
+              a.href = url;
+              a.download = "EVpool_backup_" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + ".json";
+              document.body.appendChild(a); a.click(); document.body.removeChild(a);
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+              showMsg("✅ Backup downloaded (" + counts + ")");
+            } catch (e) { showMsg("⚠️ Backup failed: " + e.message); }
+          }}>📥 Export Backup</button>
+
+          <label style={{ ...css.btn(T.warning || T.muted), width: "auto", padding: "10px 18px", display: "inline-flex", alignItems: "center", cursor: "pointer", margin: 0 }}>
+            📤 Restore from Backup
+            <input type="file" accept="application/json,.json" style={{ display: "none" }} onChange={(ev) => {
+              const file = ev.target.files && ev.target.files[0];
+              ev.target.value = "";
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => {
+                let parsed;
+                try { parsed = JSON.parse(reader.result); }
+                catch (e) { showMsg("⚠️ Not a valid backup file."); return; }
+                if (!parsed || parsed._type !== "ev-pool-backup" || !parsed.data) {
+                  showMsg("⚠️ This file is not an EV Pool backup.");
+                  return;
+                }
+                const d = parsed.data;
+                const summary = "Cars " + (d.cars || []).length + " · Users " + (d.users || []).length + " · Trips " + (d.trips || []).length + " · Fuel " + (d.fuel || []).length + " · Maint " + (d.maintenance || []).length;
+                const when = parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString() : "unknown date";
+                if (!window.confirm("Restore this backup?\n\nFrom: " + when + "\n" + summary + "\n\n⚠️ This REPLACES all current live data on every device. This cannot be undone. Continue?")) return;
+                (async () => {
+                  try {
+                    showMsg("⏳ Restoring… do not close this page.");
+                    if (Array.isArray(d.cars))        await saveCars(d.cars);
+                    if (Array.isArray(d.users))       await saveAllUsers(d.users);
+                    if (Array.isArray(d.trips))       await saveTrips(d.trips);
+                    if (Array.isArray(d.fuel))        await saveFuel(d.fuel);
+                    if (Array.isArray(d.maintenance)) await saveMaint(d.maintenance);
+                    showMsg("✅ Restore complete — " + summary);
+                  } catch (e) { showMsg("⚠️ Restore failed: " + e.message); }
+                })();
+              };
+              reader.readAsText(file);
+            }} />
+          </label>
+        </div>
+        <div style={{ fontSize: 11, color: T.mutedCard, marginTop: 10 }}>
+          💡 Export weekly and keep the dated file safe. Restore replaces all live data, so only use it to recover from a problem.
         </div>
       </div>
 
