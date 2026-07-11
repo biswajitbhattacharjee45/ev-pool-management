@@ -11,8 +11,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Pool EV" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%231e293b'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23facc15'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%231e293b'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23facc15'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+  <link rel="manifest" id="pwaManifest">
   <title>⚡ Pool EV Management</title>
-  <script>console.log("EV Pool build: 2026-06-17-FIX6 (3rd admin added)");</script>
+  <script>console.log("EV Pool build: 2026-07-11-INSTALL (one-tap install button)");</script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3698,6 +3701,83 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
       el.style.opacity = "0";
       setTimeout(() => { el.style.display = "none"; }, 580);
     };
+  </script>
+  <script>
+    // ── PWA SETUP + ONE-TAP INSTALL (self-contained; does not touch app code) ──
+    (function(){
+      let deferredInstall=null;
+      const isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+      const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+
+      function makeIconPNG(size){
+        return new Promise(res=>{
+          const c=document.createElement('canvas');c.width=size;c.height=size;
+          const x=c.getContext('2d');
+          x.fillStyle='#1e293b';
+          const r=size*0.18;
+          x.beginPath();x.moveTo(r,0);x.lineTo(size-r,0);x.quadraticCurveTo(size,0,size,r);x.lineTo(size,size-r);x.quadraticCurveTo(size,size,size-r,size);x.lineTo(r,size);x.quadraticCurveTo(0,size,0,size-r);x.lineTo(0,r);x.quadraticCurveTo(0,0,r,0);x.fill();
+          x.font=(size*0.5)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';
+          x.fillText('\u26A1',size/2,size*0.45);
+          x.fillStyle='#facc15';x.font='bold '+(size*0.14)+'px sans-serif';
+          x.fillText('POOL EV',size/2,size*0.78);
+          c.toBlob(b=>res(URL.createObjectURL(b)),'image/png');
+        });
+      }
+      (async function setupManifest(){
+        try{
+          const [i192,i512]=await Promise.all([makeIconPNG(192),makeIconPNG(512)]);
+          const manifest={name:"Pool EV Management",short_name:"Pool EV",start_url:location.href.split('#')[0],scope:location.pathname,display:"standalone",background_color:"#1e293b",theme_color:"#1e293b",icons:[
+            {src:i192,sizes:"192x192",type:"image/png"},
+            {src:i512,sizes:"512x512",type:"image/png",purpose:"any maskable"}
+          ]};
+          const mb=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+          const ml=document.getElementById('pwaManifest');if(ml)ml.href=URL.createObjectURL(mb);
+        }catch(e){}
+      })();
+
+      // Floating install banner (fixed at bottom, above everything)
+      function buildBanner(){
+        if(document.getElementById('evInstallBanner'))return;
+        const st=document.createElement('style');
+        st.textContent='#evInstallBanner{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:99999;background:linear-gradient(135deg,#1e293b,#0f172a);border:1.5px solid #facc15;border-radius:14px;padding:13px 16px;display:none;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;box-shadow:0 10px 34px rgba(0,0,0,.35);font-family:"DM Sans",sans-serif;}#evInstallBanner.show{display:flex;}#evInstallBanner .t{font-size:13px;color:#fff;flex:1;min-width:180px;}#evInstallBanner .t b{color:#facc15;}#evInstallBanner button{font-family:inherit;font-weight:700;border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;}#evInstallBanner .go{background:#facc15;border:none;color:#1e293b;}#evInstallBanner .no{background:transparent;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.85);}#evIosOv{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:none;}#evIosOv.op{display:block;}#evIosOv .sh{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:22px 22px calc(26px + env(safe-area-inset-bottom));font-family:"DM Sans",sans-serif;}#evIosOv h3{margin:0 0 12px;font-size:19px;}#evIosOv p{font-size:14px;line-height:2;margin:0;}#evIosOv .ok{margin-top:16px;width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;}';
+        document.head.appendChild(st);
+        const b=document.createElement('div');b.id='evInstallBanner';
+        b.innerHTML='<div class="t">\ud83d\udcf2 <b>Install this app</b> \u2014 one tap from your home screen, no browser needed.</div><div style="display:flex;gap:8px"><button class="go">Install App</button><button class="no">Later</button></div>';
+        document.body.appendChild(b);
+        b.querySelector('.go').onclick=doInstall;
+        b.querySelector('.no').onclick=function(){b.classList.remove('show');localStorage.setItem('ev_installDismiss','1');};
+        const ov=document.createElement('div');ov.id='evIosOv';
+        ov.innerHTML='<div class="sh"><h3>\ud83d\udcf2 Install on iPhone</h3><p>1. Tap the <b>Share</b> button <span style="border:1px solid #ccc;border-radius:6px;padding:1px 7px">\u2b06\ufe0f</span> at the bottom of Safari<br>2. Scroll down, tap <b>"Add to Home Screen"</b><br>3. Tap <b>Add</b> \u2014 done!</p><button class="ok">Got it</button></div>';
+        document.body.appendChild(ov);
+        ov.onclick=function(){ov.classList.remove('op');};
+        ov.querySelector('.sh').onclick=function(e){e.stopPropagation();};
+        ov.querySelector('.ok').onclick=function(){ov.classList.remove('op');};
+      }
+      function showBanner(){
+        if(isStandalone||localStorage.getItem('ev_installDismiss')==='1')return;
+        buildBanner();
+        document.getElementById('evInstallBanner').classList.add('show');
+      }
+      async function doInstall(){
+        if(deferredInstall){
+          deferredInstall.prompt();
+          const r=await deferredInstall.userChoice;
+          if(r.outcome==='accepted')document.getElementById('evInstallBanner').classList.remove('show');
+          deferredInstall=null;
+        }else if(isIOS){
+          buildBanner();
+          document.getElementById('evIosOv').classList.add('op');
+        }else{
+          alert('Open your browser menu (\u22ee) and tap "Add to Home screen"');
+        }
+      }
+      window.addEventListener('beforeinstallprompt',function(e){
+        e.preventDefault();
+        deferredInstall=e;
+        showBanner();
+      });
+      if(isIOS&&!isStandalone)setTimeout(showBanner,1500);
+    })();
   </script>
 </body>
 </html>
