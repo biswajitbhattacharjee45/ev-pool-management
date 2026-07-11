@@ -15,7 +15,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%231e293b'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23facc15'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
   <link rel="manifest" id="pwaManifest">
   <title>⚡ Pool EV Management</title>
-  <script>console.log("EV Pool build: 2026-07-11-INSTALL2 (banner always shows on mobile)");</script>
+  <script>console.log("EV Pool build: 2026-07-11-INSTALL3 (floating install button)");</script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3703,7 +3703,7 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
     };
   </script>
   <script>
-    // ── PWA SETUP + ONE-TAP INSTALL (self-contained; does not touch app code) ──
+    // ── PWA SETUP + INSTALL BUTTON (self-contained; does not touch app code) ──
     (function(){
       let deferredInstall=null;
       const isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
@@ -3735,56 +3735,87 @@ function UserManagement({ currentUser, cars, saveCars, allUsers, saveAllUsers, s
         }catch(e){}
       })();
 
-      // Floating install banner (fixed at bottom, above everything)
-      function buildBanner(){
-        if(document.getElementById('evInstallBanner'))return;
+      window.addEventListener('beforeinstallprompt',function(e){
+        e.preventDefault();
+        deferredInstall=e;
+      });
+
+      function buildUI(){
+        if(document.getElementById('evInstallBtn'))return;
         const st=document.createElement('style');
-        st.textContent='#evInstallBanner{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:99999;background:linear-gradient(135deg,#1e293b,#0f172a);border:1.5px solid #facc15;border-radius:14px;padding:13px 16px;display:none;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;box-shadow:0 10px 34px rgba(0,0,0,.35);font-family:"DM Sans",sans-serif;}#evInstallBanner.show{display:flex;}#evInstallBanner .t{font-size:13px;color:#fff;flex:1;min-width:180px;}#evInstallBanner .t b{color:#facc15;}#evInstallBanner button{font-family:inherit;font-weight:700;border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;}#evInstallBanner .go{background:#facc15;border:none;color:#1e293b;}#evInstallBanner .no{background:transparent;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.85);}#evIosOv{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:none;}#evIosOv.op{display:block;}#evIosOv .sh{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:22px 22px calc(26px + env(safe-area-inset-bottom));font-family:"DM Sans",sans-serif;}#evIosOv h3{margin:0 0 12px;font-size:19px;}#evIosOv p{font-size:14px;line-height:2;margin:0;}#evIosOv .ok{margin-top:16px;width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;}';
+        st.textContent=[
+        '#evInstallBtn{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:99999;',
+        'display:flex;align-items:center;gap:8px;padding:12px 18px;border:none;border-radius:999px;cursor:pointer;',
+        'background:linear-gradient(135deg,#facc15,#eab308);color:#1e293b;',
+        'font-family:"DM Sans",sans-serif;font-weight:800;font-size:14px;letter-spacing:.2px;',
+        'box-shadow:0 6px 22px rgba(234,179,8,.45),0 2px 8px rgba(0,0,0,.25);',
+        'animation:evPulse 2.4s ease-in-out infinite;}',
+        '#evInstallBtn:active{transform:scale(.96);}',
+        '@keyframes evPulse{0%,100%{box-shadow:0 6px 22px rgba(234,179,8,.45),0 2px 8px rgba(0,0,0,.25);}50%{box-shadow:0 6px 30px rgba(234,179,8,.75),0 2px 8px rgba(0,0,0,.25);}}',
+        '#evIosOv{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(3px);z-index:99999;display:none;}',
+        '#evIosOv.op{display:block;}',
+        '#evIosOv .sh{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:20px 20px 0 0;padding:10px 22px calc(26px + env(safe-area-inset-bottom));font-family:"DM Sans",sans-serif;box-shadow:0 -10px 40px rgba(0,0,0,.3);}',
+        '#evIosOv .hdl{width:38px;height:4px;background:#e2e8f0;border-radius:3px;margin:8px auto 14px;}',
+        '#evIosOv h3{margin:0 0 4px;font-size:19px;color:#1e293b;}',
+        '#evIosOv .sub{font-size:12px;color:#64748b;margin:0 0 14px;}',
+        '#evIosOv .step{display:flex;align-items:flex-start;gap:12px;padding:10px 0;font-size:14px;color:#334155;line-height:1.5;}',
+        '#evIosOv .n{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#1e293b;color:#facc15;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}',
+        '#evIosOv .ok{margin-top:14px;width:100%;padding:13px;border-radius:12px;border:none;background:#1e293b;color:#facc15;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;}'
+        ].join('');
         document.head.appendChild(st);
-        const b=document.createElement('div');b.id='evInstallBanner';
-        b.innerHTML='<div class="t">\ud83d\udcf2 <b>Install this app</b> \u2014 one tap from your home screen, no browser needed.</div><div style="display:flex;gap:8px"><button class="go">Install App</button><button class="no">Later</button></div>';
-        document.body.appendChild(b);
-        b.querySelector('.go').onclick=doInstall;
-        b.querySelector('.no').onclick=function(){b.classList.remove('show');localStorage.setItem('ev_installDismiss','1');};
-        const ov=document.createElement('div');ov.id='evIosOv';
-        ov.innerHTML='<div class="sh"><h3>\ud83d\udcf2 Install on iPhone</h3><p>1. Tap the <b>Share</b> button <span style="border:1px solid #ccc;border-radius:6px;padding:1px 7px">\u2b06\ufe0f</span> at the bottom of Safari<br>2. Scroll down, tap <b>"Add to Home Screen"</b><br>3. Tap <b>Add</b> \u2014 done!</p><button class="ok">Got it</button></div>';
+
+        const btn=document.createElement('button');
+        btn.id='evInstallBtn';
+        btn.innerHTML='<span style="font-size:17px">\ud83d\udcf2</span> Install App';
+        btn.onclick=doInstall;
+        document.body.appendChild(btn);
+
+        const ov=document.createElement('div');
+        ov.id='evIosOv';
+        ov.innerHTML='<div class="sh"><div class="hdl"></div><div id="evShContent"></div></div>';
         document.body.appendChild(ov);
         ov.onclick=function(){ov.classList.remove('op');};
         ov.querySelector('.sh').onclick=function(e){e.stopPropagation();};
-        ov.querySelector('.ok').onclick=function(){ov.classList.remove('op');};
       }
-      function showBanner(){
-        if(isStandalone||localStorage.getItem('ev_installDismiss')==='1')return;
-        buildBanner();
-        document.getElementById('evInstallBanner').classList.add('show');
+
+      function showSheet(title,steps){
+        buildUI();
+        const c=document.getElementById('evShContent');
+        c.innerHTML='<h3>'+title+'</h3><p class="sub">Takes about 10 seconds \u2014 after this, the app opens with one tap from your home screen.</p>'
+          +steps.map(function(s,i){return '<div class="step"><div class="n">'+(i+1)+'</div><div>'+s+'</div></div>';}).join('')
+          +'<button class="ok" onclick="document.getElementById(\'evIosOv\').classList.remove(\'op\')">Got it \u2713</button>';
+        document.getElementById('evIosOv').classList.add('op');
       }
+
       async function doInstall(){
         if(deferredInstall){
           deferredInstall.prompt();
           const r=await deferredInstall.userChoice;
-          if(r.outcome==='accepted')document.getElementById('evInstallBanner').classList.remove('show');
+          if(r.outcome==='accepted'){
+            const b=document.getElementById('evInstallBtn');if(b)b.style.display='none';
+          }
           deferredInstall=null;
         }else if(isIOS){
-          buildBanner();
-          document.getElementById('evIosOv').classList.add('op');
+          showSheet('\ud83d\udcf2 Install on iPhone',[
+            'Tap the <b>Share</b> button <span style="border:1px solid #cbd5e1;border-radius:6px;padding:1px 8px">\u2b06\ufe0f</span> at the bottom of Safari',
+            'Scroll down and tap <b>"Add to Home Screen"</b>',
+            'Tap <b>Add</b> \u2014 the \u26a1 Pool EV icon appears on your home screen'
+          ]);
         }else{
-          buildBanner();
-          const ov=document.getElementById('evIosOv');
-          ov.querySelector('.sh').innerHTML='<h3>\ud83d\udcf2 Install on Android</h3><p>1. Tap the <b>\u22ee</b> (three dots) menu at the top right of Chrome<br>2. Tap <b>"Add to Home screen"</b> or <b>"Install app"</b><br>3. Tap <b>Install / Add</b> \u2014 done! The \u26a1 icon appears on your home screen.</p><button class="ok">Got it</button>';
-          ov.querySelector('.sh').onclick=function(e){e.stopPropagation();};
-          ov.querySelector('.ok').onclick=function(){ov.classList.remove('op');};
-          ov.classList.add('op');
+          showSheet('\ud83d\udcf2 Install on Android',[
+            'Tap the <b>\u22ee</b> (three dots) menu at the top-right of Chrome',
+            'Tap <b>"Add to Home screen"</b> or <b>"Install app"</b>',
+            'Tap <b>Install</b> \u2014 the \u26a1 Pool EV icon appears on your home screen'
+          ]);
         }
       }
-      window.addEventListener('beforeinstallprompt',function(e){
-        e.preventDefault();
-        deferredInstall=e;
-        showBanner();
-      });
-      // Always show the banner on any phone/tablet after a short delay,
-      // even if Chrome hasn't fired the install-ready event yet.
+
+      // Show the button on all mobile devices when not already installed
       const isMobile=/Android|iPad|iPhone|iPod|Mobile/i.test(navigator.userAgent);
-      if(isMobile&&!isStandalone)setTimeout(showBanner,1200);
+      if(isMobile&&!isStandalone){
+        if(document.body){buildUI();}
+        else document.addEventListener('DOMContentLoaded',buildUI);
+      }
     })();
   </script>
 </body>
